@@ -1,0 +1,325 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{CDAC708C-0B3D-486A-8279-94F1305CED1E}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>TRAODLE</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <CodeAnalysisRuleSet>NativeRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\AoD\C++\VISUAL C++\TRAODLE\TRAODLE;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\AoD\C++\VISUAL C++\TRAODLE\TRAODLE;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnablePREfast>false</EnablePREfast>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>D:\AoD\C++\VISUAL C++\TRAODLE\TRAODLE\libxl\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Classes.h" />
+    <ClInclude Include="concol.h" />
+    <ClInclude Include="FBX\FBX_Classes.h" />
+    <ClInclude Include="FBX\FBX_Functions.h" />
+    <ClInclude Include="hash_Functions.h" />
+    <ClInclude Include="MATH\math.h" />
+    <ClInclude Include="MA\MA_Classes.h" />
+    <ClInclude Include="MA\MA_Functions.h" />
+    <ClInclude Include="Misc_Functions.h" />
+    <ClInclude Include="OutMsgInterface.h" />
+    <ClInclude Include="picosha2.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TRAE\CLUSTER\CLUSTER_Functions.h" />
+    <ClInclude Include="TRAE\CLUSTER\CLUSTER_Struct.h" />
+    <ClInclude Include="TRAE\LVC\LVC_Functions.h" />
+    <ClInclude Include="TRAE\LVC\LVC_Struct.h" />
+    <ClInclude Include="TRAE\MDC\MDC_Functions.h" />
+    <ClInclude Include="TRAE\MDC\MDC_Struct.h" />
+    <ClInclude Include="TRAE\TEXSET\TEXSET_Functions.h" />
+    <ClInclude Include="TRAE\TEXSET\TEXSET_Struct.h" />
+    <ClInclude Include="TRAE\TRAE_Functions.h" />
+    <ClInclude Include="TRAE\GEOM_Struct.h" />
+    <ClInclude Include="TRAOD\CAM\CAM_Functions.h" />
+    <ClInclude Include="TRAOD\CAM\CAM_Struct.h" />
+    <ClInclude Include="TRAOD\CHR\CHR_Struct.h" />
+    <ClInclude Include="TRAOD\CLN\CLN_Functions.h" />
+    <ClInclude Include="TRAOD\CLN\CLN_Struct.h" />
+    <ClInclude Include="TRAOD\CLZ\CLZ_Functions.h" />
+    <ClInclude Include="TRAOD\CLZ\CLZ_Struct.h" />
+    <ClInclude Include="TRAOD\GMX\GMX_Functions.h" />
+    <ClInclude Include="TRAOD\GMX\GMX_Struct.h" />
+    <ClInclude Include="TRAOD\RMX\RMX_Functions.h" />
+    <ClInclude Include="TRAOD\RMX\RMX_Struct.h" />
+    <ClInclude Include="TRAOD\SCX\SCX_Struct.h" />
+    <ClInclude Include="TRAOD\ZONE\ZONE_Functions.h" />
+    <ClInclude Include="TRAOD\ZONE\ZONE_Struct.h" />
+    <ClInclude Include="ZLIB\zlib.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Calculate_Faces.cpp" />
+    <ClCompile Include="concol.cpp" />
+    <ClCompile Include="DrawTriangle.cpp" />
+    <ClCompile Include="Fatal_Error_Terminate.cpp" />
+    <ClCompile Include="FBX\FBX_Export.cpp" />
+    <ClCompile Include="FBX\FBX_Write_Animation.cpp" />
+    <ClCompile Include="FBX\FBX_Write_AnimCurve_Subroutine.cpp" />
+    <ClCompile Include="FBX\FBX_Write_Camera.cpp" />
+    <ClCompile Include="FBX\FBX_Write_Geometry.cpp" />
+    <ClCompile Include="FBX\FBX_Write_Group.cpp" />
+    <ClCompile Include="FBX\FBX_Write_Header.cpp" />
+    <ClCompile Include="FBX\FBX_Write_Joint.cpp" />
+    <ClCompile Include="FBX\FBX_Write_Locator.cpp" />
+    <ClCompile Include="FBX\FBX_Write_Object_definitions.cpp" />
+    <ClCompile Include="FBX\FBX_Write_PointLight.cpp" />
+    <ClCompile Include="FBX\FBX_Write_Texture.cpp" />
+    <ClCompile Include="AOD_IO_Init.cpp" />
+    <ClCompile Include="GetRoomInfo.cpp" />
+    <ClCompile Include="mathAxisAngleToQuaternion.cpp" />
+    <ClCompile Include="MATH\math.cpp" />
+    <ClCompile Include="MATH\mathLoadUnitMatrix.cpp" />
+    <ClCompile Include="MATH\mathMatrixGetAngles.cpp" />
+    <ClCompile Include="MATH\mathMatrixLookAt.cpp" />
+    <ClCompile Include="MATH\mathMatrixToEuler.cpp" />
+    <ClCompile Include="MATH\mathMulMatrices.cpp" />
+    <ClCompile Include="MATH\mathMulQuaternions.cpp" />
+    <ClCompile Include="MATH\mathQuatNormalise.cpp" />
+    <ClCompile Include="MATH\mathQuatToMatrix.cpp" />
+    <ClCompile Include="MATH\mathRadToDeg.cpp" />
+    <ClCompile Include="MATH\mathRot.cpp" />
+    <ClCompile Include="MATH\mathRotAxis.cpp" />
+    <ClCompile Include="MATH\mathRotTrans.cpp" />
+    <ClCompile Include="MATH\mathRotTransPers2.cpp" />
+    <ClCompile Include="MATH\mathRotX.cpp" />
+    <ClCompile Include="MATH\mathRotY.cpp" />
+    <ClCompile Include="MATH\mathRotZ.cpp" />
+    <ClCompile Include="MATH\mathTranslatef.cpp" />
+    <ClCompile Include="MATH\mathTransposeAMatrix.cpp" />
+    <ClCompile Include="MATH\mathWrapAngle180.cpp" />
+    <ClCompile Include="MA\MA_Export.cpp" />
+    <ClCompile Include="MA\MA_Write_Animation.cpp" />
+    <ClCompile Include="MA\MA_Write_Animation_Subroutine.cpp" />
+    <ClCompile Include="MA\MA_Write_BossWave.cpp" />
+    <ClCompile Include="MA\MA_Write_Camera.cpp" />
+    <ClCompile Include="MA\MA_Write_DefaultNodes.cpp" />
+    <ClCompile Include="MA\MA_Write_DisplayLayer.cpp" />
+    <ClCompile Include="MA\MA_Write_Header.cpp" />
+    <ClCompile Include="MA\MA_Write_Joint.cpp" />
+    <ClCompile Include="MA\MA_Write_Locator.cpp" />
+    <ClCompile Include="MA\MA_Write_Material.cpp" />
+    <ClCompile Include="MA\MA_Write_Mesh.cpp" />
+    <ClCompile Include="MA\MA_Write_NurbsSurface.cpp" />
+    <ClCompile Include="MA\MA_Write_PointLight.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_PolyPlane.cpp" />
+    <ClCompile Include="MA\MA_Write_Texture.cpp" />
+    <ClCompile Include="MA\MA_Write_Transform.cpp" />
+    <ClCompile Include="OutMsgInterface.cpp" />
+    <ClCompile Include="Reverb_presets.cpp" />
+    <ClCompile Include="Texture_DXT1toRGB.cpp" />
+    <ClCompile Include="Texture_DXT3toRGBA.cpp" />
+    <ClCompile Include="Texture_DXT3toRGB_A.cpp" />
+    <ClCompile Include="Texture_RAWtoBMP.cpp" />
+    <ClCompile Include="Texture_RAWtoDDS.cpp" />
+    <ClCompile Include="DrawBox.cpp" />
+    <ClCompile Include="DrawRectangle.cpp" />
+    <ClCompile Include="FindBestThreadNumber.cpp" />
+    <ClCompile Include="GetHashValue.cpp" />
+    <ClCompile Include="hashID.cpp" />
+    <ClCompile Include="nodeID.cpp" />
+    <ClCompile Include="Texture_RAWtoTGA.cpp" />
+    <ClCompile Include="Texture_RGBAtoRGB_A.cpp" />
+    <ClCompile Include="TRAE\AE_IO_Init.cpp" />
+    <ClCompile Include="TRAE\CLUSTER\AE_GetFilenameFromHash.cpp" />
+    <ClCompile Include="TRAE\CLUSTER\Export_CLUSTER.cpp" />
+    <ClCompile Include="TRAE\Export_TRAE.cpp" />
+    <ClCompile Include="TRAE\LVC\Export_LVC.cpp" />
+    <ClCompile Include="TRAE\LVC\LVC_Read_Geometry.cpp" />
+    <ClCompile Include="TRAE\MDC\Export_MDC.cpp" />
+    <ClCompile Include="TRAE\MDC\MDC_Read_Geometry.cpp" />
+    <ClCompile Include="TRAE\TEXSET\Export_TEXSET.cpp" />
+    <ClCompile Include="TRAE\TRAE_GEOMRAW_Read.cpp" />
+    <ClCompile Include="TRAODLE.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TRAOD\CAM\CAM_Read.cpp" />
+    <ClCompile Include="TRAOD\CAM\Export_CAM.cpp" />
+    <ClCompile Include="TRAOD\CLN\CLN_Get_Triangle.cpp" />
+    <ClCompile Include="TRAOD\CLN\CLN_Read.cpp" />
+    <ClCompile Include="TRAOD\CLN\Export_CLN.cpp" />
+    <ClCompile Include="TRAOD\CLZ\Decompress_CLZ.cpp" />
+    <ClCompile Include="TRAOD\GMX\AoD_GetFilenameFromHash.cpp" />
+    <ClCompile Include="TRAOD\GMX\Export_GMX.cpp" />
+    <ClCompile Include="TRAOD\RMX\Export_RMX.cpp" />
+    <ClCompile Include="TRAOD\RMX\Isolate_duplicated_lights.cpp" />
+    <ClCompile Include="TRAOD\RMX\Isolate_duplicated_water.cpp" />
+    <ClCompile Include="TRAOD\RMX\RMX_Audio_Locator.cpp" />
+    <ClCompile Include="TRAOD\RMX\RMX_Light.cpp" />
+    <ClCompile Include="TRAOD\RMX\RMX_Portal.cpp" />
+    <ClCompile Include="TRAOD\RMX\RMX_PS2_Room_Obj.cpp" />
+    <ClCompile Include="TRAOD\RMX\RMX_Read.cpp" />
+    <ClCompile Include="TRAOD\RMX\RMX_Water.cpp" />
+    <ClCompile Include="TRAOD\ZONE\CheckDoubleSided.cpp" />
+    <ClCompile Include="TRAOD\ZONE\CheckShadowMap.cpp" />
+    <ClCompile Include="TRAOD\ZONE\Export_ZONE.cpp" />
+    <ClCompile Include="TRAOD\ZONE\ZONE_Read_Fakes.cpp" />
+    <ClCompile Include="TRAOD\ZONE\ZONE_Read_Rooms.cpp" />
+    <ClCompile Include="TRAOD\ZONE\ZONE_Read_Rooms_MT.cpp" />
+    <ClCompile Include="TRAOD\ZONE\ZONE_Read_Materials.cpp" />
+    <ClCompile Include="TRAOD\ZONE\ZONE_Read_Textures.cpp" />
+    <ClCompile Include="ZLIB\adler32.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ZLIB\crc32.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ZLIB\inffast.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ZLIB\inflate.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ZLIB\inftrees.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ZLIB\zutil.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

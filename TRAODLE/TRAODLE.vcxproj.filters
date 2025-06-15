@@ -1,0 +1,537 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="File di origine">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="File di intestazione">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="File di risorse">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="File di origine\FBX Exporter">
+      <UniqueIdentifier>{8fefff09-5168-4618-94de-f2b59bc24eb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di origine\MA Exporter">
+      <UniqueIdentifier>{0c7a66a7-5ed5-4415-879e-416d780487e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di origine\math">
+      <UniqueIdentifier>{8da8a74d-d871-4fc6-b810-35c34d8e95e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di intestazione\Structs">
+      <UniqueIdentifier>{643521a1-2cf4-459f-a0f6-3aef817f6a30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di intestazione\Functions">
+      <UniqueIdentifier>{e54e7f5e-2e40-401c-a837-f9a015ec2cfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di origine\TRAE">
+      <UniqueIdentifier>{7a2dc731-2089-46b1-ba11-bcba73821a9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di origine\TRAOD">
+      <UniqueIdentifier>{52247e77-bf0a-46e2-acb2-9457f03dde66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di origine\TRAOD\RMX">
+      <UniqueIdentifier>{42fd1948-19b1-4b92-acd2-fc88c5139ec0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di origine\TRAOD\ZONE">
+      <UniqueIdentifier>{9abe02c4-17f6-4ab9-b002-1e4687d4e33d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di origine\TRAOD\GMX">
+      <UniqueIdentifier>{4197205c-b815-4657-86a5-3e28402a8b2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di origine\TRAOD\CLN">
+      <UniqueIdentifier>{662c1581-fea7-4801-8aa1-f0fc007338e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di origine\TRAOD\CAM">
+      <UniqueIdentifier>{c110a123-f03f-406c-89ac-495db105f982}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di intestazione\Functions\TRAOD">
+      <UniqueIdentifier>{b089c533-8923-4835-89a9-2b711b1dd04d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di intestazione\Functions\TRAE">
+      <UniqueIdentifier>{669bfc82-cad7-4160-b6c4-5db4ec473375}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di intestazione\Structs\TRAOD">
+      <UniqueIdentifier>{5c9f313d-9e90-4788-8a9d-989cfd39d5cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di intestazione\Structs\TRAE">
+      <UniqueIdentifier>{72fc4eac-986c-4c7f-92dc-b4316aa2e0c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di origine\TRAE\CLUSTER">
+      <UniqueIdentifier>{8c45c264-22e2-4a69-ab3b-f83d661fb5ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di origine\TRAE\TEXSET">
+      <UniqueIdentifier>{a394984b-4aac-4db1-9fbb-d83e3f02e6f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di origine\TRAE\LVC">
+      <UniqueIdentifier>{803e556d-fd53-4339-b42d-f8cff0c98a53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di origine\TRAE\MDC">
+      <UniqueIdentifier>{cde96709-6cd5-4374-aa19-f5005cfc2eef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di origine\TRAOD\CLZ">
+      <UniqueIdentifier>{fccdb3e0-ab0d-40b5-83eb-dc9b02d15c7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di origine\ZLIB">
+      <UniqueIdentifier>{aa363081-457f-4fdb-a223-020f9aadf70c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Classes.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="FBX\FBX_Classes.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="MA\MA_Classes.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="FBX\FBX_Functions.h">
+      <Filter>File di intestazione\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="MA\MA_Functions.h">
+      <Filter>File di intestazione\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAE\TRAE_Functions.h">
+      <Filter>File di intestazione\Functions\TRAE</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\GMX\GMX_Functions.h">
+      <Filter>File di intestazione\Functions\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\CAM\CAM_Functions.h">
+      <Filter>File di intestazione\Functions\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\CLN\CLN_Functions.h">
+      <Filter>File di intestazione\Functions\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\RMX\RMX_Functions.h">
+      <Filter>File di intestazione\Functions\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\ZONE\ZONE_Functions.h">
+      <Filter>File di intestazione\Functions\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\ZONE\ZONE_Struct.h">
+      <Filter>File di intestazione\Structs\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\SCX\SCX_Struct.h">
+      <Filter>File di intestazione\Structs\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\RMX\RMX_Struct.h">
+      <Filter>File di intestazione\Structs\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\GMX\GMX_Struct.h">
+      <Filter>File di intestazione\Structs\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\CLN\CLN_Struct.h">
+      <Filter>File di intestazione\Structs\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\CHR\CHR_Struct.h">
+      <Filter>File di intestazione\Structs\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\CAM\CAM_Struct.h">
+      <Filter>File di intestazione\Structs\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAE\GEOM_Struct.h">
+      <Filter>File di intestazione\Structs\TRAE</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAE\CLUSTER\CLUSTER_Functions.h">
+      <Filter>File di intestazione\Functions\TRAE</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAE\CLUSTER\CLUSTER_Struct.h">
+      <Filter>File di intestazione\Structs\TRAE</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAE\TEXSET\TEXSET_Functions.h">
+      <Filter>File di intestazione\Functions\TRAE</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAE\TEXSET\TEXSET_Struct.h">
+      <Filter>File di intestazione\Structs\TRAE</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAE\LVC\LVC_Struct.h">
+      <Filter>File di intestazione\Structs\TRAE</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAE\LVC\LVC_Functions.h">
+      <Filter>File di intestazione\Functions\TRAE</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAE\MDC\MDC_Struct.h">
+      <Filter>File di intestazione\Structs\TRAE</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAE\MDC\MDC_Functions.h">
+      <Filter>File di intestazione\Functions\TRAE</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\CLZ\CLZ_Functions.h">
+      <Filter>File di intestazione\Functions\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\CLZ\CLZ_Struct.h">
+      <Filter>File di intestazione\Structs\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="hash_Functions.h">
+      <Filter>File di intestazione\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc_Functions.h">
+      <Filter>File di intestazione\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="picosha2.h">
+      <Filter>File di intestazione\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="ZLIB\zlib.h">
+      <Filter>File di intestazione\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="concol.h">
+      <Filter>File di intestazione\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="OutMsgInterface.h">
+      <Filter>File di intestazione\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="MATH\math.h">
+      <Filter>File di intestazione\Functions</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="TRAODLE.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="nodeID.cpp">
+      <Filter>File di origine\FBX Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="hashID.cpp">
+      <Filter>File di origine\FBX Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawBox.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="FindBestThreadNumber.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawRectangle.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture_RAWtoDDS.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="FBX\FBX_Export.cpp">
+      <Filter>File di origine\FBX Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="FBX\FBX_Write_Animation.cpp">
+      <Filter>File di origine\FBX Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="FBX\FBX_Write_AnimCurve_Subroutine.cpp">
+      <Filter>File di origine\FBX Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="FBX\FBX_Write_Camera.cpp">
+      <Filter>File di origine\FBX Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="FBX\FBX_Write_Geometry.cpp">
+      <Filter>File di origine\FBX Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="FBX\FBX_Write_Group.cpp">
+      <Filter>File di origine\FBX Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="FBX\FBX_Write_Header.cpp">
+      <Filter>File di origine\FBX Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="FBX\FBX_Write_Locator.cpp">
+      <Filter>File di origine\FBX Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="FBX\FBX_Write_Object_definitions.cpp">
+      <Filter>File di origine\FBX Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="FBX\FBX_Write_PointLight.cpp">
+      <Filter>File di origine\FBX Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="FBX\FBX_Write_Texture.cpp">
+      <Filter>File di origine\FBX Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Export.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_Animation.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_Animation_Subroutine.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_Camera.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_DefaultNodes.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_DisplayLayer.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_Header.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_Locator.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_Mesh.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_NurbsSurface.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_PointLight.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_Texture.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_Transform.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathRadToDeg.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="GetHashValue.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Calculate_Faces.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawTriangle.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture_RAWtoBMP.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_Material.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAE\Export_TRAE.cpp">
+      <Filter>File di origine\TRAE</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAE\TRAE_GEOMRAW_Read.cpp">
+      <Filter>File di origine\TRAE</Filter>
+    </ClCompile>
+    <ClCompile Include="AOD_IO_Init.cpp">
+      <Filter>File di origine\TRAOD</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\CAM\CAM_Read.cpp">
+      <Filter>File di origine\TRAOD\CAM</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\CAM\Export_CAM.cpp">
+      <Filter>File di origine\TRAOD\CAM</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\CLN\CLN_Read.cpp">
+      <Filter>File di origine\TRAOD\CLN</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\CLN\Export_CLN.cpp">
+      <Filter>File di origine\TRAOD\CLN</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\GMX\Export_GMX.cpp">
+      <Filter>File di origine\TRAOD\GMX</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\GMX\AoD_GetFilenameFromHash.cpp">
+      <Filter>File di origine\TRAOD\GMX</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\RMX\Export_RMX.cpp">
+      <Filter>File di origine\TRAOD\RMX</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\RMX\RMX_Audio_Locator.cpp">
+      <Filter>File di origine\TRAOD\RMX</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\RMX\RMX_Light.cpp">
+      <Filter>File di origine\TRAOD\RMX</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\RMX\RMX_Portal.cpp">
+      <Filter>File di origine\TRAOD\RMX</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\RMX\RMX_PS2_Room_Obj.cpp">
+      <Filter>File di origine\TRAOD\RMX</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\RMX\RMX_Read.cpp">
+      <Filter>File di origine\TRAOD\RMX</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\RMX\RMX_Water.cpp">
+      <Filter>File di origine\TRAOD\RMX</Filter>
+    </ClCompile>
+    <ClCompile Include="Reverb_presets.cpp">
+      <Filter>File di origine\TRAOD\RMX</Filter>
+    </ClCompile>
+    <ClCompile Include="GetRoomInfo.cpp">
+      <Filter>File di origine\TRAOD\ZONE</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\ZONE\Export_ZONE.cpp">
+      <Filter>File di origine\TRAOD\ZONE</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\ZONE\ZONE_Read_Materials.cpp">
+      <Filter>File di origine\TRAOD\ZONE</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\ZONE\ZONE_Read_Textures.cpp">
+      <Filter>File di origine\TRAOD\ZONE</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAE\AE_IO_Init.cpp">
+      <Filter>File di origine\TRAE</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAE\CLUSTER\Export_CLUSTER.cpp">
+      <Filter>File di origine\TRAE\CLUSTER</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAE\CLUSTER\AE_GetFilenameFromHash.cpp">
+      <Filter>File di origine\TRAE\CLUSTER</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAE\TEXSET\Export_TEXSET.cpp">
+      <Filter>File di origine\TRAE\TEXSET</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAE\LVC\LVC_Read_Geometry.cpp">
+      <Filter>File di origine\TRAE\LVC</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAE\LVC\Export_LVC.cpp">
+      <Filter>File di origine\TRAE\LVC</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\ZONE\CheckDoubleSided.cpp">
+      <Filter>File di origine\TRAOD\ZONE</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture_DXT1toRGB.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture_DXT3toRGB_A.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture_RGBAtoRGB_A.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture_RAWtoTGA.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\CLN\CLN_Get_Triangle.cpp">
+      <Filter>File di origine\TRAOD\CLN</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAE\MDC\MDC_Read_Geometry.cpp">
+      <Filter>File di origine\TRAE\MDC</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAE\MDC\Export_MDC.cpp">
+      <Filter>File di origine\TRAE\MDC</Filter>
+    </ClCompile>
+    <ClCompile Include="FBX\FBX_Write_Joint.cpp">
+      <Filter>File di origine\FBX Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_Joint.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathQuatNormalise.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathQuatToMatrix.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture_DXT3toRGBA.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\CLZ\Decompress_CLZ.cpp">
+      <Filter>File di origine\TRAOD\CLZ</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLIB\zutil.c">
+      <Filter>File di origine\ZLIB</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLIB\adler32.c">
+      <Filter>File di origine\ZLIB</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLIB\crc32.c">
+      <Filter>File di origine\ZLIB</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLIB\inffast.c">
+      <Filter>File di origine\ZLIB</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLIB\inflate.c">
+      <Filter>File di origine\ZLIB</Filter>
+    </ClCompile>
+    <ClCompile Include="ZLIB\inftrees.c">
+      <Filter>File di origine\ZLIB</Filter>
+    </ClCompile>
+    <ClCompile Include="concol.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="OutMsgInterface.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="Fatal_Error_Terminate.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_PolyPlane.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_BossWave.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\RMX\Isolate_duplicated_lights.cpp">
+      <Filter>File di origine\TRAOD\RMX</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\RMX\Isolate_duplicated_water.cpp">
+      <Filter>File di origine\TRAOD\RMX</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\ZONE\ZONE_Read_Fakes.cpp">
+      <Filter>File di origine\TRAOD\ZONE</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\ZONE\ZONE_Read_Rooms.cpp">
+      <Filter>File di origine\TRAOD\ZONE</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\ZONE\ZONE_Read_Rooms_MT.cpp">
+      <Filter>File di origine\TRAOD\ZONE</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\ZONE\CheckShadowMap.cpp">
+      <Filter>File di origine\TRAOD\ZONE</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathMulMatrices.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathMulQuaternions.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathRot.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathRotX.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathRotY.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathRotZ.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathWrapAngle180.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathTransposeAMatrix.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathMatrixGetAngles.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathMatrixToEuler.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="mathAxisAngleToQuaternion.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathMatrixLookAt.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathLoadUnitMatrix.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathTranslatef.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathRotAxis.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathRotTransPers2.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathRotTrans.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\math.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
