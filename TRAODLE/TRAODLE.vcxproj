@@ -165,6 +165,7 @@
     <ClInclude Include="TRAE\TEXSET\TEXSET_Struct.h" />
     <ClInclude Include="TRAE\TRAE_Functions.h" />
     <ClInclude Include="TRAE\GEOM_Struct.h" />
+    <ClInclude Include="TRAOD Remastered\MESH\MESH_Functions.h" />
     <ClInclude Include="TRAOD\CAM\CAM_Functions.h" />
     <ClInclude Include="TRAOD\CAM\CAM_Struct.h" />
     <ClInclude Include="TRAOD\CHR\CHR_Struct.h" />
@@ -198,7 +199,6 @@
     <ClCompile Include="FBX\FBX_Write_Object_definitions.cpp" />
     <ClCompile Include="FBX\FBX_Write_PointLight.cpp" />
     <ClCompile Include="FBX\FBX_Write_Texture.cpp" />
-    <ClCompile Include="AOD_IO_Init.cpp" />
     <ClCompile Include="GetRoomInfo.cpp" />
     <ClCompile Include="mathAxisAngleToQuaternion.cpp" />
     <ClCompile Include="MATH\math.cpp" />
@@ -265,10 +265,14 @@
     <ClCompile Include="TRAE\MDC\MDC_Read_Geometry.cpp" />
     <ClCompile Include="TRAE\TEXSET\Export_TEXSET.cpp" />
     <ClCompile Include="TRAE\TRAE_GEOMRAW_Read.cpp" />
+    <ClCompile Include="TRAOD Remastered\AODRemastered_IO_Init.cpp" />
+    <ClCompile Include="TRAOD Remastered\MESH\Export_MESH.cpp" />
+    <ClCompile Include="TRAOD Remastered\MESH\MESH_Read_Object.cpp" />
     <ClCompile Include="TRAODLE.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TRAOD\AOD_IO_Init.cpp" />
     <ClCompile Include="TRAOD\CAM\CAM_Read.cpp" />
     <ClCompile Include="TRAOD\CAM\Export_CAM.cpp" />
     <ClCompile Include="TRAOD\CLN\CLN_Get_Triangle.cpp" />

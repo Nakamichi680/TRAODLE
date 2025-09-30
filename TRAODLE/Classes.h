@@ -120,6 +120,26 @@ public:
 };
 
 
+class AODRemastered_IO_CLASS {
+public:
+	TCHAR Console_OldTitle[MAX_PATH];
+	LPCWSTR Console_NewTitle = L"Tomb Raider - The Angel of Darkness Remastered MESH Exporter (by Nakamichi680)";
+	LPWSTR folder_exe_lpwstr = new TCHAR[MAX];			// Cartella in cui si trova il programma
+	LPWSTR folder_msh_lpwstr = new TCHAR[MAX];			// Cartella in cui si trova il file MSH
+	string folder_msh;									// Cartella in cui si trova il file MSH con backslash \ alla fine del nome (non usare per cambiare cartella)
+	LPWSTR folder_object_lpwstr = new TCHAR[MAX];		// Cartella in cui verrà estratto il file MSH (es. \50093659)
+	string folder_object;								// Cartella in cui verrà estratto il file MSH (es. \50093659\) con backslash \ alla fine del nome
+	string file_msh;									// Nome del file MESH (può avere solo estensione MSH, es. 50093659.MSH)
+	string objectname;									// Nome dell'oggetto 3D contenuto nel file MSH (es. 50093659)
+	LPWSTR folder_temp_lpwstr = new TCHAR[MAX];			// Cartella temporanea di lavoro per le varie subroutines
+	string folder_temp;									// Cartella temporanea di lavoro per le varie subroutines con backslash \ alla fine del nome
+
+	AODRemastered_IO_CLASS()												// Constructor
+	{
+		GetConsoleTitle(AOD_IO.Console_OldTitle, MAX_PATH);
+	}
+};
+
 
 class AE_IO_CLASS {
 private:

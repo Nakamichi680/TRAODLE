@@ -10,8 +10,10 @@
 #include "TRAOD/RMX/RMX_Functions.h"
 #include "TRAOD/CLN/CLN_Functions.h"
 #include "TRAOD/CLZ/CLZ_Functions.h"
-AOD_IO_CLASS AOD_IO;				// Classe Input/Output globale per AoD
-AE_IO_CLASS AE_IO;					// Classe Input/Output globale per AE
+#include "TRAOD Remastered/MESH/MESH_Functions.h"
+AOD_IO_CLASS AOD_IO;							// Classe Input/Output globale per AoD
+AODRemastered_IO_CLASS AODRemastered_IO;		// Classe Input/Output globale per AoD Remastered
+AE_IO_CLASS AE_IO;								// Classe Input/Output globale per AE
 ofstream msg_file_stream;
 mutex mu;
 
@@ -21,28 +23,35 @@ int main(int argc, char **argv)
 	chrono::steady_clock::time_point begin = chrono::steady_clock::now();
 	msgInit();
 	//FindBestThreadNumber();
-	msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Tomb Raider - The Angel of Darkness Level Exporter by Nakamichi680\n";
-	msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Version 0.200502\n";
 
-	int mode = 1;			// 0 = Tomb Raider Anniversary Edition, 1 = Tomb Raider The Angel of Darkness
+	int mode;			// 0 = Tomb Raider Anniversary Edition, 1 = Tomb Raider The Angel of Darkness, 2 = AoD Remastered MESH Exporter
+
+	msg(msg::TGT::CONS, msg::TYP::OVR) << "Mode? ";
+	cin >> mode;
+	if (mode != 0 && mode != 1 && mode != 2)
+		return Fatal_Error_Terminate();
+	system("cls");
+
 
 	switch (mode)
 	{
-	case 0:																	// TRAE
+	case 0: {																// TRAE
+		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Tomb Raider - Anniversary Edition Level Exporter by Nakamichi680\n";
+		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Version 0.250620\n";
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Mode = 0 - AE";
 
 		// INIZIALIZZAZIONE FILES E CARTELLE
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Initializing IO";
 		if (!AE_IO_Init(argv))			// Se c'è qualsiasi errore in fase di avvio il programma termina
 			return Fatal_Error_Terminate();
-		
+
 		msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Input filename: " << AE_IO.folder_cluster << AE_IO.file_cluster;
 
 		// ESTRAZIONE FILES DAL CLUSTER
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Unpacking CLUSTER file";
 		if (!Export_CLUSTER())
 			return Fatal_Error_Terminate();
-		
+
 		// CREAZIONE CARTELLE PER FILE DI OUTPUT
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Creating target folders";
 		SetCurrentDirectory(AE_IO.folder_level_lpwstr);
@@ -59,7 +68,7 @@ int main(int argc, char **argv)
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "*********************************";
 		for (unsigned int i = 0; i < AE_IO.clusterfiles.size(); i++)
 		{
-			switch(AE_IO.clusterfiles[i].type)
+			switch (AE_IO.clusterfiles[i].type)
 			{
 			case(AEFileType::LVC):
 				if (!Export_LVC(AE_IO.clusterfiles[i].name))
@@ -85,10 +94,12 @@ int main(int argc, char **argv)
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "*      Exporting files END      *";
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "*********************************";
 		break;
-
+	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	case 1:																	// TRAOD
+	case 1: {																// TRAOD
+		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Tomb Raider - The Angel of Darkness Level Exporter by Nakamichi680\n";
+		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Version 0.250620\n";
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Mode = 1 - AOD";
 
 		// INIZIALIZZAZIONE FILES E CARTELLE
@@ -100,10 +111,10 @@ int main(int argc, char **argv)
 
 		// CONVERSIONE DA CLZ A GMX
 		unsigned int sz = AOD_IO.file_clzgmx.size();
-		if (AOD_IO.file_clzgmx[sz-3] == 'C' && AOD_IO.file_clzgmx[sz-2] == 'L' && AOD_IO.file_clzgmx[sz-1] == 'Z')
+		if (AOD_IO.file_clzgmx[sz - 3] == 'C' && AOD_IO.file_clzgmx[sz - 2] == 'L' && AOD_IO.file_clzgmx[sz - 1] == 'Z')
 		{
 			msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "CLZ input file detected. Decompressing";
-			if(!Decompress_CLZ())
+			if (!Decompress_CLZ())
 				return Fatal_Error_Terminate();
 		}
 
@@ -138,7 +149,7 @@ int main(int argc, char **argv)
 
 		for (unsigned int i = 0; i < AOD_IO.gmxfiles.size(); i++)
 		{
-			switch(AOD_IO.gmxfiles[i].type)
+			switch (AOD_IO.gmxfiles[i].type)
 			{
 			case(AoDFileType::RMX):
 				if (!Export_RMX(AOD_IO.gmxfiles[i].name))
@@ -146,8 +157,8 @@ int main(int argc, char **argv)
 				msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "";
 				break;
 			case(AoDFileType::ZONE):
-				//if (!Export_ZONE(AOD_IO.gmxfiles[i].name))
-					//msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "ZONE exporting completed with error(s)";
+				if (!Export_ZONE(AOD_IO.gmxfiles[i].name))
+					msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "ZONE exporting completed with error(s)";
 				msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "";
 				break;
 			case(AoDFileType::CAM):
@@ -165,6 +176,37 @@ int main(int argc, char **argv)
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "*********************************";
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "*      Exporting files END      *";
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "*********************************";
+		break;
+	}
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	case 2: {																// TRAOD Remastered MESH Exporter
+		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Tomb Raider - The Angel of Darkness Remastered MESH Exporter by Nakamichi680\n";
+		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Version 0.250620\n";
+		msg(msg::TGT::FILE, msg::TYP::LOG) << "Mode = 2 - AOD Remastered MESH Exporter";
+
+		// INIZIALIZZAZIONE FILES E CARTELLE
+		msg(msg::TGT::FILE, msg::TYP::LOG) << "Initializing IO";
+		if (!AODRemastered_IO_Init(argv))			// Se c'è qualsiasi errore in fase di avvio il programma termina
+			return Fatal_Error_Terminate();
+
+		msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Input filename: " << AODRemastered_IO.folder_msh << AODRemastered_IO.file_msh;
+
+		// CREAZIONE CARTELLA PER FILE DI OUTPUT
+		msg(msg::TGT::FILE, msg::TYP::LOG) << "Creating target folder";
+		CreateDirectory(AODRemastered_IO.folder_object_lpwstr, NULL);		// Crea la cartella \NOMEFILEMESH
+
+		// ESPORTAZIONE GEOMETRIA DAL FILE MSH
+		msg(msg::TGT::FILE, msg::TYP::LOG) << "********************************";
+		msg(msg::TGT::FILE, msg::TYP::LOG) << "*     Exporting mesh BEGIN     *";
+		msg(msg::TGT::FILE, msg::TYP::LOG) << "********************************";
+		if (!Export_MESH(AODRemastered_IO.file_msh))
+			msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "MESH exporting completed with error(s)";
+		msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "";
+		msg(msg::TGT::FILE, msg::TYP::LOG) << "********************************";
+		msg(msg::TGT::FILE, msg::TYP::LOG) << "*      Exporting mesh END      *";
+		msg(msg::TGT::FILE, msg::TYP::LOG) << "********************************";
+	}
 	}
 
 	chrono::steady_clock::time_point end= chrono::steady_clock::now();

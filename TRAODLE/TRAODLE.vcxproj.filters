@@ -79,6 +79,15 @@
     <Filter Include="File di origine\ZLIB">
       <UniqueIdentifier>{aa363081-457f-4fdb-a223-020f9aadf70c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="File di origine\TRAOD Remastered">
+      <UniqueIdentifier>{850db564-06d1-4178-abca-31f39354f8c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di origine\TRAOD Remastered\MSH">
+      <UniqueIdentifier>{a253aa7f-96ad-43de-9dd4-9e83834ec5c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di intestazione\Functions\TRAOD Remastered">
+      <UniqueIdentifier>{219e2b7c-fe0a-4d9b-87ae-fa954b40490b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -191,6 +200,9 @@
     </ClInclude>
     <ClInclude Include="MATH\math.h">
       <Filter>File di intestazione\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD Remastered\MESH\MESH_Functions.h">
+      <Filter>File di intestazione\Functions\TRAOD Remastered</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -310,9 +322,6 @@
     </ClCompile>
     <ClCompile Include="TRAE\TRAE_GEOMRAW_Read.cpp">
       <Filter>File di origine\TRAE</Filter>
-    </ClCompile>
-    <ClCompile Include="AOD_IO_Init.cpp">
-      <Filter>File di origine\TRAOD</Filter>
     </ClCompile>
     <ClCompile Include="TRAOD\CAM\CAM_Read.cpp">
       <Filter>File di origine\TRAOD\CAM</Filter>
@@ -532,6 +541,18 @@
     </ClCompile>
     <ClCompile Include="MATH\math.cpp">
       <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\AOD_IO_Init.cpp">
+      <Filter>File di origine\TRAOD</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD Remastered\AODRemastered_IO_Init.cpp">
+      <Filter>File di origine\TRAOD Remastered</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD Remastered\MESH\Export_MESH.cpp">
+      <Filter>File di origine\TRAOD Remastered\MSH</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD Remastered\MESH\MESH_Read_Object.cpp">
+      <Filter>File di origine\TRAOD Remastered\MSH</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

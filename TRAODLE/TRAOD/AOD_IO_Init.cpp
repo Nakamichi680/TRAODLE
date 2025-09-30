@@ -34,11 +34,11 @@ bool AOD_IO_Init (char **argv)
 		temp = temp.substr(0, temp.find_last_of("\\"));													/*      C:\Cartella_EXE	(o C:)				*/
 		if (temp.find("\\") == string::npos)					// Aggiunge "\" se non ne trova nemmeno uno (per il root dell'unità)
 			temp.append("\\");
-		mbstowcs(AOD_IO.folder_exe_lpwstr, temp.c_str(), MAX);											/*		C:\Cartella_EXE	(o C:\)				*/
+		std::mbstowcs(AOD_IO.folder_exe_lpwstr, temp.c_str(), MAX);										/*		C:\Cartella_EXE	(o C:\)				*/
 		temp = input.substr(0, input.find_last_of("\\"));												/*      C:\Cartella_CLZGMX (o C:)			*/	
 		if (temp.find("\\") == string::npos)					// Aggiunge "\" se non ne trova nemmeno uno (per il root dell'unità)
 			temp.append("\\");
-		mbstowcs(AOD_IO.folder_clzgmx_lpwstr, temp.c_str(), MAX);										/*		C:\Cartella_CLZGMX (o C:\)			*/
+		std::mbstowcs(AOD_IO.folder_clzgmx_lpwstr, temp.c_str(), MAX);									/*		C:\Cartella_CLZGMX (o C:\)			*/
 		AOD_IO.folder_clzgmx = input.substr(0, input.find_last_of("\\") + 1);							/*		C:\Cartella_CLZGMX\					*/
 		AOD_IO.file_clzgmx = input.substr(input.find_last_of("\\") + 1);								/*		Nome_livello(.CLZ/.GMX)				*/
 	}
@@ -73,7 +73,7 @@ bool AOD_IO_Init (char **argv)
 	/////////////////////// PREPARAZIONE NOME CARTELLA LIVELLO (es. PARIS1\)
 	AOD_IO.folder_level = AOD_IO.folder_clzgmx;
 	AOD_IO.folder_level.append(AOD_IO.levelname);
-	mbstowcs(AOD_IO.folder_level_lpwstr, AOD_IO.folder_level.c_str(), MAX);
+	std::mbstowcs(AOD_IO.folder_level_lpwstr, AOD_IO.folder_level.c_str(), MAX);
 	AOD_IO.folder_level.append("\\");
 
 	/////////////////////// PREPARAZIONE NOMI SOTTOCARTELLE (es. PARIS1\Cameras, PARIS1\Animations, PARIS1\Zones)
@@ -85,13 +85,13 @@ bool AOD_IO_Init (char **argv)
 	AOD_IO.folder_blendshapes.append("Blendshapes");
 	AOD_IO.folder_collisions.append("Collisions");
 	AOD_IO.folder_characters.append("Characters");
-	mbstowcs(AOD_IO.folder_cameras_lpwstr, AOD_IO.folder_cameras.c_str(), MAX);
-	mbstowcs(AOD_IO.folder_animations_lpwstr, AOD_IO.folder_animations.c_str(), MAX);
-	mbstowcs(AOD_IO.folder_zones_lpwstr, AOD_IO.folder_zones.c_str(), MAX);
-	mbstowcs(AOD_IO.folder_rooms_lpwstr, AOD_IO.folder_rooms.c_str(), MAX);
-	mbstowcs(AOD_IO.folder_blendshapes_lpwstr, AOD_IO.folder_blendshapes.c_str(), MAX);
-	mbstowcs(AOD_IO.folder_collisions_lpwstr, AOD_IO.folder_collisions.c_str(), MAX);
-	mbstowcs(AOD_IO.folder_characters_lpwstr, AOD_IO.folder_characters.c_str(), MAX);
+	std::mbstowcs(AOD_IO.folder_cameras_lpwstr, AOD_IO.folder_cameras.c_str(), MAX);
+	std::mbstowcs(AOD_IO.folder_animations_lpwstr, AOD_IO.folder_animations.c_str(), MAX);
+	std::mbstowcs(AOD_IO.folder_zones_lpwstr, AOD_IO.folder_zones.c_str(), MAX);
+	std::mbstowcs(AOD_IO.folder_rooms_lpwstr, AOD_IO.folder_rooms.c_str(), MAX);
+	std::mbstowcs(AOD_IO.folder_blendshapes_lpwstr, AOD_IO.folder_blendshapes.c_str(), MAX);
+	std::mbstowcs(AOD_IO.folder_collisions_lpwstr, AOD_IO.folder_collisions.c_str(), MAX);
+	std::mbstowcs(AOD_IO.folder_characters_lpwstr, AOD_IO.folder_characters.c_str(), MAX);
 	AOD_IO.folder_cameras.append("\\");
 	AOD_IO.folder_animations.append("\\");
 	AOD_IO.folder_zones.append("\\");
@@ -110,10 +110,10 @@ bool AOD_IO_Init (char **argv)
 	cfi.dwFontSize.Y = 14;									// Dimensione caratteri
 	cfi.FontFamily = FF_DONTCARE;
 	cfi.FontWeight = FW_NORMAL;
-	wcscpy(cfi.FaceName, L"Lucida Console");				// Seleziona il carattere Lucida Console (in questo momento non è ancora impostato!!!)
+	std::wcscpy(cfi.FaceName, L"Lucida Console");			// Seleziona il carattere Lucida Console (in questo momento non è ancora impostato!!!)
 	SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &cfi);		// Imposta dimensione caratteri e font
 	//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 0xf0);				// Imposta il colore di testo e sfondo
-	system("chcp 437 >nul");														// Imposta il codepage americano
+	std::system("chcp 437 >nul");												// Imposta il codepage americano
 	//system("mode 119, 43");
 	//concolinit();																// Inizializzazione colori testo concol
 	return true;
