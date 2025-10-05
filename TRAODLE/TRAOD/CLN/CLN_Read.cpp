@@ -4,6 +4,7 @@
 #include "TRAOD/CLN/CLN_Struct.h"
 #include "Misc_Functions.h"
 #include "TRAOD/CLN/CLN_Functions.h"
+#include "resource.h"
 
 
 class Octant
@@ -20,6 +21,8 @@ public:
 
 bool CLN_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 {
+	//if (SaveTGAResource(IDR_COLLISION_STONE2, "FANCULO.tga"))
+
 	CLN_OCTREE cln_octree;
 	CLN_TLIST cln_tlist;
 	vector <Octant> octree (1);
@@ -63,7 +66,7 @@ bool CLN_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 
 	// Creazione layer collisioni per file Maya ASCII
 	stringstream layername1, layername2;
-	layername1 << AOD_IO.levelname << "_collisions";
+	layername1 << AOD_IO.levelname << "_Collisions";
 	layername2 << layername1.str() << "_octree";
 	Layer collisions_layer, octree_layer;
 	collisions_layer.name = layername1.str();
@@ -73,7 +76,7 @@ bool CLN_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 	MA.Layer.push_back(collisions_layer);			// Layer collisioni in mesh singola
 	MA.Layer.push_back(octree_layer);				// Layer octree/collisioni in mesh multiple
 
-	vector <unsigned short> vtype, vpadding1, vpadding2;
+	vector <unsigned short> vtype, vpadding1, vpadding2, vcomposition, vmapping, vbitattrib;
 
 
 
@@ -86,7 +89,7 @@ bool CLN_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 		clnfile.read(reinterpret_cast<char*>(&octree[o].Ptr_TList), sizeof(cln_octree.Ptr_TList));			// Puntatore a inizio lista triangoli per quell'ottante
 		clnfile.seekg(4, ios_base::cur);																	// Salta Unknown2
 		clnfile.read(reinterpret_cast<char*>(&cln_octree.nChildren), sizeof(cln_octree.nChildren));
-		clnfile.seekg(2, ios_base::cur);																	// Salta Unknown3
+		clnfile.read(reinterpret_cast<char*>(&cln_octree.ChildrenIndices), sizeof(cln_octree.ChildrenIndices));
 		clnfile.read(reinterpret_cast<char*>(&octree[o].Vmin.x), sizeof(cln_octree.Xmin));
 		clnfile.read(reinterpret_cast<char*>(&octree[o].Vmin.y), sizeof(cln_octree.Ymin));
 		clnfile.read(reinterpret_cast<char*>(&octree[o].Vmin.z), sizeof(cln_octree.Zmin));
@@ -151,50 +154,80 @@ bool CLN_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 			unsigned int t = 0;
 			while (t < cln_octree.nTriangles)
 			{
-				clnfile.read(reinterpret_cast<char*>(&cln_tlist.Unknown1), sizeof(cln_tlist.Unknown1));
+				clnfile.read(reinterpret_cast<char*>(&cln_tlist.attribute), sizeof(cln_tlist.attribute));
 				clnfile.read(reinterpret_cast<char*>(&cln_tlist.Unknown2), sizeof(cln_tlist.Unknown2));
-				clnfile.read(reinterpret_cast<char*>(&cln_tlist.Unknown3), sizeof(cln_tlist.Unknown3));
 				clnfile.read(reinterpret_cast<char*>(&cln_tlist.nIndices), sizeof(cln_tlist.nIndices));
 
-				if (find(vtype.begin(), vtype.end(), cln_tlist.Unknown1) == vtype.end())
-					vtype.push_back(cln_tlist.Unknown1);
+				unsigned short composition, mapping, bitattrib;
+
+				composition = cln_tlist.attribute & 0xFF;               // bits 0–7
+				mapping = (cln_tlist.attribute >> 8) & 0x3;				// bits 8–9 (2 bits)
+				bitattrib = (cln_tlist.attribute >> 10) & 0x003FFFFF;	// bits 10–31 (22 bits)
+
+
+				if (find(vtype.begin(), vtype.end(), cln_tlist.attribute) == vtype.end())
+					vtype.push_back(cln_tlist.attribute);
 				if (find(vpadding1.begin(), vpadding1.end(), cln_tlist.Unknown2) == vpadding1.end())
 					vpadding1.push_back(cln_tlist.Unknown2);
-				if (find(vpadding2.begin(), vpadding2.end(), cln_tlist.Unknown3) == vpadding2.end())
-					vpadding2.push_back(cln_tlist.Unknown3);
+				//if (find(vpadding2.begin(), vpadding2.end(), cln_tlist.Unknown3) == vpadding2.end())
+					//vpadding2.push_back(cln_tlist.Unknown3);
+				if (find(vcomposition.begin(), vcomposition.end(), composition) == vcomposition.end())
+					vcomposition.push_back(composition);
+				if (find(vmapping.begin(), vmapping.end(), mapping) == vmapping.end())
+					vmapping.push_back(mapping);
+				if (find(vbitattrib.begin(), vbitattrib.end(), bitattrib) == vbitattrib.end())
+					vbitattrib.push_back(bitattrib);
 
 				if (cln_tlist.nIndices > 0)
 				{
-					stringstream meshname;
+					stringstream meshname, ssmaterial;
 					meshname << ss1.str() << "_tris_" << t;
+					ssmaterial << AOD_IO.levelname << "_Collision_" << GetCompositionName(composition);
+					
 					Mesh temp_mesh;
 					temp_mesh.name = meshname.str();
 					temp_mesh.parent = ss1.str();
 					temp_mesh.FBX_parent = hashID(ss1.str(), "Group");
 					temp_mesh.layer = octree_layer.name;
+					temp_mesh.material_name = ssmaterial.str();
 					temp_mesh.nV = cln_tlist.nIndices * 3;
-					temp_mesh.uv_set1_flag = temp_mesh.uv_set2_flag = temp_mesh.normals_flag = temp_mesh.tangents_flag = temp_mesh.binormals_flag = temp_mesh.vcolors_flag = false;
+					temp_mesh.uv_set2_flag = temp_mesh.normals_flag = temp_mesh.tangents_flag = temp_mesh.binormals_flag = temp_mesh.vcolors_flag = false;
 
 					for (unsigned int i = 0; i < cln_tlist.nIndices; i++)
 					{
 						clnfile.read(reinterpret_cast<char*>(&cln_tlist.Index), sizeof(cln_tlist.Index));
 						streamoff old_position = clnfile.tellg();
 						clndebug << right << setw(7) << cln_tlist.Index;
-						//msg(msg::TGT::FILE, msg::TYP::OVR) << right << setw(7) << cln_tlist.Index;
 						clnfile.seekg(triangle_position + cln_tlist.Index * 48);
-						XYZ v0, v1, v2;
+						Vec3 v1, v2, v3;
 						unsigned int MissingAxis, Unknown;
-						CLN_Get_Triangle(clnfile, v0, v1, v2, MissingAxis, Unknown);
+						CLN_Get_Triangle(clnfile, v1, v2, v3, MissingAxis, Unknown);
 						clnfile.seekg(old_position);
-						temp_mesh.X.push_back(v0.x);
 						temp_mesh.X.push_back(v1.x);
 						temp_mesh.X.push_back(v2.x);
-						temp_mesh.Y.push_back(v0.y);
+						temp_mesh.X.push_back(v3.x);
 						temp_mesh.Y.push_back(v1.y);
 						temp_mesh.Y.push_back(v2.y);
-						temp_mesh.Z.push_back(v0.z);
+						temp_mesh.Y.push_back(v3.y);
 						temp_mesh.Z.push_back(v1.z);
 						temp_mesh.Z.push_back(v2.z);
+						temp_mesh.Z.push_back(v3.z);
+
+						// Ottimizzazione UV per evitare texture stretching
+						Vec3 edge1 = v2 - v1;
+						Vec3 edge2 = v3 - v1;
+						Vec3 normal = edge1.cross(edge2).normalized();
+						Vec3 tangent = edge1.normalized();							// asse U
+						Vec3 bitangent = normal.cross(tangent).normalized();		// asse V
+						Vec2 uv1(0.0f, 0.0f);										// origine
+						Vec2 uv2((v2 - v1).dot(tangent), (v2 - v1).dot(bitangent));
+						Vec2 uv3((v3 - v1).dot(tangent), (v3 - v1).dot(bitangent));
+						temp_mesh.U1.push_back(uv1.u / 1024);
+						temp_mesh.V1.push_back(uv1.v / 1024);
+						temp_mesh.U1.push_back(uv2.u / 1024);
+						temp_mesh.V1.push_back(uv2.v / 1024);
+						temp_mesh.U1.push_back(uv3.u / 1024);
+						temp_mesh.V1.push_back(uv3.v / 1024);
 
 						Face triangle;
 						triangle.v1 = i * 3;		triangle.v2 = i * 3 + 1;		triangle.v3 = i * 3 + 2;
@@ -222,68 +255,55 @@ bool CLN_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 
 	// Creazione classe mesh per geometria collisioni
 	stringstream meshname;
-	meshname << AOD_IO.levelname << "_CLN_TRIANGLES";
+	meshname << AOD_IO.levelname << "_Collisions";
 	Mesh cln_mesh;
 	cln_mesh.name = meshname.str();
 	cln_mesh.layer = collisions_layer.name;
 	cln_mesh.nV = cln_octree.Ptr_TList / 16;		// Numero di triangoli x 3
-	cln_mesh.uv_set1_flag = cln_mesh.uv_set2_flag = cln_mesh.normals_flag = cln_mesh.tangents_flag = cln_mesh.binormals_flag = false;
+	cln_mesh.uv_set2_flag = cln_mesh.normals_flag = cln_mesh.tangents_flag = cln_mesh.binormals_flag = cln_mesh.vcolors_flag = false;
 
-	vector <unsigned int> tags_list;
+	vector <unsigned int> attribute_list;
 
 	for (unsigned int i = 0; i < (cln_octree.Ptr_TList / 48); i++)
 	{
-		XYZ v0, v1, v2;
-		unsigned int MissingAxis, Unknown;
-		CLN_Get_Triangle(clnfile, v0, v1, v2, MissingAxis, Unknown);
-		if (find(tags_list.begin(), tags_list.end(), Unknown) == tags_list.end())
-			tags_list.push_back(Unknown);
+		Vec3 v1, v2, v3;
+		unsigned int MissingAxis, attribute, composition, mapping, bitattrib;
+		CLN_Get_Triangle(clnfile, v1, v2, v3, MissingAxis, attribute);
+		composition = attribute & 0xFF;					// bits 0–7: Materiale della superficie (legno, pietra, metallo, neve, ecc.)
+		mapping = (attribute >> 8) & 0x3;				// bits 8–9 (2 bits): Tipo di superficie (None, Floor, Ceiling)
+		bitattrib = (attribute >> 10) & 0x003FFFFF;		// bits 10–31 (22 bits): Interazione (morte, scale, parete scalabile, scivolo, ecc.)
 
-		// Aggiunta coordinate vertici e indici spigoli triangolo
-		cln_mesh.X.push_back(v0.x);
+		if (find(attribute_list.begin(), attribute_list.end(), attribute) == attribute_list.end())
+			attribute_list.push_back(attribute);
+
+		// Aggiunta coordinate vertici
 		cln_mesh.X.push_back(v1.x);
 		cln_mesh.X.push_back(v2.x);
-		cln_mesh.Y.push_back(v0.y);
+		cln_mesh.X.push_back(v3.x);
 		cln_mesh.Y.push_back(v1.y);
 		cln_mesh.Y.push_back(v2.y);
-		cln_mesh.Z.push_back(v0.z);
+		cln_mesh.Y.push_back(v3.y);
 		cln_mesh.Z.push_back(v1.z);
 		cln_mesh.Z.push_back(v2.z);
-		/*float R = (float)(0xFF & (Unknown >> 16)) / 255;
-		float G = (float)(0xFF & (Unknown >> 8)) / 255;
-		float B = (float)(0xFF & Unknown) / 255;*/
-		float R, G, B;
-		switch (MissingAxis)
-		{
-		case(1):
-			R = 1.0f;
-			G = 0;
-			B = 0;
-			break;
-		case(2):
-			R = 0;
-			G = 1.0f;
-			B = 0;
-			break;
-		case(3):
-			R = 0;
-			G = 0;
-			B = 1.0f;
-		}
+		cln_mesh.Z.push_back(v3.z);
+		
+		// Ottimizzazione UV per evitare texture stretching
+		Vec3 edge1 = v2 - v1;
+		Vec3 edge2 = v3 - v1;
+		Vec3 normal = edge1.cross(edge2).normalized();
+		Vec3 tangent = edge1.normalized();							// asse U
+		Vec3 bitangent = normal.cross(tangent).normalized();		// asse V
+		Vec2 uv1(0.0f, 0.0f);										// origine
+		Vec2 uv2((v2 - v1).dot(tangent), (v2 - v1).dot(bitangent));
+		Vec2 uv3((v3 - v1).dot(tangent), (v3 - v1).dot(bitangent));
+		cln_mesh.U1.push_back(uv1.u / 1024);
+		cln_mesh.V1.push_back(uv1.v / 1024);
+		cln_mesh.U1.push_back(uv2.u / 1024);
+		cln_mesh.V1.push_back(uv2.v / 1024);
+		cln_mesh.U1.push_back(uv3.u / 1024);
+		cln_mesh.V1.push_back(uv3.v / 1024);
 
-		cln_mesh.R.push_back(R);
-		cln_mesh.G.push_back(G);
-		cln_mesh.B.push_back(B);
-		cln_mesh.A.push_back(1);
-		cln_mesh.R.push_back(R);
-		cln_mesh.G.push_back(G);
-		cln_mesh.B.push_back(B);
-		cln_mesh.A.push_back(1);
-		cln_mesh.R.push_back(R);
-		cln_mesh.G.push_back(G);
-		cln_mesh.B.push_back(B);
-		cln_mesh.A.push_back(1);
-
+		// Aggiunta indici spigoli triangolo
 		Face triangle;
 		triangle.v1 = i * 3;		triangle.v2 = i * 3 + 1;		triangle.v3 = i * 3 + 2;
 		cln_mesh.Face.push_back(triangle);
@@ -293,7 +313,7 @@ bool CLN_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 	for (unsigned int k = 0; k < tags_list.size(); k++)
 		msg(msg::TGT::FILE, msg::TYP::OVR) << "  " << std::hex << tags_list[k] << std::dec;
 
-	msg(msg::TGT::FILE, msg::TYP::DBG) << "TLIST.Unknown1 values:";
+	msg(msg::TGT::FILE, msg::TYP::DBG) << "TLIST.attribute values:";
 	for (unsigned int k = 0; k < vtype.size(); k++)
 		msg(msg::TGT::FILE, msg::TYP::OVR) << "  " << std::hex << vtype[k] << std::dec;
 
@@ -301,12 +321,52 @@ bool CLN_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 	for (unsigned int k = 0; k < vpadding1.size(); k++)
 		msg(msg::TGT::FILE, msg::TYP::OVR) << "  " << std::hex << vpadding1[k] << std::dec;
 
-	msg(msg::TGT::FILE, msg::TYP::DBG) << "TLIST.Unknown3 values:";
-	for (unsigned int k = 0; k < vpadding2.size(); k++)
-		msg(msg::TGT::FILE, msg::TYP::OVR) << "  " << std::hex << vpadding2[k] << std::dec;
+	//msg(msg::TGT::FILE, msg::TYP::DBG) << "TLIST.Unknown3 values:";
+	//for (unsigned int k = 0; k < vpadding2.size(); k++)
+		//msg(msg::TGT::FILE, msg::TYP::OVR) << "  " << std::hex << vpadding2[k] << std::dec;
 
+	msg(msg::TGT::FILE, msg::TYP::DBG) << "Composition values:";
+	for (unsigned int k = 0; k < vcomposition.size(); k++)
+		msg(msg::TGT::FILE, msg::TYP::OVR) << "  " << vcomposition[k];
+	msg(msg::TGT::FILE, msg::TYP::DBG) << "mapping values:";
+	for (unsigned int k = 0; k < vmapping.size(); k++)
+		msg(msg::TGT::FILE, msg::TYP::OVR) << "  " << vmapping[k];
+	msg(msg::TGT::FILE, msg::TYP::DBG) << "bitattrib values:";
+	for (unsigned int k = 0; k < vbitattrib.size(); k++)
+		msg(msg::TGT::FILE, msg::TYP::OVR) << "  " << vbitattrib[k];
 
 	FBX.Geometry.push_back(cln_mesh);						// Inserimento collisioni nel vettore mesh del file FBX
-	MA.Mesh.push_back(cln_mesh);							// Inserimento collisioni nel vettore mesh del file MA	
+	MA.Mesh.push_back(cln_mesh);							// Inserimento collisioni nel vettore mesh del file MA
+
+	// Creazione cartella per textures collisioni
+	AOD_IO.folder_temp = AOD_IO.folder_collisions;
+	AOD_IO.folder_temp.append("Collision_Textures");
+	mbstowcs(AOD_IO.folder_temp_lpwstr, AOD_IO.folder_temp.c_str(), MAX);
+	CreateDirectory(AOD_IO.folder_temp_lpwstr, NULL);		// Crea la cartella \NOMELIVELLO\Collisions\Collision_Textures
+	SetCurrentDirectory(AOD_IO.folder_temp_lpwstr);
+
+	// Creazione materiali e textures per composition
+	for (unsigned int k = 0; k < vcomposition.size(); k++)
+	{
+		stringstream ssmaterial, diffuse, texture_name, pathfilename, filename;
+		ssmaterial << AOD_IO.levelname << "_Collision_" << GetCompositionName(vcomposition[k]);
+		diffuse << "Collision_Texture_" << GetCompositionName(vcomposition[k]);
+		Material mat;
+		mat.name = ssmaterial.str();
+		mat.Type = Material::TYPE::LAMBERT;
+		mat.color = diffuse.str();
+		MA.Material.push_back(mat);
+
+		Texture tex;
+		texture_name << "Collision_Texture_" << GetCompositionName(vcomposition[k]);
+		filename << "Collision_Tex_" << GetCompositionName(vcomposition[k]) << ".tga";
+		pathfilename << AOD_IO.folder_temp << "\\" << filename.str();
+		tex.name = texture_name.str();
+		tex.filename = pathfilename.str();
+		MA.Texture.push_back(tex);
+		SaveTGAResource(vcomposition[k] + 100, filename.str());
+	}
+
+
 	return true;
 }

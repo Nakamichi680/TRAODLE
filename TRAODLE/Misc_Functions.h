@@ -6,6 +6,7 @@ void FindBestThreadNumber ();
 bool AOD_IO_Init (char **argv);
 bool AODRemastered_IO_Init (char **argv);
 bool AE_IO_Init (char **argv);
+bool SaveTGAResource (int resourceID, string filename);
 int Fatal_Error_Terminate ();
 Mesh DrawBox (string name, string parent, string layer, XYZ Vmin, XYZ Vmax, unsigned int VC_ARGB);
 Mesh DrawTriangle (string name, string parent, string layer, XYZ v0, XYZ v1, XYZ v2, unsigned int VC_ARGB);

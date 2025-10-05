@@ -154,6 +154,7 @@
     <ClInclude Include="Misc_Functions.h" />
     <ClInclude Include="OutMsgInterface.h" />
     <ClInclude Include="picosha2.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TRAE\CLUSTER\CLUSTER_Functions.h" />
     <ClInclude Include="TRAE\CLUSTER\CLUSTER_Struct.h" />
@@ -242,6 +243,7 @@
     <ClCompile Include="MA\MA_Write_Transform.cpp" />
     <ClCompile Include="OutMsgInterface.cpp" />
     <ClCompile Include="Reverb_presets.cpp" />
+    <ClCompile Include="SaveTGAResource.cpp" />
     <ClCompile Include="Texture_DXT1toRGB.cpp" />
     <ClCompile Include="Texture_DXT3toRGBA.cpp" />
     <ClCompile Include="Texture_DXT3toRGB_A.cpp" />
@@ -278,6 +280,7 @@
     <ClCompile Include="TRAOD\CLN\CLN_Get_Triangle.cpp" />
     <ClCompile Include="TRAOD\CLN\CLN_Read.cpp" />
     <ClCompile Include="TRAOD\CLN\Export_CLN.cpp" />
+    <ClCompile Include="TRAOD\CLN\GetCompositionName.cpp" />
     <ClCompile Include="TRAOD\CLZ\Decompress_CLZ.cpp" />
     <ClCompile Include="TRAOD\GMX\AoD_GetFilenameFromHash.cpp" />
     <ClCompile Include="TRAOD\GMX\Export_GMX.cpp" />
@@ -322,6 +325,17 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\Collision_Marble1.tga" />
+    <Image Include="Resources\Collision_Marble2.tga" />
+    <Image Include="Resources\Collision_Marble3.tga" />
+    <Image Include="Resources\Collision_Stone1.tga" />
+    <Image Include="Resources\Collision_Stone2.tga" />
+    <Image Include="Resources\Collision_Stone3.tga" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

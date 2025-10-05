@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 
 	int mode;			// 0 = Tomb Raider Anniversary Edition, 1 = Tomb Raider The Angel of Darkness, 2 = AoD Remastered MESH Exporter
 
-	msg(msg::TGT::CONS, msg::TYP::OVR) << "Mode? ";
+	msg(msg::TGT::CONS, msg::TYP::OVR) << "Mode? 0 - AE, 1 - AoD, 2 - AoD Remastered MSH   ";
 	cin >> mode;
 	if (mode != 0 && mode != 1 && mode != 2)
 		return Fatal_Error_Terminate();

@@ -212,6 +212,77 @@ public:
 };
 
 
+struct Vec2 {
+	float u, v;
+
+	// Costruttori
+	Vec2() : u(0), v(0) {}
+	Vec2(float u_, float v_) : u(u_), v(v_) {}
+
+	// Operatori
+	Vec2 operator+(const Vec2& other) const { return { u + other.u, v + other.v }; }
+	Vec2 operator-(const Vec2& other) const { return { u - other.u, v - other.v }; }
+	Vec2 operator*(float scalar) const { return { u * scalar, v * scalar }; }
+	Vec2 operator/(float scalar) const { return { u / scalar, v / scalar }; }
+
+	// Confronto
+	bool operator==(const Vec2& other) const { return u == other.u && v == other.v; }
+	bool operator!=(const Vec2& other) const { return !(*this == other); }
+
+	// Lunghezza
+	float length() const { return std::sqrt(u * u + v * v); }
+
+	// Normalizzazione
+	Vec2 normalized() const {
+		float len = length();
+		return len > 0 ? (*this) / len : Vec2(0, 0);
+	}
+
+	// Dot product
+	float dot(const Vec2& other) const { return u * other.u + v * other.v; }
+};
+
+
+struct Vec3 {
+	float x, y, z;
+
+	// Costruttori
+	Vec3() : x(0), y(0), z(0) {}
+	Vec3(float x_, float y_, float z_) : x(x_), y(y_), z(z_) {}
+
+	// Operatori
+	Vec3 operator+(const Vec3& other) const { return { x + other.x, y + other.y, z + other.z }; }
+	Vec3 operator-(const Vec3& other) const { return { x - other.x, y - other.y, z - other.z }; }
+	Vec3 operator*(float scalar) const { return { x * scalar, y * scalar, z * scalar }; }
+	Vec3 operator/(float scalar) const { return { x / scalar, y / scalar, z / scalar }; }
+
+	// Confronto
+	bool operator==(const Vec3& other) const { return x == other.x && y == other.y && z == other.z; }
+	bool operator!=(const Vec3& other) const { return !(*this == other); }
+
+	// Lunghezza
+	float length() const { return std::sqrt(x * x + y * y + z * z); }
+
+	// Normalizzazione
+	Vec3 normalized() const {
+		float len = length();
+		return len > 0 ? (*this) / len : Vec3(0, 0, 0);
+	}
+
+	// Dot product
+	float dot(const Vec3& other) const { return x * other.x + y * other.y + z * other.z; }
+
+	// Cross product
+	Vec3 cross(const Vec3& other) const {
+		return {
+			y * other.z - z * other.y,
+			z * other.x - x * other.z,
+			x * other.y - y * other.x
+		};
+	}
+};
+
+
 struct MATRIX {
 	float m00 = 1, m01 = 0, m02 = 0, m03 = 0;
 	float m10 = 0, m11 = 1, m12 = 0, m13 = 0;
@@ -536,6 +607,13 @@ public:
 };
 
 
+class ObjectGroup {
+public:
+	string material_name;
+	vector <unsigned int> FaceIDs;
+};
+
+
 class Mesh {
 public:
 	string name;					// Nome del modello geometrico
@@ -551,6 +629,7 @@ public:
 	bool binormals_flag = true;
 	bool vcolors_flag = true;
 	bool doublesided = true;
+	bool multimaterial = false;
 	vector <float> X;
     vector <float> Y;
     vector <float> Z;
@@ -571,5 +650,6 @@ public:
     vector <float> G;
     vector <float> B;
 	vector <float> A;
-	vector <Face> Face;		// utilizzato da FBX (tris e quads) e MA (solo tris)
+	vector <Face> Face;				// utilizzato da FBX (tris e quads) e MA (solo tris)
+	vector <ObjectGroup> Groups;	// utilizzato per le mesh con materiali multipli
 };

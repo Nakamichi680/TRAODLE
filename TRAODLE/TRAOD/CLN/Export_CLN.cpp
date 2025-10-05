@@ -8,7 +8,6 @@ bool Export_CLN (string filename)
 {
 	FBX_EXPORT FBX;
 	MA_EXPORT MA;
-	return true;																					// DA TOGLIERE
 	msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Reading " << filename;
 	SetCurrentDirectory(AOD_IO.folder_level_lpwstr);			// \NOMELIVELLO
 	if (!CLN_Read(filename, FBX, MA))							// Lettura collisioni

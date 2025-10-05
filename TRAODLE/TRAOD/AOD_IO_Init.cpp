@@ -77,7 +77,7 @@ bool AOD_IO_Init (char **argv)
 	AOD_IO.folder_level.append("\\");
 
 	/////////////////////// PREPARAZIONE NOMI SOTTOCARTELLE (es. PARIS1\Cameras, PARIS1\Animations, PARIS1\Zones)
-	AOD_IO.folder_cameras = AOD_IO.folder_animations = AOD_IO.folder_zones = AOD_IO.folder_rooms = AOD_IO.folder_level;
+	AOD_IO.folder_cameras = AOD_IO.folder_animations = AOD_IO.folder_zones = AOD_IO.folder_rooms = AOD_IO.folder_blendshapes = AOD_IO.folder_collisions = AOD_IO.folder_characters = AOD_IO.folder_level;
 	AOD_IO.folder_cameras.append("Cameras");
 	AOD_IO.folder_animations.append("Animations");
 	AOD_IO.folder_zones.append("Zones");

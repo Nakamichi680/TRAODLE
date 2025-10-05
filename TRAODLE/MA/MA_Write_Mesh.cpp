@@ -331,6 +331,40 @@ void MA_Write_Mesh (Mesh mesh, MA_EXPORT &MA)
 	out << "	setAttr \".vir\" yes;\n";
 	out << "	setAttr \".vif\" yes;\n";
 
+	// Scrittura Groups per mesh multimateriali
+	if (mesh.multimaterial)
+		for (unsigned int g = 0; g < mesh.Groups.size(); g++)
+		{
+			stringstream temp_list;
+			unsigned int counter(0);
+			// Preparazione elenco facce
+			if (!mesh.Groups[g].FaceIDs.empty())
+			{
+				sort(mesh.Groups[g].FaceIDs.begin(), mesh.Groups[g].FaceIDs.end());		// Mette in ordine crescente l'ID delle facce
+				size_t i = 0;
+				while (i < mesh.Groups[g].FaceIDs.size())
+				{
+					unsigned int start = mesh.Groups[g].FaceIDs[i];
+					unsigned int end = start;
+
+					// Estendi finché i numeri sono consecutivi
+					while (i + 1 < mesh.Groups[g].FaceIDs.size() && mesh.Groups[g].FaceIDs[i + 1] == mesh.Groups[g].FaceIDs[i] + 1)
+					{
+						i++;
+						end = mesh.Groups[g].FaceIDs[i];
+					}
+
+					if (start == end)
+						temp_list << " f[" << start << "]";
+					else
+						temp_list << " f[" << start << ":" << end << "]";
+					i++;
+					counter++;
+				}
+			}
+			out << "	setAttr \".iog[0].og[" << g << "].gcl\" - type \"componentList\" " << counter << temp_list.str() << ";\n";
+		}
+
 	// Scrittura UVs
 	if (mesh.uv_set1_flag && mesh.uv_set2_flag)
 		out << "	setAttr -s 2 \".uvst\";\n";
@@ -668,13 +702,31 @@ void MA_Write_Mesh (Mesh mesh, MA_EXPORT &MA)
 	out << "	setAttr \".db\" yes;\n";
 	out << "	setAttr \".bw\" 1.704961;\n";
 
+	// Mesh multimateriale: creazione nodi group
+	if (mesh.multimaterial)
+		for (unsigned int g = 0; g < mesh.Groups.size(); g++)
+		{
+			out << "createNode groupId - n \"groupID" << mesh.name << g << "\";";
+			out << "	setAttr \".ihi\" 0;\n";
+		}
+	
 	MA.MA_Nodes << out.str();
 	out.str("");
 
+	// Mesh con materiale singolo
 	if (mesh.material_name.size() > 0)
 		out << "connectAttr \"" << mesh.name << "Shape.iog\" \"" << mesh.material_name << "SG.dsm\" -na;\n";
 	else
 		out << "connectAttr \"" << mesh.name << "Shape.iog\" \":initialShadingGroup.dsm\" -na;\n";
+
+	// Mesh multimateriale
+	if (mesh.multimaterial)
+		for (unsigned int g = 0; g < mesh.Groups.size(); g++)
+		{
+			out << "connectAttr \"groupId" << mesh.name  << g << ".id\" \"" << mesh.name << "Shape.iog.og[" << g << "].gid\";\n";
+			out << "connectAttr \"" << mesh.Groups[g].material_name << "SG.mwc\" \"" << mesh.name << "Shape.iog.og[" << g << "].gco\";\n";
+			out << "connectAttr \"" << mesh.name << "Shape.iog.og[" << g << "]\" \"" << mesh.Groups[g].material_name << "SG.dsm\" - na;\n";
+		}
 
 	if (mesh.layer.size() > 0)
 		out << "connectAttr \"" << mesh.layer << ".di\" \"" << mesh.name << ".do\";\n";

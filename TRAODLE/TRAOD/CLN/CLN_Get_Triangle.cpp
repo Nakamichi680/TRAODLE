@@ -3,7 +3,7 @@
 #include "TRAOD/CLN/CLN_Struct.h"
 
 
-void CLN_Get_Triangle(ifstream &clnfile, XYZ &v0, XYZ &v1, XYZ &v2, unsigned int &MissingAxis, unsigned int &Unknown)
+void CLN_Get_Triangle(ifstream &clnfile, Vec3 &v1, Vec3 &v2, Vec3 &v3, unsigned int &MissingAxis, unsigned int &attribute)
 {
 	CLN_TRIANGLE cln_triangle;
 
@@ -18,7 +18,7 @@ void CLN_Get_Triangle(ifstream &clnfile, XYZ &v0, XYZ &v1, XYZ &v2, unsigned int
 	clnfile.read(reinterpret_cast<char*>(&cln_triangle.v1b), sizeof(cln_triangle.v1b));
 	clnfile.read(reinterpret_cast<char*>(&cln_triangle.v2b), sizeof(cln_triangle.v2b));
 	clnfile.read(reinterpret_cast<char*>(&cln_triangle.v3b), sizeof(cln_triangle.v3b));
-	clnfile.read(reinterpret_cast<char*>(&Unknown), sizeof(cln_triangle.Unknown));
+	clnfile.read(reinterpret_cast<char*>(&attribute), sizeof(cln_triangle.attribute));
 	cln_triangle.ConstValue *= 1024;
 	cln_triangle.v1a *= 1024;
 	cln_triangle.v2a *= 1024;
@@ -30,37 +30,37 @@ void CLN_Get_Triangle(ifstream &clnfile, XYZ &v0, XYZ &v1, XYZ &v2, unsigned int
 	switch (cln_triangle.MissingAxis)
 	{
 	case (1):
-		v0.y = cln_triangle.v1a;
-		v1.y = cln_triangle.v2a;
-		v2.y = cln_triangle.v3a;
-		v0.z = cln_triangle.v1b;
-		v1.z = cln_triangle.v2b;
-		v2.z = cln_triangle.v3b;
-		v0.x = (v0.y * cln_triangle.vecY + v0.z * cln_triangle.vecZ + cln_triangle.ConstValue) / -cln_triangle.vecX;
+		v1.y = cln_triangle.v1a;
+		v2.y = cln_triangle.v2a;
+		v3.y = cln_triangle.v3a;
+		v1.z = cln_triangle.v1b;
+		v2.z = cln_triangle.v2b;
+		v3.z = cln_triangle.v3b;
 		v1.x = (v1.y * cln_triangle.vecY + v1.z * cln_triangle.vecZ + cln_triangle.ConstValue) / -cln_triangle.vecX;
 		v2.x = (v2.y * cln_triangle.vecY + v2.z * cln_triangle.vecZ + cln_triangle.ConstValue) / -cln_triangle.vecX;
+		v3.x = (v3.y * cln_triangle.vecY + v3.z * cln_triangle.vecZ + cln_triangle.ConstValue) / -cln_triangle.vecX;
 		break;
 	case (2):
-		v0.x = cln_triangle.v1a;
-		v1.x = cln_triangle.v2a;
-		v2.x = cln_triangle.v3a;
-		v0.z = cln_triangle.v1b;
-		v1.z = cln_triangle.v2b;
-		v2.z = cln_triangle.v3b;
-		v0.y = (v0.x * cln_triangle.vecX + v0.z * cln_triangle.vecZ + cln_triangle.ConstValue) / -cln_triangle.vecY;
+		v1.x = cln_triangle.v1a;
+		v2.x = cln_triangle.v2a;
+		v3.x = cln_triangle.v3a;
+		v1.z = cln_triangle.v1b;
+		v2.z = cln_triangle.v2b;
+		v3.z = cln_triangle.v3b;
 		v1.y = (v1.x * cln_triangle.vecX + v1.z * cln_triangle.vecZ + cln_triangle.ConstValue) / -cln_triangle.vecY;
 		v2.y = (v2.x * cln_triangle.vecX + v2.z * cln_triangle.vecZ + cln_triangle.ConstValue) / -cln_triangle.vecY;
+		v3.y = (v3.x * cln_triangle.vecX + v3.z * cln_triangle.vecZ + cln_triangle.ConstValue) / -cln_triangle.vecY;
 		break;
 	case (3):
-		v0.x = cln_triangle.v1a;
-		v1.x = cln_triangle.v2a;
-		v2.x = cln_triangle.v3a;
-		v0.y = cln_triangle.v1b;
-		v1.y = cln_triangle.v2b;
-		v2.y = cln_triangle.v3b;
-		v0.z = (v0.x * cln_triangle.vecX + v0.y * cln_triangle.vecY + cln_triangle.ConstValue) / -cln_triangle.vecZ;
+		v1.x = cln_triangle.v1a;
+		v2.x = cln_triangle.v2a;
+		v3.x = cln_triangle.v3a;
+		v1.y = cln_triangle.v1b;
+		v2.y = cln_triangle.v2b;
+		v3.y = cln_triangle.v3b;
 		v1.z = (v1.x * cln_triangle.vecX + v1.y * cln_triangle.vecY + cln_triangle.ConstValue) / -cln_triangle.vecZ;
 		v2.z = (v2.x * cln_triangle.vecX + v2.y * cln_triangle.vecY + cln_triangle.ConstValue) / -cln_triangle.vecZ;
+		v3.z = (v3.x * cln_triangle.vecX + v3.y * cln_triangle.vecY + cln_triangle.ConstValue) / -cln_triangle.vecZ;
 	}
 
 	MissingAxis = cln_triangle.MissingAxis;

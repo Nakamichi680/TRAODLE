@@ -83,8 +83,8 @@ bool CAM_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 		COI[f] = sqrt(pow(Zat[f] - Zfrom[f], 2) + pow(Yat[f] - Yfrom[f], 2) + pow(Xat[f] - Xfrom[f], 2));
 
 
-		msg(msg::TGT::FILE, msg::TYP::DBG) << f << ") FROM: " << Xfrom[f] << " " << Yfrom[f] << " " << Zfrom[f] << "   AT: " << Xat[f] << " " << Yat[f] << " " << Zat[f];
-		msg(msg::TGT::FILE, msg::TYP::DBG) << "   ROT: " << Xrot[f] << " " << Yrot[f] << " " << Zrot[f] << "   F.L.: " << Focal_lenght[f] << "   COI: " << COI[f];
+		//msg(msg::TGT::FILE, msg::TYP::DBG) << f << ") FROM: " << Xfrom[f] << " " << Yfrom[f] << " " << Zfrom[f] << "   AT: " << Xat[f] << " " << Yat[f] << " " << Zat[f];
+		//msg(msg::TGT::FILE, msg::TYP::DBG) << "   ROT: " << Xrot[f] << " " << Yrot[f] << " " << Zrot[f] << "   F.L.: " << Focal_lenght[f] << "   COI: " << COI[f];
 
 		VECTOR vec_cam;
 		vec_cam.x = Xat[f] - Xfrom[f];
@@ -95,10 +95,10 @@ bool CAM_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 		a.x = vec_cam.x;
 		b.y = vec_cam.y;
 
-		if (mathVectorDot(a, b) == 0)
+		/*if (mathVectorDot(a, b) == 0)
 			cout << "è uguale a zero" << endl;
 		else
-			cout << "fslkfncldnfjlksd" << endl;
+			cout << "fslkfncldnfjlksd" << endl;*/
 
 
 		XYZ angles = mathVectorGetAngles(vec_cam);
