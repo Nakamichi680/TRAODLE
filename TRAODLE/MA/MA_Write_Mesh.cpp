@@ -3,7 +3,7 @@
 #include "MA/MA_Classes.h"
 
 
-void MA_Write_Mesh (Mesh mesh, MA_EXPORT &MA)
+void MA_Write_Mesh (const Mesh& mesh, MA_EXPORT &MA)
 {
 	unsigned int n1, n2, i, v1, v2, v3, v4, NumOfEdges = 0;
 	vector <Edge> Ed;
@@ -336,22 +336,23 @@ void MA_Write_Mesh (Mesh mesh, MA_EXPORT &MA)
 		for (unsigned int g = 0; g < mesh.Groups.size(); g++)
 		{
 			stringstream temp_list;
+			ObjectGroup temp_group = mesh.Groups[g];
 			unsigned int counter(0);
 			// Preparazione elenco facce
-			if (!mesh.Groups[g].FaceIDs.empty())
+			if (!temp_group.FaceIDs.empty())
 			{
-				sort(mesh.Groups[g].FaceIDs.begin(), mesh.Groups[g].FaceIDs.end());		// Mette in ordine crescente l'ID delle facce
+				sort(temp_group.FaceIDs.begin(), temp_group.FaceIDs.end());		// Mette in ordine crescente l'ID delle facce
 				size_t i = 0;
-				while (i < mesh.Groups[g].FaceIDs.size())
+				while (i < temp_group.FaceIDs.size())
 				{
-					unsigned int start = mesh.Groups[g].FaceIDs[i];
+					unsigned int start = temp_group.FaceIDs[i];
 					unsigned int end = start;
 
 					// Estendi finché i numeri sono consecutivi
-					while (i + 1 < mesh.Groups[g].FaceIDs.size() && mesh.Groups[g].FaceIDs[i + 1] == mesh.Groups[g].FaceIDs[i] + 1)
+					while (i + 1 < temp_group.FaceIDs.size() && temp_group.FaceIDs[i + 1] == temp_group.FaceIDs[i] + 1)
 					{
 						i++;
-						end = mesh.Groups[g].FaceIDs[i];
+						end = temp_group.FaceIDs[i];
 					}
 
 					if (start == end)
@@ -362,7 +363,7 @@ void MA_Write_Mesh (Mesh mesh, MA_EXPORT &MA)
 					counter++;
 				}
 			}
-			out << "	setAttr \".iog[0].og[" << g << "].gcl\" - type \"componentList\" " << counter << temp_list.str() << ";\n";
+			out << "	setAttr \".iog[0].og[" << g << "].gcl\" -type \"componentList\" " << counter << temp_list.str() << ";\n";
 		}
 
 	// Scrittura UVs
@@ -474,83 +475,6 @@ void MA_Write_Mesh (Mesh mesh, MA_EXPORT &MA)
 			n1 += 125;
 			n2 += 125;
 		} while (i < mesh.nV);
-
-		/*unsigned int currentvertex = 1;
-		unsigned int currentface = 0;
-		unsigned int nFaces = 0;
-		for (unsigned int j = 0; j < mesh.Face.size(); j++)
-			nFaces += mesh.Face[j].TrisOrQuads;
-
-		//cout << "mesh: " << mesh.name << endl;
-		//cout << "nFaces " << nFaces << endl;
-
-		if (nFaces > 125)
-			out << "	setAttr -s " << nFaces << " \".clst[0].clsp\";\n";
-		do
-		{
-			n2 = min(nFaces - 1, n2);
-			out << "	setAttr ";
-			if (nFaces <= 125)
-				out << "-s " << n2 + 1 << " ";
-			if (n1 == n2)
-				out << "\".clst[0].clsp[" << n1 << "]\" ";
-			else
-				out << "\".clst[0].clsp[" << n1 << ":" << n2 << "]\" ";
-			
-			for (i = n1; i <= n2; i++)
-			{
-				//cout << "i: " << i << "     n1: " << n1 << "      n2: " << n2 << "      currentface: " << currentface << "       currentvertex: " << currentvertex << endl;
-
-				switch (mesh.Face[currentface].TrisOrQuads)
-				{
-				case 3:
-					switch (currentvertex)
-					{
-					case 1:
-						out << " " << mesh.R[mesh.Face[currentface].v1] << " " << mesh.G[mesh.Face[currentface].v1] << " " << mesh.B[mesh.Face[currentface].v1] << " " << mesh.A[mesh.Face[currentface].v1];	// Scrive i valori
-						currentvertex = 2;
-						break;
-					case 2:
-						out << " " << mesh.R[mesh.Face[currentface].v2] << " " << mesh.G[mesh.Face[currentface].v2] << " " << mesh.B[mesh.Face[currentface].v2] << " " << mesh.A[mesh.Face[currentface].v2];	// Scrive i valori
-						currentvertex = 3;
-						break;
-					case 3:
-						out << " " << mesh.R[mesh.Face[currentface].v3] << " " << mesh.G[mesh.Face[currentface].v3] << " " << mesh.B[mesh.Face[currentface].v3] << " " << mesh.A[mesh.Face[currentface].v3];	// Scrive i valori
-						currentvertex = 1;
-						currentface++;
-						break;
-					}
-					break;
-
-				case 4:
-					switch (currentvertex)
-					{
-					case 1:
-						out << " " << mesh.R[mesh.Face[currentface].v1] << " " << mesh.G[mesh.Face[currentface].v1] << " " << mesh.B[mesh.Face[currentface].v1] << " " << mesh.A[mesh.Face[currentface].v1];	// Scrive i valori
-						currentvertex = 2;
-						break;
-					case 2:
-						out << " " << mesh.R[mesh.Face[currentface].v2] << " " << mesh.G[mesh.Face[currentface].v2] << " " << mesh.B[mesh.Face[currentface].v2] << " " << mesh.A[mesh.Face[currentface].v2];	// Scrive i valori
-						currentvertex = 3;
-						break;
-					case 3:
-						out << " " << mesh.R[mesh.Face[currentface].v3] << " " << mesh.G[mesh.Face[currentface].v3] << " " << mesh.B[mesh.Face[currentface].v3] << " " << mesh.A[mesh.Face[currentface].v3];	// Scrive i valori
-						currentvertex = 4;
-						break;
-					case 4:
-						out << " " << mesh.R[mesh.Face[currentface].v4] << " " << mesh.G[mesh.Face[currentface].v4] << " " << mesh.B[mesh.Face[currentface].v4] << " " << mesh.A[mesh.Face[currentface].v4];	// Scrive i valori
-						currentvertex = 1;
-						currentface++;
-					}
-				}
-
-				if ((i + 1) % 3 == 0 && i != n2)														// Va a capo ogni 3
-					out << "\n		";
-			}
-			out << ";\n";																				// Chiude il gruppo dati
-			n1 += 125;
-			n2 += 125;
-		} while (i < nFaces);*/
 	}
 
 	// Scrittura vertici
@@ -706,7 +630,7 @@ void MA_Write_Mesh (Mesh mesh, MA_EXPORT &MA)
 	if (mesh.multimaterial)
 		for (unsigned int g = 0; g < mesh.Groups.size(); g++)
 		{
-			out << "createNode groupId - n \"groupID" << mesh.name << g << "\";";
+			out << "createNode groupId -n \"groupId" << mesh.name << g << "\";\n";
 			out << "	setAttr \".ihi\" 0;\n";
 		}
 	
@@ -717,7 +641,8 @@ void MA_Write_Mesh (Mesh mesh, MA_EXPORT &MA)
 	if (mesh.material_name.size() > 0)
 		out << "connectAttr \"" << mesh.name << "Shape.iog\" \"" << mesh.material_name << "SG.dsm\" -na;\n";
 	else
-		out << "connectAttr \"" << mesh.name << "Shape.iog\" \":initialShadingGroup.dsm\" -na;\n";
+		if (!mesh.multimaterial)
+			out << "connectAttr \"" << mesh.name << "Shape.iog\" \":initialShadingGroup.dsm\" -na;\n";
 
 	// Mesh multimateriale
 	if (mesh.multimaterial)

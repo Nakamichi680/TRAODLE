@@ -560,29 +560,15 @@
     <ClCompile Include="SaveTGAResource.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="TRAOD\CLN\GetCompositionName.cpp">
+    <ClCompile Include="TRAOD\CLN\CLN_GetAttributeName.cpp">
       <Filter>File di origine\TRAOD\CLN</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Resources\Collision_Marble1.tga">
-      <Filter>File di risorse</Filter>
-    </Image>
-    <Image Include="Resources\Collision_Marble2.tga">
-      <Filter>File di risorse</Filter>
-    </Image>
-    <Image Include="Resources\Collision_Marble3.tga">
-      <Filter>File di risorse</Filter>
-    </Image>
-    <Image Include="Resources\Collision_Stone1.tga">
-      <Filter>File di risorse</Filter>
-    </Image>
-    <Image Include="Resources\Collision_Stone2.tga">
-      <Filter>File di risorse</Filter>
-    </Image>
-    <Image Include="Resources\Collision_Stone3.tga">
-      <Filter>File di risorse</Filter>
-    </Image>
+    <ClCompile Include="TRAOD\CLN\CLN_GetResource.cpp">
+      <Filter>File di origine\TRAOD\CLN</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_CalculatePerspCamera.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">

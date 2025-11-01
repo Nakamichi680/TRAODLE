@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 	{
 	case 0: {																// TRAE
 		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Tomb Raider - Anniversary Edition Level Exporter by Nakamichi680\n";
-		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Version 0.250620\n";
+		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Version 0.251012\n";
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Mode = 0 - AE";
 
 		// INIZIALIZZAZIONE FILES E CARTELLE
@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 
 	case 1: {																// TRAOD
 		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Tomb Raider - The Angel of Darkness Level Exporter by Nakamichi680\n";
-		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Version 0.250620\n";
+		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Version 0.251012\n";
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Mode = 1 - AOD";
 
 		// INIZIALIZZAZIONE FILES E CARTELLE
@@ -182,7 +182,7 @@ int main(int argc, char **argv)
 
 	case 2: {																// TRAOD Remastered MESH Exporter
 		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Tomb Raider - The Angel of Darkness Remastered MESH Exporter by Nakamichi680\n";
-		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Version 0.250620\n";
+		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Version 0.251012\n";
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Mode = 2 - AOD Remastered MESH Exporter";
 
 		// INIZIALIZZAZIONE FILES E CARTELLE

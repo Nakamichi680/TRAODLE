@@ -19,7 +19,7 @@ void MA_Write_DefaultNodes (MA_EXPORT &MA);
 
 void MA_Write_Transform (unsigned int t, MA_EXPORT &MA);
 
-void MA_Write_Mesh (Mesh mesh, MA_EXPORT &MA);
+void MA_Write_Mesh (const Mesh& mesh, MA_EXPORT &MA);
 
 void MA_Write_DisplayLayer (unsigned int l, MA_EXPORT &MA);
 
@@ -34,3 +34,5 @@ void MA_Write_Joint (unsigned int j, MA_EXPORT &MA);
 void MA_Write_PolyPlane (unsigned int p, MA_EXPORT &MA);
 
 void MA_Write_BossWave (unsigned int b, MA_EXPORT &MA);
+
+Camera MA_CalculatePerspCamera(const vector<Mesh>& meshes, const vector<Transform>& transforms, float azimuthDeg, float elevationDeg, float distanceMultiplier);

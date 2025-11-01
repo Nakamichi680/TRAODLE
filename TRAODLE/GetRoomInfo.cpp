@@ -15,7 +15,7 @@ bool GetRoomInfo (vector <RoomInfo> &RMX_Rooms)
 	ifstream rmxfile(RMX_Filename, std::ios::binary);
 	if (!rmxfile.is_open())
 	{
-		cout << "\nFATAL ERROR: " << RMX_Filename << " not found.";
+		msg(msg::TGT::CONS, msg::TYP::FATAL) << RMX_Filename << " not found.";
 		return false;
 	}
 
@@ -28,7 +28,7 @@ bool GetRoomInfo (vector <RoomInfo> &RMX_Rooms)
 
 	if (rmx_header.Version != 3.6f)				// Se la versione di file RMX non è la 3.6
 	{
-		cout << "Error - RMX version mismatch\n";
+		msg(msg::TGT::CONS, msg::TYP::FATAL) << "RMX version mismatch.";
 		return false;
 	}
 

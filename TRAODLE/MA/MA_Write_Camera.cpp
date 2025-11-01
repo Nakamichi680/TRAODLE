@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "MA/MA_Classes.h"
-//#include "MA_Functions.h"
+
 
 void MA_Write_Camera (unsigned int c, MA_EXPORT &MA)
 {

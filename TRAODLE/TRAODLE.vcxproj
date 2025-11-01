@@ -241,6 +241,7 @@
     <ClCompile Include="MA\MA_Write_PolyPlane.cpp" />
     <ClCompile Include="MA\MA_Write_Texture.cpp" />
     <ClCompile Include="MA\MA_Write_Transform.cpp" />
+    <ClCompile Include="MA\MA_CalculatePerspCamera.cpp" />
     <ClCompile Include="OutMsgInterface.cpp" />
     <ClCompile Include="Reverb_presets.cpp" />
     <ClCompile Include="SaveTGAResource.cpp" />
@@ -277,10 +278,11 @@
     <ClCompile Include="TRAOD\AOD_IO_Init.cpp" />
     <ClCompile Include="TRAOD\CAM\CAM_Read.cpp" />
     <ClCompile Include="TRAOD\CAM\Export_CAM.cpp" />
+    <ClCompile Include="TRAOD\CLN\CLN_GetResource.cpp" />
     <ClCompile Include="TRAOD\CLN\CLN_Get_Triangle.cpp" />
     <ClCompile Include="TRAOD\CLN\CLN_Read.cpp" />
     <ClCompile Include="TRAOD\CLN\Export_CLN.cpp" />
-    <ClCompile Include="TRAOD\CLN\GetCompositionName.cpp" />
+    <ClCompile Include="TRAOD\CLN\CLN_GetAttributeName.cpp" />
     <ClCompile Include="TRAOD\CLZ\Decompress_CLZ.cpp" />
     <ClCompile Include="TRAOD\GMX\AoD_GetFilenameFromHash.cpp" />
     <ClCompile Include="TRAOD\GMX\Export_GMX.cpp" />
@@ -325,14 +327,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Resources\Collision_Marble1.tga" />
-    <Image Include="Resources\Collision_Marble2.tga" />
-    <Image Include="Resources\Collision_Marble3.tga" />
-    <Image Include="Resources\Collision_Stone1.tga" />
-    <Image Include="Resources\Collision_Stone2.tga" />
-    <Image Include="Resources\Collision_Stone3.tga" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

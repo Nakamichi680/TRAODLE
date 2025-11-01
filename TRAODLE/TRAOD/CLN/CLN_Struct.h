@@ -47,7 +47,7 @@ struct CLN_TRIANGLE		// Size: 48 bytes
 struct CLN_TLIST		// Size: variable
 {
 	uint32_t attribute;
-	uint16_t Unknown2;
+	uint16_t padding;
 	uint16_t nIndices;
 	uint16_t Index;
 };

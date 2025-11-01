@@ -1,5 +1,7 @@
 #pragma once
-
+#ifndef M_PI
+#define M_PI 3.14159265358f
+#endif
 #define MAX 256
 class AOD_IO_CLASS;
 class AODRemastered_IO_CLASS;
@@ -11,7 +13,7 @@ extern AODRemastered_IO_CLASS AODRemastered_IO;
 extern AE_IO_CLASS AE_IO;
 
 using namespace std;
-
+#define NOMINMAX
 #include <cassert>
 #include <stdio.h>
 #include <tchar.h>
@@ -27,6 +29,8 @@ using namespace std;
 #include <mutex>
 #include <algorithm>
 #include <ctime>
+#include <limits>
+#include <cmath>
 #include "windows.h"
 #include "picosha2.h"
 #include "atlstr.h"

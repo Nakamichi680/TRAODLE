@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "MA/MA_Functions.h"
 #include "MA/MA_Classes.h"
 
 void MA_Write_DefaultNodes (MA_EXPORT &MA)
@@ -12,27 +13,21 @@ void MA_Write_DefaultNodes (MA_EXPORT &MA)
 	if (Max_frame == 0)
 		Max_frame = 120;
 
-	// Calcolo posizione telecamera Persp	DA IMPLEMENTARE!!!!
-	//for (MA.Mesh.size())
-	
+	// Calcolo posizione telecamera Persp
+	Camera persp = MA_CalculatePerspCamera(MA.Mesh, MA.Transform, 45, 30, 3.0f);
+
 	// TELECAMERE
 	out << "createNode transform -s -n \"persp\";\n";
 	out << "	setAttr \".v\" no;\n";
-	if (MA.UpAxis == 'y')
-	{
-		out << "	setAttr \".t\" -type \"double3\" 200 100 0;\n";
-		out << "	setAttr \".r\" -type \"double3\" -28 45 0;\n";
-	}
-	if (MA.UpAxis == 'z')
-	{
-		out << "	setAttr \".t\" -type \"double3\" 10000 10000 10000;\n";
-		out << "	setAttr \".r\" -type \"double3\" 62 0 -44;\n";
-	}
+	out << "	setAttr \".t\" -type \"double3\" " << persp.tX << " " << persp.tY << " " << persp.tZ << ";\n";
+	out << "	setAttr \".r\" -type \"double3\" " << persp.rX << " " << persp.rY << " " << persp.rZ << ";\n";
 	out << "createNode camera -s -n \"perspShape\" -p \"persp\";\n";
 	out << "	setAttr -k off \".v\" no;\n";
-	out << "	setAttr \".fl\" 18;\n";
-	out << "	setAttr \".ncp\" " << MA.NearClipPlane << ";\n";
-	out << "	setAttr \".fcp\" " << MA.FarClipPlane << ";\n";
+	out << "	setAttr \".cap\" -type \"double2\" " << persp.hfa << " " << persp.vfa << ";\n";
+	out << "	setAttr \".fl\" " << persp.fl << ";\n";
+	out << "	setAttr \".coi\" " << persp.coi << ";\n";
+	out << "	setAttr \".ncp\" " << persp.ncp << ";\n";
+	out << "	setAttr \".fcp\" " << persp.fcp << ";\n";
 	out << "	setAttr \".imn\" -type \"string\" \"persp\";\n";
 	out << "	setAttr \".den\" -type \"string\" \"persp_depth\";\n";
 	out << "	setAttr \".man\" -type \"string\" \"persp_mask\";\n";
