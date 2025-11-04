@@ -21,9 +21,11 @@ bool MESH_Read_Object (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 
 	// CREAZIONE LAYERS ZONE PER FILE MA
 	Layer Mesh_layer, Mesh_BB_layer;
-	stringstream Mesh_layer_name, Mesh_BB_layer_name;
-	Mesh_layer_name << "MESH_" << AODRemastered_IO.objectname;
+	Transform Mesh_group;
+	stringstream Mesh_layer_name, Mesh_BB_layer_name, Mesh_group_name;
+	Mesh_layer_name << "MSH_" << AODRemastered_IO.objectname;
 	Mesh_BB_layer_name << Mesh_layer_name.str() << "_bounding_boxes";
+	Mesh_group_name << "MESH_" << AODRemastered_IO.objectname;
 	Mesh_layer.name = Mesh_layer_name.str();
 	Mesh_layer.Label_ARGB = 0xFF00D822;
 	MA.Layer.push_back(Mesh_layer);
@@ -32,6 +34,9 @@ bool MESH_Read_Object (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 	Mesh_BB_layer.Visible = false;
 	Mesh_BB_layer.Type = LayerDisplayType::Template;
 	MA.Layer.push_back(Mesh_BB_layer);
+	Mesh_group.name = Mesh_group_name.str();
+	FBX.Group.push_back(Mesh_group);								// Inserimento gruppo oggetto nel file FBX
+	MA.Transform.push_back(Mesh_group);								// Inserimento gruppo oggetto nel file MA
 
 	// Lettura Header oggetto
 	meshfile.read(reinterpret_cast<char*>(&zone_mesh_object_header.Object_size), sizeof(zone_mesh_object_header.Object_size));	// Dimensione oggetto in bytes
@@ -44,14 +49,10 @@ bool MESH_Read_Object (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 	streamoff vertex_position = 52;																// Memorizza la posizione iniziale del blocco vertici
 	streamoff strip_position = vertex_position + zone_mesh_object_header.nVertices * 40;		// Memorizza la posizione iniziale del blocco triangle strip
 	streamoff elements_position = strip_position + zone_mesh_object_header.nIndices * 2;		// Memorizza la posizione iniziale del blocco elementi
+	
+	// Vettore contenente tutti i nomi dei materiali usati nel file msh
+	vector <string> Material_list;
 
-	/*Transform mesh;
-	stringstream temp;
-	mesh.name = Mesh_layer.name;
-	//mesh.layer = Mesh_layer.name;
-	FBX.Group.push_back(mesh);									// Inserimento gruppo oggetto nel file FBX
-	MA.Transform.push_back(mesh);								// Inserimento gruppo oggetto nel file MA
-	*/
 	for (unsigned int el = 0; el < zone_mesh_object_header.nElements; el++)
 	{
 		Mesh element;				// Classe provvisoria contente i valori letti dal file MSH. Va copiata nell'apposito array FBX e/o MA al termine dell'estrazione
@@ -59,8 +60,9 @@ bool MESH_Read_Object (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 		ssname << "MESH_" << AODRemastered_IO.objectname << "_PART_" << el;
 		ssbbname << ssname.str() << "_BB";
 		element.name = ssname.str();
+		element.parent = Mesh_group.name;
 		element.layer = Mesh_layer_name.str();
-		element.FBX_parent = hashID(Mesh_layer.name, "Group");
+		element.FBX_parent = hashID(Mesh_group.name, "Group");
 
 		// Lettura dati elemento
 		XYZ BBmin, BBmax;
@@ -78,8 +80,8 @@ bool MESH_Read_Object (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 		meshfile.read(reinterpret_cast<char*>(&BBmax.x), sizeof(zone_mesh_element.BB_Xmax));										// Bounding box X max
 		meshfile.read(reinterpret_cast<char*>(&BBmax.y), sizeof(zone_mesh_element.BB_Ymax));										// Bounding box Y max
 		meshfile.read(reinterpret_cast<char*>(&BBmax.z), sizeof(zone_mesh_element.BB_Xmax));										// Bounding box Z max
-		FBX.Geometry.push_back(DrawBox(ssbbname.str(), "", Mesh_BB_layer_name.str(), BBmin, BBmax, 0x35500000));
-		MA.Mesh.push_back(DrawBox(ssbbname.str(), "", Mesh_BB_layer_name.str(), BBmin, BBmax, 0x35500000));
+		FBX.Geometry.push_back(DrawBox(ssbbname.str(), Mesh_group_name.str(), Mesh_BB_layer_name.str(), BBmin, BBmax, 0x35500000));
+		MA.Mesh.push_back(DrawBox(ssbbname.str(), Mesh_group_name.str(), Mesh_BB_layer_name.str(), BBmin, BBmax, 0x35500000));
 
 		// Se l'elemento non contiene almeno 1 triangolo (numero indici almeno pari a 3) viene saltato
 		if (zone_mesh_element.nElement_Indices < 3)
@@ -88,18 +90,15 @@ bool MESH_Read_Object (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 			continue;
 		}
 
-		/*
 		// Aggiunta collegamento a materiale
-		ssmaterial << AOD_IO.levelname << "_" << zonename << "_Material_" << zone_mesh_element.Material_Ref;
-		element.material_name = ssmaterial.str();
+		if (zone_mesh_element.Material_Ref >= 0)
+			ssmaterial << "MESH_" << AODRemastered_IO.objectname << "_Material_" << zone_mesh_element.Material_Ref;
+		else
+			ssmaterial << "MESH_" << AODRemastered_IO.objectname << "_Material_N" << to_string(-zone_mesh_element.Material_Ref);
 
-		// Controllo double sided e shadow map nel materiale associato
-		zonefile.seekg(zone_header.TEXTURE_PTR + 16 + zone_mesh_element.Material_Ref * 24);
-		zonefile.read(reinterpret_cast<char*>(&zone_materials_list.TextureMode), sizeof(zone_materials_list.TextureMode));
-		zonefile.read(reinterpret_cast<char*>(&zone_materials_list.DoubleSided), sizeof(zone_materials_list.DoubleSided));
-		element.doublesided = CheckDoubleSided(zone_materials_list.TextureMode, zone_materials_list.DoubleSided);
-		element.uv_set2_flag = CheckShadowMap(zone_materials_list.TextureMode);
-		*/
+		element.material_name = ssmaterial.str();
+		if (find(Material_list.begin(), Material_list.end(), ssmaterial.str()) == Material_list.end())
+			Material_list.push_back(ssmaterial.str());
 
 		// Lettura strip
 		vector <unsigned int> strip(zone_mesh_element.nElement_Indices);
@@ -170,5 +169,15 @@ bool MESH_Read_Object (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 	}
 
 	meshfile.close();
+
+	// Creazione materiali dummy
+	for (unsigned int m = 0; m < Material_list.size(); m++)
+	{
+		Material mat;
+		mat.name = Material_list[m];
+		mat.Type = Material::TYPE::LAMBERT;
+		MA.Material.push_back(mat);
+	}
+
 	return true;
 }

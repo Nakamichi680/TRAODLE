@@ -5,6 +5,53 @@
 #include "TRAOD/CAM/CAM_Struct.h"
 
 
+MATRIX rotationY(float angleRad) {
+	MATRIX result;
+	float c = std::cos(angleRad);
+	float s = std::sin(angleRad);
+
+	result.m00 = c;  result.m01 = 0;  result.m02 = s;
+	result.m10 = 0;  result.m11 = 1;  result.m12 = 0;
+	result.m20 = -s; result.m21 = 0;  result.m22 = c;
+
+	return result;
+}
+
+
+float toRadians(float degrees) {
+	return degrees * M_PI / 180.0f;
+}
+
+
+float toDegrees(float radians) {
+	return radians * 180.0f / M_PI;
+}
+
+
+XYZ matrixToEulerXYZ(MATRIX mat) {
+	XYZ euler;
+
+	// Estrazione angoli Euler con ordine XYZ
+	float sy = mat.m02;
+
+	// Clamp per evitare problemi numerici
+	sy = std::max(-1.0f, std::min(1.0f, sy));
+
+	if (std::abs(sy) < 0.99999f) {
+		euler.x = std::atan2(-mat.m12, mat.m22);
+		euler.y = std::asin(sy);
+		euler.z = std::atan2(-mat.m01, mat.m00);
+	}
+	else {
+		// Gimbal lock case
+		euler.x = std::atan2(mat.m21, mat.m11);
+		euler.y = std::copysign(M_PI / 2.0f, sy);
+		euler.z = 0;
+	}
+
+	return euler;
+}
+
 bool CAM_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 {
 	CAM_HEADER cam_header;
@@ -80,13 +127,135 @@ bool CAM_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 	///////////////////    CALCOLO VALORI DI ROTAZIONE E SALVATAGGIO ANIMAZIONE
 	for (unsigned int f = 0; f < cam_header.nFrames; f++)
 	{
-		COI[f] = sqrt(pow(Zat[f] - Zfrom[f], 2) + pow(Yat[f] - Yfrom[f], 2) + pow(Xat[f] - Xfrom[f], 2));
+		/*msg(msg::TGT::CONS, msg::TYP::DBG) << "X from? ";
+		cin >> Xfrom[f];
+		msg(msg::TGT::CONS, msg::TYP::DBG) << "Y from? ";
+		cin >> Yfrom[f];
+		msg(msg::TGT::CONS, msg::TYP::DBG) << "Z from? ";
+		cin >> Zfrom[f];
+		msg(msg::TGT::CONS, msg::TYP::DBG) << "X at? ";
+		cin >> Xat[f];
+		msg(msg::TGT::CONS, msg::TYP::DBG) << "Y at? ";
+		cin >> Yat[f];
+		msg(msg::TGT::CONS, msg::TYP::DBG) << "Z at? ";
+		cin >> Zat[f];
+		msg(msg::TGT::CONS, msg::TYP::DBG) << "Roll? ";
+		cin >> Roll[f];
+		
+		*/
+
+
+
+		float dx = Xat[f] - Xfrom[f];
+		float dy = Yat[f] - Yfrom[f];
+		float dz = Zat[f] - Zfrom[f];
+
+		float length = std::sqrt(dx*dx + dy * dy + dz * dz);
+
+		if (length < 1e-6f) {
+			Xrot[f] = 0;
+			Yrot[f] = Roll[f];
+			Zrot[f] = 0;
+		}
+
+		dx /= length;
+		dy /= length;
+		dz /= length;
+
+		// Rotazione X: elevazione rispetto al piano XY (CORRETTA)
+		float distXY = std::sqrt(dx*dx + dy * dy);
+		Xrot[f] = 90.0f + toDegrees(std::atan2(dz, distXY));
+
+		// Rotazione Z: orientamento nel piano XY
+		Zrot[f] = toDegrees(std::atan2(-dx, dy));
+
+		// Rotazione Y: roll trasformato per gimbal lock
+		Yrot[f] = toDegrees(std::atan(std::tan(toRadians(Roll[f])) * std::cos(toRadians(Zrot[f]))));
+
+
+
+
+
+
+		/*
+
+
+
+
+		// Calcola il vettore direzione (forward = -Z locale in Maya)
+		VECTOR vec_cam;
+		vec_cam.x = Xat[f] - Xfrom[f];
+		vec_cam.y = Yat[f] - Yfrom[f];
+		vec_cam.z = Zat[f] - Zfrom[f];
+		vec_cam = mathVectorNormalise(vec_cam);
+		
+		// Definisci l'up temporaneo come Z (z-up system)
+		VECTOR worldUp = { 0, 0, 1 };
+
+		// Calcola il vettore right (X locale)
+		VECTOR right = mathVectorCross(vec_cam, worldUp);
+		right = mathVectorNormalise(right);
+
+		// Se forward è parallelo a worldUp, usa un fallback
+		if (sqrt(right.x*right.x + right.y * right.y + right.z * right.z) < 1e-6f)
+			right = { 1, 0, 0 };
+
+		// Ricalcola up come perpendicolare a forward e right
+		VECTOR up = mathVectorCross(right, vec_cam);
+		up = mathVectorNormalise(up);
+
+		// Costruisci la matrice di orientamento base della camera
+		// (right, up, -forward) perché Maya usa -Z come direzione di vista
+		MATRIX lookAtMatrix;
+		lookAtMatrix.m00 = right.x;    lookAtMatrix.m01 = up.x;    lookAtMatrix.m02 = -vec_cam.x;
+		lookAtMatrix.m10 = right.y;    lookAtMatrix.m11 = up.y;    lookAtMatrix.m12 = -vec_cam.y;
+		lookAtMatrix.m20 = right.z;    lookAtMatrix.m21 = up.z;    lookAtMatrix.m22 = -vec_cam.z;
+
+		// Applica il roll attorno all'asse Y globale
+		MATRIX rollMatrix = rotationY(toRadians(Roll[f]));
+		MATRIX finalMatrix = mathMulMatrices(rollMatrix, lookAtMatrix);
+
+		// Estrai gli angoli di Eulero XYZ
+		XYZ euler = matrixToEulerXYZ(finalMatrix);
+
+		Xrot[f] = toDegrees(euler.x);
+		Yrot[f] = toDegrees(euler.y);
+		Zrot[f] = toDegrees(euler.z);
+		
+		*/
+		
+
+
+
+
+
+
+		
+
+
+
+
+
+		/*
+
+		msg(msg::TGT::CONS, msg::TYP::DBG) << "Camera X pos: " << Xfrom[f];
+		msg(msg::TGT::CONS, msg::TYP::DBG) << "Camera Y pos: " << Yfrom[f];
+		msg(msg::TGT::CONS, msg::TYP::DBG) << "Camera Z pos: " << Zfrom[f];
+		msg(msg::TGT::CONS, msg::TYP::DBG) << "Camera X rot: " << Xrot[f];
+		msg(msg::TGT::CONS, msg::TYP::DBG) << "Camera Y rot: " << Yrot[f];
+		msg(msg::TGT::CONS, msg::TYP::DBG) << "Camera Z rot: " << Zrot[f];
+		
+		*/
+		
+		
+		
+		//COI[f] = sqrt(pow(Zat[f] - Zfrom[f], 2) + pow(Yat[f] - Yfrom[f], 2) + pow(Xat[f] - Xfrom[f], 2));
 
 
 		//msg(msg::TGT::FILE, msg::TYP::DBG) << f << ") FROM: " << Xfrom[f] << " " << Yfrom[f] << " " << Zfrom[f] << "   AT: " << Xat[f] << " " << Yat[f] << " " << Zat[f];
 		//msg(msg::TGT::FILE, msg::TYP::DBG) << "   ROT: " << Xrot[f] << " " << Yrot[f] << " " << Zrot[f] << "   F.L.: " << Focal_lenght[f] << "   COI: " << COI[f];
 
-		VECTOR vec_cam;
+		/*VECTOR vec_cam;
 		vec_cam.x = Xat[f] - Xfrom[f];
 		vec_cam.y = Yat[f] - Yfrom[f];
 		vec_cam.z = Zat[f] - Zfrom[f];
@@ -95,17 +264,17 @@ bool CAM_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 		a.x = vec_cam.x;
 		b.y = vec_cam.y;
 
-		/*if (mathVectorDot(a, b) == 0)
+		if (mathVectorDot(a, b) == 0)
 			cout << "è uguale a zero" << endl;
 		else
-			cout << "fslkfncldnfjlksd" << endl;*/
+			cout << "fslkfncldnfjlksd" << endl
 
 
 		XYZ angles = mathVectorGetAngles(vec_cam);
 		mathRadToDeg(&angles);
 		Xrot[f] = angles.x;
 		Yrot[f] = angles.y;
-		Zrot[f] = -angles.z + 180;
+		Zrot[f] = -angles.z + 180;*/
 
 
 		/*VECTOR camera, target;

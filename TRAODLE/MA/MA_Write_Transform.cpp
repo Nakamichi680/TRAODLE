@@ -17,4 +17,11 @@ void MA_Write_Transform (unsigned int t, MA_EXPORT &MA)
 	if (MA.Transform[t].scale_flag)
 		out << "	setAttr \".s\" -type \"double3\" " << MA.Transform[t].sX << " " << MA.Transform[t].sY << " " << MA.Transform[t].sZ << ";\n";
 	MA.MA_Nodes << out.str();
+
+	out.str("");
+
+	if (MA.Transform[t].layer.size() > 0)
+		out << "connectAttr \"" << MA.Transform[t].layer << ".di\" \"" << MA.Transform[t].name << ".do\";\n";
+
+	MA.MA_Connections << out.str();
 }

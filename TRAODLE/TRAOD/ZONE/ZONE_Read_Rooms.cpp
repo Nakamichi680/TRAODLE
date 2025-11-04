@@ -27,7 +27,7 @@ bool ZONE_Read_Rooms (string filename, vector <RoomInfo> RMX_Rooms, FBX_EXPORT &
 	// CREAZIONE LAYERS ZONE PER FILE MA
 	Layer Zone_layer, Zone_BB_layer;
 	stringstream Zone_layer_name, Zone_BB_layer_name;
-	Zone_layer_name << AOD_IO.levelname << "_" << zonename;
+	Zone_layer_name << AOD_IO.levelname << "_" << zonename << "_Rooms";
 	Zone_BB_layer_name << Zone_layer_name.str() << "_bounding_boxes";
 	Zone_layer.name = Zone_layer_name.str();
 	Zone_layer.Label_ARGB = 0xFF00D822;

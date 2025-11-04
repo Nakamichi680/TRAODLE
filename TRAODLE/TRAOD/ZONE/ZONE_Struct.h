@@ -186,7 +186,7 @@ struct ZONE_MESH_ELEMENT
     uint32_t nElement_Triangles;	// Numero di triangoli. Sempre uguale a numero indici triangle strip dell'elemento - 2
     uint32_t nElement_Indices;		// Numero di indici di vertici. Sempre uguale a nElement_Triangles + 2
     uint32_t Offset;				// Il primo è 00000000h, i successivi sono Offset + nElement_Indices dell'elemento precedente
-    uint32_t Material_Ref;			// Numero del materiale
+    int32_t Material_Ref;			// Numero del materiale
     uint32_t Unknown1;				// Sempre FFFFFFFFh ?
     uint32_t Vbuffer_min;			// Indice del vertice più piccolo dell'elemento
     uint32_t Vbuffer_max;			// Indice del vertice più grande dell'elemento

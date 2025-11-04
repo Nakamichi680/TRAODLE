@@ -22,7 +22,6 @@ public:
 bool CLN_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 {
 	CLN_OCTREE cln_octree;
-	//CLN_TLIST cln_tlist;
 	vector <Octant> octree (1);
 
 	ifstream clnfile(filename, std::ios::binary);
@@ -64,7 +63,7 @@ bool CLN_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 
 	vector <string> attribute_list;
 
-	// LETTURA COLLISIONI IN BASE ALL'OCTREE ED ESPORTAZIONE IN MESH MULTIPLE
+	// LETTURA COLLISIONI IN BASE ALL'OCTREE ED ESPORTAZIONE IN BOUNDING BOXES OCTREES
 	// Lettura octree
 	for (unsigned int o = 0; o < octree.size(); o++)
 	{
@@ -124,95 +123,6 @@ bool CLN_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 		ss3 << AOD_IO.levelname << "_CLN_OCTANT_" << octree[o].name << "_box";
 		FBX.Geometry.push_back(DrawBox(ss3.str(), ss1.str(), octree_layer.name, octree[o].Vmin, octree[o].Vmax, 0x25FDBC2E));
 		MA.Mesh.push_back(DrawBox(ss3.str(), ss1.str(), octree_layer.name, octree[o].Vmin, octree[o].Vmax, 0x25FDBC2E));
-		
-		/*
-		// Esportazione triangoli per ottanti senza discendenti
-		if (cln_octree.nChildren == 0)
-		{
-			//msg(msg::TGT::FILE, msg::TYP::DBG) << "octant " << left << setw(10) << octree[o].name << "   nTriangles: " << left << setw(5) << cln_octree.nTriangles << "Indices: ";
-			clndebug << endl << "octant " << left << setw(10) << octree[o].name << "   nTriangles: " << left << setw(5) << cln_octree.nTriangles << "Indices: ";
-			clnfile.seekg(triangle_position + octree[o].Ptr_TList);
-			unsigned int t = 0;
-			while (t < cln_octree.nTriangles)
-			{
-				clnfile.read(reinterpret_cast<char*>(&cln_tlist.attribute), sizeof(cln_tlist.attribute));
-				clnfile.read(reinterpret_cast<char*>(&cln_tlist.padding), sizeof(cln_tlist.padding));
-				clnfile.read(reinterpret_cast<char*>(&cln_tlist.nIndices), sizeof(cln_tlist.nIndices));
-
-				unsigned short composition, mapping, bitattrib;
-
-				composition = cln_tlist.attribute & 0xFF;               // bits 0–7
-				mapping = (cln_tlist.attribute >> 8) & 0x3;				// bits 8–9 (2 bits)
-				bitattrib = (cln_tlist.attribute >> 10) & 0x003FFFFF;	// bits 10–31 (22 bits)
-
-				if (find(vtype.begin(), vtype.end(), cln_tlist.attribute) == vtype.end())
-					vtype.push_back(cln_tlist.attribute);
-				if (find(vpadding.begin(), vpadding.end(), cln_tlist.padding) == vpadding.end())
-					vpadding.push_back(cln_tlist.padding);
-
-				if (cln_tlist.nIndices > 0)
-				{
-					stringstream meshname, ssmaterial;
-					meshname << ss1.str() << "_tris_" << t;
-					ssmaterial << AOD_IO.levelname << "_Collision_" << GetCompositionName(composition);
-					
-					Mesh temp_mesh;
-					temp_mesh.name = meshname.str();
-					temp_mesh.parent = ss1.str();
-					temp_mesh.FBX_parent = hashID(ss1.str(), "Group");
-					temp_mesh.layer = octree_layer.name;
-					temp_mesh.material_name = ssmaterial.str();
-					temp_mesh.nV = cln_tlist.nIndices * 3;
-					temp_mesh.uv_set2_flag = temp_mesh.normals_flag = temp_mesh.tangents_flag = temp_mesh.binormals_flag = temp_mesh.vcolors_flag = false;
-
-					for (unsigned int i = 0; i < cln_tlist.nIndices; i++)
-					{
-						clnfile.read(reinterpret_cast<char*>(&cln_tlist.Index), sizeof(cln_tlist.Index));
-						streamoff old_position = clnfile.tellg();
-						clndebug << right << setw(7) << cln_tlist.Index;
-						clnfile.seekg(triangle_position + cln_tlist.Index * 48);
-						Vec3 v1, v2, v3;
-						unsigned int MissingAxis, Unknown;
-						CLN_Get_Triangle(clnfile, v1, v2, v3, MissingAxis, Unknown);
-						clnfile.seekg(old_position);
-						temp_mesh.X.push_back(v1.x);
-						temp_mesh.X.push_back(v2.x);
-						temp_mesh.X.push_back(v3.x);
-						temp_mesh.Y.push_back(v1.y);
-						temp_mesh.Y.push_back(v2.y);
-						temp_mesh.Y.push_back(v3.y);
-						temp_mesh.Z.push_back(v1.z);
-						temp_mesh.Z.push_back(v2.z);
-						temp_mesh.Z.push_back(v3.z);
-
-						// Ottimizzazione UV per evitare texture stretching
-						Vec3 edge1 = v2 - v1;
-						Vec3 edge2 = v3 - v1;
-						Vec3 normal = edge1.cross(edge2).normalized();
-						Vec3 tangent = edge1.normalized();							// asse U
-						Vec3 bitangent = normal.cross(tangent).normalized();		// asse V
-						Vec2 uv1(0.0f, 0.0f);										// origine
-						Vec2 uv2((v2 - v1).dot(tangent), (v2 - v1).dot(bitangent));
-						Vec2 uv3((v3 - v1).dot(tangent), (v3 - v1).dot(bitangent));
-						temp_mesh.U1.push_back(uv1.u / 1024);
-						temp_mesh.V1.push_back(uv1.v / 1024);
-						temp_mesh.U1.push_back(uv2.u / 1024);
-						temp_mesh.V1.push_back(uv2.v / 1024);
-						temp_mesh.U1.push_back(uv3.u / 1024);
-						temp_mesh.V1.push_back(uv3.v / 1024);
-
-						Face triangle;
-						triangle.v1 = i * 3;		triangle.v2 = i * 3 + 1;		triangle.v3 = i * 3 + 2;
-						temp_mesh.Face.push_back(triangle);
-					}
-
-					FBX.Geometry.push_back(temp_mesh);
-					MA.Mesh.push_back(temp_mesh);
-				}
-				t += cln_tlist.nIndices;
-			}
-		}
-		*/
 	}	
 	
 	// LETTURA INTERA GEOMETRIA DELLE COLLISIONI ED ESPORTAZIONE IN MESH UNICA
