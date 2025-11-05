@@ -440,12 +440,16 @@ public:
 	string shadow;										// Texture shadow map
 	string transparency;								// Texture trasparenza
 	string bump;										// Texture bump map
-	string specular;									// Texture specular/envelope
+	string specular;									// Texture envelope (per Arnold) / specular (per Phong)
+	string reflection;									// Texture envelope (per Phong)
 	string emissive;									// Texture per effetto glow
 	float metalness = 0.3f;
-	float specular_color_R = 1;							// Colore riflesso 0-1
-	float specular_color_G = 1;							// Colore riflesso 0-1
-	float specular_color_B = 1;							// Colore riflesso 0-1
+	float specular_color_R = 1;							// Colore riflesso 0-1 (solo Arnold, in Phong indica specular)
+	float specular_color_G = 1;							// Colore riflesso 0-1 (solo Arnold, in Phong indica specular)
+	float specular_color_B = 1;							// Colore riflesso 0-1 (solo Arnold, in Phong indica specular)
+	float reflectivity_color_R = 1;						// Colore riflesso 0-1 (solo Phong)
+	float reflectivity_color_G = 1;						// Colore riflesso 0-1 (solo Phong)
+	float reflectivity_color_B = 1;						// Colore riflesso 0-1 (solo Phong)
 	float opacity_R = 1;								// Valore trasparenza 0-1
 	float opacity_G = 1;								// Valore trasparenza 0-1
 	float opacity_B = 1;								// Valore trasparenza 0-1

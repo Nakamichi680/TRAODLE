@@ -91,8 +91,6 @@ private:
 	TYP type = TYP::LOG;
 };
 
-
 #define msg(output_target, message_type) msg(__FUNCTION__, output_target, message_type)
-
 
 void msgInit ();		// Inizializza l'interfaccia di output su console e su file

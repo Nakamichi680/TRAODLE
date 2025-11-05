@@ -232,7 +232,10 @@
     <ClCompile Include="MA\MA_Write_Header.cpp" />
     <ClCompile Include="MA\MA_Write_Joint.cpp" />
     <ClCompile Include="MA\MA_Write_Locator.cpp" />
-    <ClCompile Include="MA\MA_Write_Material.cpp" />
+    <ClCompile Include="MA\MA_Write_Material_Arnold.cpp" />
+    <ClCompile Include="MA\MA_Write_Material_Empty.cpp" />
+    <ClCompile Include="MA\MA_Write_Material_Lambert.cpp" />
+    <ClCompile Include="MA\MA_Write_Material_Phong.cpp" />
     <ClCompile Include="MA\MA_Write_Mesh.cpp" />
     <ClCompile Include="MA\MA_Write_NurbsSurface.cpp" />
     <ClCompile Include="MA\MA_Write_PointLight.cpp">
@@ -299,6 +302,8 @@
     <ClCompile Include="TRAOD\ZONE\CheckShadowMap.cpp" />
     <ClCompile Include="TRAOD\ZONE\Export_ZONE.cpp" />
     <ClCompile Include="TRAOD\ZONE\ZONE_Read_Fakes.cpp" />
+    <ClCompile Include="TRAOD\ZONE\ZONE_Read_Materials_Arnold.cpp" />
+    <ClCompile Include="TRAOD\ZONE\ZONE_Read_Materials_MayaHw20.cpp" />
     <ClCompile Include="TRAOD\ZONE\ZONE_Read_Rooms.cpp" />
     <ClCompile Include="TRAOD\ZONE\ZONE_Read_Rooms_MT.cpp" />
     <ClCompile Include="TRAOD\ZONE\ZONE_Read_Materials.cpp" />

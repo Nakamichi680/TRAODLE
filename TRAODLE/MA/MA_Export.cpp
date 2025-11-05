@@ -61,7 +61,23 @@ void MA_Export (string output_filename, MA_EXPORT &MA)
 	if (MA.Material.size() > 0)
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Writing materials";
 	for (unsigned int m = 0; m < MA.Material.size(); m++)
-		MA_Write_Material(m, MA);
+	{
+		switch (MA.Material[m].Type)
+		{
+		case (Material::TYPE::EMPTY):
+			MA_Write_Material_Empty(m, MA);
+			break;
+		case (Material::TYPE::LAMBERT):
+			MA_Write_Material_Lambert(m, MA);
+			break;
+		case (Material::TYPE::PHONG):
+			MA_Write_Material_Phong(m, MA);
+			break;
+		case (Material::TYPE::AISTANDARDSURFACE):
+			MA_Write_Material_Arnold(m, MA);
+			break;
+		}
+	}
 
 	if (MA.Texture.size() > 0)
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Writing textures";

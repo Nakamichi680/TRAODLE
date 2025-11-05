@@ -317,9 +317,6 @@
     <ClCompile Include="Texture_RAWtoBMP.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="MA\MA_Write_Material.cpp">
-      <Filter>File di origine\MA Exporter</Filter>
-    </ClCompile>
     <ClCompile Include="TRAE\Export_TRAE.cpp">
       <Filter>File di origine\TRAE</Filter>
     </ClCompile>
@@ -567,6 +564,24 @@
       <Filter>File di origine\TRAOD\CLN</Filter>
     </ClCompile>
     <ClCompile Include="MA\MA_CalculatePerspCamera.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\ZONE\ZONE_Read_Materials_MayaHw20.cpp">
+      <Filter>File di origine\TRAOD\ZONE</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\ZONE\ZONE_Read_Materials_Arnold.cpp">
+      <Filter>File di origine\TRAOD\ZONE</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_Material_Lambert.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_Material_Empty.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_Material_Arnold.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_Material_Phong.cpp">
       <Filter>File di origine\MA Exporter</Filter>
     </ClCompile>
   </ItemGroup>

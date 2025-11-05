@@ -16,11 +16,13 @@ AODRemastered_IO_CLASS AODRemastered_IO;		// Classe Input/Output globale per AoD
 AE_IO_CLASS AE_IO;								// Classe Input/Output globale per AE
 ofstream msg_file_stream;
 mutex mu;
+int TargetRenderer;
+string version = "0.251105";
 
 
 int main(int argc, char **argv)
 {
-	chrono::steady_clock::time_point begin = chrono::steady_clock::now();
+	chrono::steady_clock::time_point begin;
 	msgInit();
 	//FindBestThreadNumber();
 
@@ -37,8 +39,10 @@ int main(int argc, char **argv)
 	{
 	case 0: {																// TRAE
 		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Tomb Raider - Anniversary Edition Level Exporter by Nakamichi680\n";
-		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Version 0.251012\n";
+		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Version " << version << "\n";
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Mode = 0 - AE";
+
+		begin = chrono::steady_clock::now();
 
 		// INIZIALIZZAZIONE FILES E CARTELLE
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Initializing IO";
@@ -99,8 +103,16 @@ int main(int argc, char **argv)
 
 	case 1: {																// TRAOD
 		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Tomb Raider - The Angel of Darkness Level Exporter by Nakamichi680\n";
-		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Version 0.251012\n";
+		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Version " << version << "\n";
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Mode = 1 - AOD";
+
+		// SCELTA TARGET RENDERER PER MAYA (MAYA HARDWARE O ARNOLD). INFLUENZA L'ESPORTAZIONE DEI MATERIALI
+		msg(msg::TGT::CONS, msg::TYP::OVR) << "\nSelect target renderer:\n  1 - Maya Hardware 2.0\n  2 - Arnold\n";
+		cin >> TargetRenderer;
+		if (TargetRenderer != 1 && TargetRenderer != 2)
+			return Fatal_Error_Terminate();
+
+		begin = chrono::steady_clock::now();
 
 		// INIZIALIZZAZIONE FILES E CARTELLE
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Initializing IO";
@@ -182,8 +194,10 @@ int main(int argc, char **argv)
 
 	case 2: {																// TRAOD Remastered MESH Exporter
 		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Tomb Raider - The Angel of Darkness Remastered MESH Exporter by Nakamichi680\n";
-		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Version 0.251012\n";
+		msg(msg::TGT::FILE_CONS, msg::TYP::OVR) << "Version " << version << "\n";
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Mode = 2 - AOD Remastered MESH Exporter";
+
+		begin = chrono::steady_clock::now();
 
 		// INIZIALIZZAZIONE FILES E CARTELLE
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Initializing IO";

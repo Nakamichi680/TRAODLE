@@ -134,7 +134,7 @@ bool ZONE_Read_Fakes (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 		// Creazione Transform oggetto
 		Transform object;
 		stringstream temp1;
-		temp1 << AOD_IO.levelname << "_" << zonename << "_OBJECT_" << zone_fakes_element.Fake_List_Index;
+		temp1 << AOD_IO.levelname << "_" << zonename << "_FAKE_" << zone_fakes_element.Fake_List_Index;
 		object.name = temp1.str();
 		object.translate_flag = object.scale_flag = true;
 		object.tX = zone_fakes_element.Xpos;
@@ -162,7 +162,7 @@ bool ZONE_Read_Fakes (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 				// Creazione Transform parte oggetto
 				Transform part;
 				stringstream temp2;
-				temp2 << AOD_IO.levelname << "_" << zonename << "_OBJECT_" << zone_fakes_element.Fake_List_Index << "_PART_" << nPart;
+				temp2 << AOD_IO.levelname << "_" << zonename << "_FAKE_" << zone_fakes_element.Fake_List_Index << "_PART_" << nPart;
 				part.name = temp2.str();
 				part.parent = temp1.str();
 				part.FBX_parent = hashID(temp1.str(), "Group");
@@ -189,7 +189,7 @@ bool ZONE_Read_Fakes (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 				{
 					Mesh element;				// Classe provvisoria contente i valori letti dal file ZONE. Va copiata nell'apposito array FBX e/o MA al termine dell'estrazione
 					stringstream ssname, ssmaterial, ssbbname;
-					ssname << AOD_IO.levelname << "_" << zonename << "_OBJECT_" << zone_fakes_element.Fake_List_Index << "_PART_" << nPart << "_MESH_" << el;
+					ssname << AOD_IO.levelname << "_" << zonename << "_FAKE_" << zone_fakes_element.Fake_List_Index << "_PART_" << nPart << "_OBJ_" << el;
 					ssbbname << ssname.str() << "_BB";
 					element.name = ssname.str();
 					element.parent = part.name;

@@ -8,6 +8,7 @@ void MA_Write_Header (MA_EXPORT &MA)
 	out << "//Maya ASCII 2016 scene\n";
 	out << "//Codeset: 1252\n";
 	out << "requires maya \"2016\";\n";
+	out << "requires - nodeType \"colorComposite\" \"lookdevKit\" \"1.0\";\n";
 	out << "currentUnit -l centimeter -a degree -t film;\n";
 			
 	MA.MA_Header << out.str();		// Copia il testo nello stringstream Header definitivo

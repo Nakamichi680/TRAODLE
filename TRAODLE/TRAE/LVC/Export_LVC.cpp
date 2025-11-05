@@ -16,8 +16,6 @@ bool Export_LVC (string filename)
 	cout << "\nReading " << filename;
 	if (!LVC_Read_Geometry(filename, FBX, MA))					// Lettura geometria livello
 		return false;
-	//if (!ZONE_Read_Textures(filename, FBX, MA))					// Esportazione textures ed aggiunta nei vettori FBX e MA
-		//return false;
 
 	SetCurrentDirectory(AE_IO.folder_geometry_lpwstr);			// \NOMELIVELLO\Geometry
 	string outfilename = filename.substr(0, filename.size() - 4);

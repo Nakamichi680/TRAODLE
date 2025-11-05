@@ -135,7 +135,7 @@ bool CLN_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 	cln_mesh.name = meshname.str();
 	cln_mesh.layer = collisions_layer.name;
 	cln_mesh.nV = cln_octree.Ptr_TList / 16;		// Numero di triangoli x 3
-	cln_mesh.uv_set2_flag = cln_mesh.normals_flag = cln_mesh.tangents_flag = cln_mesh.binormals_flag = cln_mesh.vcolors_flag = false;
+	cln_mesh.uv_set2_flag = cln_mesh.normals_flag = cln_mesh.tangents_flag = cln_mesh.binormals_flag = cln_mesh.vcolors_flag = cln_mesh.doublesided = false;
 	cln_mesh.multimaterial = true;
 
 	// Ogni ciclo esporta un triangolo

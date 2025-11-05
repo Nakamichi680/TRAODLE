@@ -27,7 +27,15 @@ void MA_Write_NurbsSurface (unsigned int n, MA_EXPORT &MA);
 
 void MA_Write_Texture (unsigned int t, MA_EXPORT &MA);
 
-void MA_Write_Material (unsigned int m, MA_EXPORT &MA);
+void MA_Write_Material_Empty(unsigned int m, MA_EXPORT &MA);
+
+void MA_Write_Material_Lambert(unsigned int m, MA_EXPORT &MA);
+
+void MA_Write_Material_Phong(unsigned int m, MA_EXPORT &MA);
+
+void MA_Write_Material_Blinn(unsigned int m, MA_EXPORT &MA);
+
+void MA_Write_Material_Arnold(unsigned int m, MA_EXPORT &MA);
 
 void MA_Write_Joint (unsigned int j, MA_EXPORT &MA);
 
