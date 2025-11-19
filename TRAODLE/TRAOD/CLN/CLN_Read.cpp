@@ -123,6 +123,62 @@ bool CLN_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 		ss3 << AOD_IO.levelname << "_CLN_OCTANT_" << octree[o].name << "_box";
 		FBX.Geometry.push_back(DrawBox(ss3.str(), ss1.str(), octree_layer.name, octree[o].Vmin, octree[o].Vmax, 0x25FDBC2E));
 		MA.Mesh.push_back(DrawBox(ss3.str(), ss1.str(), octree_layer.name, octree[o].Vmin, octree[o].Vmax, 0x25FDBC2E));
+
+
+
+
+		// Esportazione triangoli per ottanti senza discendenti
+
+
+		if (cln_octree.nChildren == 0)
+		{
+			clnfile.seekg(triangle_position + octree[o].Ptr_TList);
+			CLN_TLIST cln_tlist;
+			unsigned int t = 0;
+			while (t < cln_octree.nTriangles)
+			{
+				clnfile.read(reinterpret_cast<char*>(&cln_tlist.attribute), sizeof(cln_tlist.attribute));
+				clnfile.read(reinterpret_cast<char*>(&cln_tlist.padding), sizeof(cln_tlist.padding));
+				clnfile.read(reinterpret_cast<char*>(&cln_tlist.nIndices), sizeof(cln_tlist.nIndices));
+				if (cln_tlist.nIndices > 0)
+				{
+					stringstream meshname;
+					meshname << ss1.str() << "_tris_" << t;
+					Mesh temp_mesh;
+					temp_mesh.name = meshname.str();
+					temp_mesh.parent = ss1.str();
+					temp_mesh.FBX_parent = hashID(ss1.str(), "Group");
+					temp_mesh.layer = octree_layer.name;
+					temp_mesh.nV = cln_tlist.nIndices * 3;
+					temp_mesh.uv_set1_flag = temp_mesh.uv_set2_flag = temp_mesh.normals_flag = temp_mesh.tangents_flag = temp_mesh.binormals_flag = temp_mesh.vcolors_flag = false;
+					for (unsigned int i = 0; i < cln_tlist.nIndices; i++)
+					{
+						clnfile.read(reinterpret_cast<char*>(&cln_tlist.Index), sizeof(cln_tlist.Index));
+						streamoff old_position = clnfile.tellg();
+						clnfile.seekg(triangle_position + cln_tlist.Index * 48);
+						Vec3 v0, v1, v2;
+						unsigned int MissingAxis, Unknown;
+						CLN_Get_Triangle(clnfile, v0, v1, v2, MissingAxis, Unknown);
+						clnfile.seekg(old_position);
+						temp_mesh.X.push_back(v0.x);
+						temp_mesh.X.push_back(v1.x);
+						temp_mesh.X.push_back(v2.x);
+						temp_mesh.Y.push_back(v0.y);
+						temp_mesh.Y.push_back(v1.y);
+						temp_mesh.Y.push_back(v2.y);
+						temp_mesh.Z.push_back(v0.z);
+						temp_mesh.Z.push_back(v1.z);
+						temp_mesh.Z.push_back(v2.z);
+						Face triangle;
+						triangle.v1 = i * 3;		triangle.v2 = i * 3 + 1;		triangle.v3 = i * 3 + 2;
+						temp_mesh.Face.push_back(triangle);
+					}
+					FBX.Geometry.push_back(temp_mesh);
+					MA.Mesh.push_back(temp_mesh);
+				}
+				t += cln_tlist.nIndices;
+			}
+		}
 	}	
 	
 	// LETTURA INTERA GEOMETRIA DELLE COLLISIONI ED ESPORTAZIONE IN MESH UNICA

@@ -256,7 +256,7 @@ bool ZONE_Read_Textures (string filename, vector <RoomInfo> RMX_Rooms, FBX_EXPOR
 									if (zone_mesh_element.Material_Ref == m)	// Se viene trovata una mesh che usa quel materiale viene aggiunto il collegamento all'uvChooser
 									{
 										stringstream ssname;
-										ssname << AOD_IO.levelname << "_" << zonename << "_OBJECT_" << zone_fakes_element.Fake_List_Index << "_PART_" << nPart << "_MESH_" << el;
+										ssname << AOD_IO.levelname << "_" << zonename << "_FAKE_" << zone_fakes_element.Fake_List_Index << "_PART_" << nPart << "_OBJ_" << el;
 										tex.UV_mesh_list.resize(tex.UV_mesh_list.size() + 1);
 										tex.UV_mesh_list[tex.UV_mesh_list.size()-1].mesh_name = ssname.str();
 										tex.UV_mesh_list[tex.UV_mesh_list.size()-1].UVset = 1;

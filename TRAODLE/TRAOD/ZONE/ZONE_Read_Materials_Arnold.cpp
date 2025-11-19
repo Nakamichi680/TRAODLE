@@ -20,6 +20,8 @@ Material ZONE_Read_Materials_Arnold(string zonename, bool diffuse_transparent, s
 	{
 	case (0):												// NONE
 		mat.Type = Material::TYPE::AISTANDARDSURFACE;
+		if (zone_materials_list.DiffuseID != -1)
+			msg(msg::TGT::FILE_CONS, msg::TYP::WARN) << material_name << " has texture(s) but diffuse color is disabled.";
 		break;
 	case (0b100):
 	case (0b100100):										// DIFFUSE
@@ -140,17 +142,16 @@ Material ZONE_Read_Materials_Arnold(string zonename, bool diffuse_transparent, s
 	case (0b10011000):										// SNOW (da fare)
 		
 		break;
-	case (0b10011100):										// GLASS (da controllare)
+	case (0b10011100):										// GLASS
 		mat.Type = Material::TYPE::AISTANDARDSURFACE;
 		if (zone_materials_list.DiffuseID != -1)
-			mat.color = slot1.str();
-		if (diffuse_transparent && btype == 3)
-			mat.transparency = slot1.str();
+			mat.emissive = slot1.str();
 		if (zone_materials_list.BumpSpecID != -1)
+		{
 			mat.specular = slot3.str();
-		//mat.metalness = 0;
-		//mat.specular_color_R = mat.specular_color_G = mat.specular_color_B = 0.65f;
-		mat.opacity_R = mat.opacity_G = mat.opacity_B = 0.5f;
+			mat.bump = slot3.str();
+		}
+		mat.metalness = 0;
 		break;
 	}
 

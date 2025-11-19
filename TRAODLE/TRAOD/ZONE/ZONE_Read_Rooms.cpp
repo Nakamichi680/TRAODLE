@@ -140,6 +140,7 @@ bool ZONE_Read_Rooms (string filename, vector <RoomInfo> RMX_Rooms, FBX_EXPORT &
 			zonefile.read(reinterpret_cast<char*>(&zone_materials_list.DoubleSided), sizeof(zone_materials_list.DoubleSided));
 			element.doublesided = CheckDoubleSided(zone_materials_list.TextureMode, zone_materials_list.DoubleSided);
 			element.uv_set2_flag = CheckShadowMap(zone_materials_list.TextureMode);
+			element.displacement = CheckFur(zone_materials_list.TextureMode);
 
 			// Lettura strip
 			vector <unsigned int> strip(zone_mesh_element.nElement_Indices);

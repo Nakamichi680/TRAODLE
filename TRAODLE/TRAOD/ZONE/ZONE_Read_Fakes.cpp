@@ -155,7 +155,7 @@ bool ZONE_Read_Fakes (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 				//msg(msg::TGT::FILE_CONS, msg::TYP::DBG) << "Reading fake object n. " << zone_fakes_element.Fake_List_Index << "   part " << nPart;
 				zonefile.read(reinterpret_cast<char*>(&zone_ps2_obj.Xrot), sizeof(zone_ps2_obj.Xrot));
 				zonefile.read(reinterpret_cast<char*>(&zone_ps2_obj.Yrot), sizeof(zone_ps2_obj.Yrot));
-				zonefile.read(reinterpret_cast<char*>(&zone_ps2_obj.Yrot), sizeof(zone_ps2_obj.Yrot));
+				zonefile.read(reinterpret_cast<char*>(&zone_ps2_obj.Zrot), sizeof(zone_ps2_obj.Zrot));
 				streamoff next_zone_ps2_obj_position = zonefile.tellg();			// Salva la posizione attuale per tornarci dopo aver letto la mesh dell'oggetto
 				zonefile.seekg(Object_offsets[zone_ps2_obj.Obj_ID]);
 

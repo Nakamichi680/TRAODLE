@@ -281,6 +281,7 @@
     <ClCompile Include="TRAOD\AOD_IO_Init.cpp" />
     <ClCompile Include="TRAOD\CAM\CAM_Read.cpp" />
     <ClCompile Include="TRAOD\CAM\Export_CAM.cpp" />
+    <ClCompile Include="TRAOD\CHR\Export_CHR.cpp" />
     <ClCompile Include="TRAOD\CLN\CLN_GetResource.cpp" />
     <ClCompile Include="TRAOD\CLN\CLN_Get_Triangle.cpp" />
     <ClCompile Include="TRAOD\CLN\CLN_Read.cpp" />
@@ -299,6 +300,7 @@
     <ClCompile Include="TRAOD\RMX\RMX_Read.cpp" />
     <ClCompile Include="TRAOD\RMX\RMX_Water.cpp" />
     <ClCompile Include="TRAOD\ZONE\CheckDoubleSided.cpp" />
+    <ClCompile Include="TRAOD\ZONE\CheckFur.cpp" />
     <ClCompile Include="TRAOD\ZONE\CheckShadowMap.cpp" />
     <ClCompile Include="TRAOD\ZONE\Export_ZONE.cpp" />
     <ClCompile Include="TRAOD\ZONE\ZONE_Read_Fakes.cpp" />

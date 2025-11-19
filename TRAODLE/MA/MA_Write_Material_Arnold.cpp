@@ -128,58 +128,43 @@ void MA_Write_Material_Arnold(unsigned int m, MA_EXPORT &MA)		// DA SISTEMARE
 
 	case (Material::SPECIAL::GLASS):
 		out << "createNode aiStandardSurface -n \"" << mat.name << "\";\n";
-		//out << "	setAttr \".base\" 1;\n";											// Imposta Base Color Weight a 1 (default 0.8)
-		out << "	setAttr \".specular_color\" -type \"float3\" 1 1 1;\n";				// Da controllare il valore di default, forse si può togliere
+		out << "	setAttr \".base\" 0;\n";											// Imposta Base Color Weight a 0 (default 0.8)
+		out << "	setAttr \".metalness\" " << mat.metalness << ";\n";
 		out << "	setAttr \".specular_roughness\" 0;\n";
-		out << "	setAttr \".specular_IOR\" 0.75;\n";
+		out << "	setAttr \".specular_IOR\" 1.9;\n";
 		out << "	setAttr \".specular_anisotropy\" 0.5;\n";
-		out << "	setAttr \".transmission\" 0.9;\n";
-		out << "	setAttr \".emission\" 0.4;\n";
-		if (mat.transparency.empty() && mat.Blend == Material::BLEND::NORMAL)
-			out << "	setAttr \".opacity\" -type \"float3\" 0.5 0.5 0.5;\n";
+		out << "	setAttr \".transmission\" 1;\n";
+		out << "	setAttr -av \".emission\" 0.1;\n";
 		out << "createNode shadingEngine -n \"" << mat.name << "SG\";\n";
 		out << "	setAttr \".ihi\" 0;\n";
 		out << "	setAttr \".ro\" yes;\n";
 		out << "createNode materialInfo -n \"" << mat.name << "materialInfo\";\n";
+
+		if (!mat.bump.empty())
+		{
+			out << "createNode bump2d -n \"" << mat.name << "bump2d\";\n";
+			out << "	setAttr \".bd\" 20;\n";								// Bump Depth
+		}
+
 		MA.MA_Nodes << out.str();
 		out.str("");
 
-		// da implementare
+		if (!mat.emissive.empty())											// Diffuse mappato su emissive
+		{
+			out << "connectAttr \"" << mat.emissive << ".oc\" \"" << mat.name << ".emission_color\";\n";
+			out << "connectAttr \"" << mat.emissive << ".msg\" \"" << mat.name << "materialInfo.t\" -na;\n";
+		}
 
-		/*connectAttr "PARIS1B_Z00_Texture_65.oa" "PARIS1B_Z00_Material_315.specular";
-		connectAttr "PARIS1B_Z00_Texture_318.oc" "PARIS1B_Z00_Material_315.emission_color"
-			;
-		connectAttr "bump2d1.o" "PARIS1B_Z00_Material_315.n";*/
-
-		if (!mat.color.empty())												// Solo diffuse map
-		{
-			if (mat.Blend == Material::BLEND::SUBTRACT)
-				out << "connectAttr \"" << mat.color << ".oc\" \"" << mat.name << ".opacity\";\n";
-			else
-				out << "connectAttr \"" << mat.color << ".oc\" \"" << mat.name << ".base_color\";\n";
-			out << "connectAttr \"" << mat.color << ".msg\" \"" << mat.name << "materialInfo.t\" -na;\n";
-		}
-		if (!mat.transparency.empty() && mat.Blend == Material::BLEND::NORMAL)	// Trasparenza
-		{
-			out << "connectAttr \"" << mat.transparency << ".oa\" \"" << mat.name << ".opacityr\";\n";
-			out << "connectAttr \"" << mat.transparency << ".oa\" \"" << mat.name << ".opacityg\";\n";
-			out << "connectAttr \"" << mat.transparency << ".oa\" \"" << mat.name << ".opacityb\";\n";
-		}
-		/*if (mat.Blend == Material::BLEND::OVERLAY)											// OVERLAY
-		{
-			out << "connectAttr \"" << mat.color << ".oa\" \"" << mat.name << ".emission\";\n";
-			out << "connectAttr \"" << mat.color << ".oc\" \"" << mat.name << ".opacity\";\n";
-		}
-		if (mat.Blend == Material::BLEND::SUBTRACT)											// SUBTRACT
-		{
-			out << "connectAttr \"" << mat.name << "aiNegate.out\" \"" << mat.name << ".base_color\";\n";
-			out << "connectAttr \"" << mat.name << "aiNegate.msg\" \":defaultRenderUtilityList1.u\" -na;\n";
-		}*/
-		if (!mat.specular.empty())															// Specular map
-		{
+		if (!mat.specular.empty())											// Specular map
 			out << "connectAttr \"" << mat.specular << ".oa\" \"" << mat.name << ".specular\";\n";
-			out << "connectAttr \"" << mat.color << ".oc\" \"" << mat.name << ".specular_color\";\n";
+
+		if (!mat.bump.empty())												// Bump map
+		{
+			out << "connectAttr \"" << mat.name << "bump2d.o\" \"" << mat.name << ".n\";\n";
+			out << "connectAttr \"" << mat.bump << ".oa\" \"" << mat.name << "bump2d.bv\";\n";
+			out << "connectAttr \"" << mat.name << "bump2d.msg\" \":defaultRenderUtilityList1.u\" -na;\n";
 		}
+
 		out << "connectAttr \"" << mat.name << ".out\" \"" << mat.name << "SG.ss\";\n";
 		out << "connectAttr \"" << mat.name << "SG.msg\" \"" << mat.name << "materialInfo.sg\";\n";
 		out << "connectAttr \"" << mat.name << "SG.pa\" \":renderPartition.st\" -na;\n";

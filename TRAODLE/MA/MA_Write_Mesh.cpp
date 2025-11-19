@@ -626,6 +626,13 @@ void MA_Write_Mesh (const Mesh& mesh, MA_EXPORT &MA)
 	out << "	setAttr \".db\" yes;\n";
 	out << "	setAttr \".bw\" 1.704961;\n";
 
+	// Mesh con fur attivato (displacement map)
+	if (mesh.displacement)
+	{
+		out << "	setAttr \".ai_subdiv_type\" 2;\n";
+		out << "	setAttr \".ai_subdiv_iterations\" 8;\n";
+	}
+
 	// Mesh multimateriale: creazione nodi group
 	if (mesh.multimaterial)
 		for (unsigned int g = 0; g < mesh.Groups.size(); g++)

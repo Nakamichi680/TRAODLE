@@ -443,6 +443,7 @@ public:
 	string specular;									// Texture envelope (per Arnold) / specular (per Phong)
 	string reflection;									// Texture envelope (per Phong)
 	string emissive;									// Texture per effetto glow
+	string displacement;								// Texture per effetto fur
 	float metalness = 0.3f;
 	float specular_color_R = 1;							// Colore riflesso 0-1 (solo Arnold, in Phong indica specular)
 	float specular_color_G = 1;							// Colore riflesso 0-1 (solo Arnold, in Phong indica specular)
@@ -634,6 +635,7 @@ public:
 	bool vcolors_flag = true;
 	bool doublesided = true;
 	bool multimaterial = false;
+	bool displacement = false;
 	vector <float> X;
     vector <float> Y;
     vector <float> Z;

@@ -11,6 +11,8 @@ bool CheckDoubleSided (unsigned short TextureMode, unsigned int DoubleSided);
 
 bool CheckShadowMap (unsigned short TextureMode);
 
+bool CheckFur (unsigned short TextureMode);
+
 bool ZONE_Read_Rooms (string filename, vector <RoomInfo> RMX_Rooms, FBX_EXPORT &FBX, MA_EXPORT &MA);
 
 bool ZONE_Read_Rooms_MT (string name1, string name2, FBX_EXPORT &FBX, MA_EXPORT &MA);

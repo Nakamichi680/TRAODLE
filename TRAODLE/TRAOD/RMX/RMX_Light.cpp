@@ -9,21 +9,30 @@ void RMX_Light (ifstream &rmxfile, string name, string room_name, string layer, 
 	RMX_LIGHT rmx_light;
 
 	// Lettura dati luce dal file RMX
-	rmxfile.seekg(32, ios_base::cur);
+	float boh1, boh2, boh3;
+	rmxfile.seekg(8, ios_base::cur);
+	rmxfile.read(rmx_light.null1, sizeof(rmx_light.null1));
 	rmxfile.read(reinterpret_cast<char*>(&rmx_light.Xpos), sizeof(rmx_light.Xpos));						// Posizione X della luce
 	rmxfile.read(reinterpret_cast<char*>(&rmx_light.Ypos), sizeof(rmx_light.Ypos));						// Posizione Y della luce
 	rmxfile.read(reinterpret_cast<char*>(&rmx_light.Zpos), sizeof(rmx_light.Zpos));						// Posizione Z della luce
-	rmxfile.seekg(56, ios_base::cur);
+	rmxfile.read(reinterpret_cast<char*>(&rmx_light.Wpos), sizeof(rmx_light.Wpos));						// Posizione W della luce
+	rmxfile.read(rmx_light.null2, sizeof(rmx_light.null2));
+	rmxfile.read(reinterpret_cast<char*>(&boh1), sizeof(boh1));	
+	rmxfile.read(reinterpret_cast<char*>(&boh2), sizeof(boh2));
+	rmxfile.read(reinterpret_cast<char*>(&boh3), sizeof(boh3));
+	rmxfile.read(rmx_light.null4, sizeof(rmx_light.null4));
 	rmxfile.read(reinterpret_cast<char*>(&rmx_light.Light_ID), sizeof(rmx_light.Light_ID));				// Hash del nome della luce
-	rmxfile.seekg(4, ios_base::cur);
+	rmxfile.read(reinterpret_cast<char*>(&rmx_light.null5), sizeof(rmx_light.null5));
 	rmxfile.read(reinterpret_cast<char*>(&rmx_light.Static_flag), sizeof(rmx_light.Static_flag));		// 4 = nodo statico, altrimenti legato a script
 	rmxfile.read(reinterpret_cast<char*>(&rmx_light.R), sizeof(rmx_light.R));							// Intensità colore rosso della luce (0-255)
 	rmxfile.read(reinterpret_cast<char*>(&rmx_light.G), sizeof(rmx_light.G));							// Intensità colore verde della luce (0-255)
 	rmxfile.read(reinterpret_cast<char*>(&rmx_light.B), sizeof(rmx_light.B));							// Intensità colore blu della luce (0-255)
-	rmxfile.seekg(4, ios_base::cur);
+	rmxfile.read(reinterpret_cast<char*>(&rmx_light.null6), sizeof(rmx_light.null6));
 	rmxfile.read(reinterpret_cast<char*>(&rmx_light.intRadius), sizeof(rmx_light.intRadius));			// Diametro interno della luce
 	rmxfile.read(reinterpret_cast<char*>(&rmx_light.extRadius), sizeof(rmx_light.extRadius));			// Diametro esterno della luce
-	rmxfile.seekg(8, ios_base::cur);
+	rmxfile.read(rmx_light.null7, sizeof(rmx_light.null7));
+
+	//msg(msg::TGT::CONS, msg::TYP::DBG) << rmx_light.null6;
 
 	// Avviso errore raggio interno esterno
 	if (rmx_light.extRadius - rmx_light.intRadius < 5)
@@ -35,9 +44,16 @@ void RMX_Light (ifstream &rmxfile, string name, string room_name, string layer, 
 		out << "	Node type: STATIC\n";
 	else
 		out << "	Node type: DYNAMIC\n";
-	out << left << setw(30) << "	Position [X/Y/Z]:" << right << setw(13) << rmx_light.Xpos << setw(13) << rmx_light.Ypos << setw(13) << rmx_light.Zpos << endl;
+	out << left << setw(30) << "	Position [X/Y/Z/W]:" << right << setw(13) << rmx_light.Xpos << setw(13) << rmx_light.Ypos << setw(13) << rmx_light.Zpos << setw(13) << rmx_light.Wpos << endl;
 	out << left << setw(30) << "	Colour [R/G/B]:" << right << setw(13) << rmx_light.R << setw(13) << rmx_light.G << setw(13) << rmx_light.B << endl;
 	out << left << setw(30) << "	Attenuation [near/far]:" << right << setw(13) << rmx_light.intRadius << setw(13) << rmx_light.extRadius << endl << endl;
+	out << left << setw(30) << "	null1:" << right << setw(13) << rmx_light.null1 << endl;
+	out << left << setw(30) << "	null2:" << right << setw(13) << rmx_light.null2 << endl;
+	out << left << setw(30) << "	null3:" << right << setw(13) << rmx_light.null3 << endl;
+	out << left << setw(30) << "	null4:" << right << setw(13) << rmx_light.null4 << endl;
+	out << left << setw(30) << "	null5:" << right << setw(13) << rmx_light.null5 << endl;
+	out << left << setw(30) << "	null6:" << right << setw(13) << rmx_light.null6 << endl;
+	out << left << setw(30) << "	null7:" << right << setw(13) << rmx_light.null7 << endl;
 
 	// Esportazione luce nei file FBX e MA
 	Light FBX_MA_light;

@@ -20,6 +20,8 @@ Material ZONE_Read_Materials_MayaHw20(string zonename, bool diffuse_transparent,
 	{
 	case (0):												// NONE
 		mat.Type = Material::TYPE::LAMBERT;
+		if (zone_materials_list.DiffuseID != -1)
+			msg(msg::TGT::FILE_CONS, msg::TYP::WARN) << material_name << " has texture(s) but diffuse color is disabled.";
 		break;
 	case (0b100):
 	case (0b100100):										// DIFFUSE
@@ -140,6 +142,8 @@ Material ZONE_Read_Materials_MayaHw20(string zonename, bool diffuse_transparent,
 		mat.Type = Material::TYPE::LAMBERT;
 		if (zone_materials_list.DiffuseID != -1)
 			mat.color = slot1.str();
+		if (zone_materials_list.ShadowMapID != -1)
+			mat.shadow = slot2.str();
 		break;
 	case (0b10001100):										// GREEN
 		mat.Type = Material::TYPE::EMPTY;

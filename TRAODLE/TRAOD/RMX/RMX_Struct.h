@@ -46,14 +46,14 @@ struct RMX_ROOM			// SIZE: 368 bytes
     uint32_t P1_Object_Last;
     uint32_t P2_Light_First;	// RMX_LIGHT offset from RMX_OFFSET of that room
 	uint32_t P2_Light_Last;
-	uint32_t Offset2;
-	uint32_t Offset3;
+	uint32_t P3_Charloc_First;	// Blocco con i personaggi (Lara e nemici)
+	uint32_t P3_Charloc_Last;
 	uint32_t P4_Trigger_First;
 	uint32_t P4_Trigger_Last;
 	uint32_t Offset6;
 	uint32_t Offset7;
-	uint32_t Offset8;
-	uint32_t Offset9;
+	uint32_t P6_Waypoint_First;
+	uint32_t P6_Waypoint_Last;
 	uint32_t Offset10;
 	uint32_t Offset11;
 	uint32_t P8_Water_First;
@@ -186,6 +186,24 @@ struct RMX_LIGHT		// SIZE: 144 bytes
     float intRadius;										// Internal sphere radius
     float extRadius;										// External sphere radius
     char null7[8];				// Always 0
+};
+
+struct RMX_ACTOR		// SIZE: 416 bytes?
+{
+	uint32_t BegPrev;										// Pointer to the beginning of the previous light from RMX_OFFSET of that room
+	uint32_t BegNext;										// Pointer to the beginning of the following light from RMX_OFFSET of that room
+	char null1[24];				// Always 0
+	float Xpos;												// X position of the actor
+	float Ypos;												// Y position of the actor
+	float Zpos;												// Z position of the actor
+	float Wpos;					// Always 0x0000803F
+	char null2[8];				// Always 0?
+	float Zrot;												// Z rotation of the actor
+	char null3[20];				// Always 0?
+	char null4[12];				// Always 0x0000803F?
+	char null5[8];				// Always 0?
+
+	char tobedone[316]; // da completare
 };
 
 struct RMX_PS2_ROOM_OBJ		// SIZE: 144 bytes

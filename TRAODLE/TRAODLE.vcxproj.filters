@@ -88,6 +88,9 @@
     <Filter Include="File di intestazione\Functions\TRAOD Remastered">
       <UniqueIdentifier>{219e2b7c-fe0a-4d9b-87ae-fa954b40490b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="File di origine\TRAOD\CHR">
+      <UniqueIdentifier>{1d216232-1c32-4e7f-a22f-48422d783f5d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -583,6 +586,12 @@
     </ClCompile>
     <ClCompile Include="MA\MA_Write_Material_Phong.cpp">
       <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\ZONE\CheckFur.cpp">
+      <Filter>File di origine\TRAOD\ZONE</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\CHR\Export_CHR.cpp">
+      <Filter>File di origine\TRAOD\CHR</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

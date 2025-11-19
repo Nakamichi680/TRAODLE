@@ -92,9 +92,9 @@ bool MESH_Read_Object (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 
 		// Aggiunta collegamento a materiale
 		if (zone_mesh_element.Material_Ref >= 0)
-			ssmaterial << "MESH_" << AODRemastered_IO.objectname << "_Material_" << zone_mesh_element.Material_Ref;
+			ssmaterial << "MESH_" << AODRemastered_IO.objectname << "_Material_N" << zone_mesh_element.Material_Ref;
 		else
-			ssmaterial << "MESH_" << AODRemastered_IO.objectname << "_Material_N" << to_string(-zone_mesh_element.Material_Ref);
+			ssmaterial << "MESH_" << AODRemastered_IO.objectname << "_Material_" << to_string(-zone_mesh_element.Material_Ref);
 
 		element.material_name = ssmaterial.str();
 		if (find(Material_list.begin(), Material_list.end(), ssmaterial.str()) == Material_list.end())
