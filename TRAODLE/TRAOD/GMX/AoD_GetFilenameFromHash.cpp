@@ -3,8 +3,52 @@
 #include "hash_Functions.h"
 
 
-string AoD_GetFilenameFromHash (int hash)
+string AoD_GetFilenameFromHash (int hash, vector <string> &filenames)
 {
+	for (string name : filenames)
+	{
+		if (GetHashValue(name.c_str()) == hash)
+		{
+			size_t pos = name.find_last_of('.');
+			string extension = (pos != std::string::npos) ? name.substr(pos + 1) : "";
+			if (extension == "CAL")				return AOD_IO.AddFileToGMXList(name, AoDFileType::CAL);
+			if (extension == "CHR")				return AOD_IO.AddFileToGMXList(name, AoDFileType::CHR);
+			if (extension == "CSS")				return AOD_IO.AddFileToGMXList(name, AoDFileType::CSS);
+			if (extension == "TXT")				return AOD_IO.AddFileToGMXList(name, AoDFileType::TXT);
+			if (extension == "CAM")				return AOD_IO.AddFileToGMXList(name, AoDFileType::CAM);
+			if (extension == "POS")				return AOD_IO.AddFileToGMXList(name, AoDFileType::POS);
+			if (extension == "TMS")				return AOD_IO.AddFileToGMXList(name, AoDFileType::TMS);
+			if (extension == "TMT")				return AOD_IO.AddFileToGMXList(name, AoDFileType::TMT);
+			if (extension == "XXX")				return AOD_IO.AddFileToGMXList(name, AoDFileType::XXX);
+			if (extension == "CBH")				return AOD_IO.AddFileToGMXList(name, AoDFileType::CBH);
+			if (extension == "CLN")				return AOD_IO.AddFileToGMXList(name, AoDFileType::CLN);
+			if (extension == "EVX")				return AOD_IO.AddFileToGMXList(name, AoDFileType::EVX);
+			if (extension == "RMX")				return AOD_IO.AddFileToGMXList(name, AoDFileType::RMX);
+			if (extension == "SCX")				return AOD_IO.AddFileToGMXList(name, AoDFileType::SCX);
+			
+			for (unsigned int i = 0; i < 100; i++)			// Il level exporter supporta fino a 100 zone (il massimo usato nel gioco è 7)
+			{
+				stringstream zone;
+				if (i < 10)
+					zone << "Z0" << i;
+				else
+					zone << "Z" << i;
+				if (extension == zone.str())	return AOD_IO.AddFileToGMXList(name, AoDFileType::ZONE);
+			}
+
+			for (unsigned int i = 0; i < 200; i++)			// Curve di animazione dei blendshapes (tipo 2, contiene molteplici animazioni)
+			{
+				stringstream tms2;
+				tms2 << i;
+				if (extension == tms2.str())	return AOD_IO.AddFileToGMXList(name, AoDFileType::TMS);
+			}
+
+			return AOD_IO.AddFileToGMXList(name, AoDFileType::UNKNOWN);
+		}
+
+	}
+	
+
 	unsigned int num_IDs = 732;
 	string ID[732], cal, chr, css, txt, cam, cbh, cln, evx, pos, rmx, scx, tms, tmt, xxx;
 
@@ -208,10 +252,13 @@ string AoD_GetFilenameFromHash (int hash)
 		return AOD_IO.AddFileToGMXList(scx, AoDFileType::SCX);
 
 
-	for (unsigned int i = 0; i < 10; i++)			// Il level exporter supporta fino a 10 zone (il massimo usato nel gioco è 7)
+	for (unsigned int i = 0; i < 100; i++)			// Il level exporter supporta fino a 100 zone (il massimo usato nel gioco è 7)
 	{
 		stringstream zone;
-		zone << AOD_IO.levelname << ".Z0" << i;
+		if (i < 10)
+			zone << AOD_IO.levelname << ".Z0" << i;
+		else 
+			zone << AOD_IO.levelname << ".Z" << i;
 		if (GetHashValue(zone.str().c_str()) == hash)
 			return AOD_IO.AddFileToGMXList(zone.str(), AoDFileType::ZONE);		// Mesh stanze, oggetti e collisioni oggetti
 	}
