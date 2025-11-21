@@ -356,9 +356,9 @@ void MA_Write_Mesh (const Mesh& mesh, MA_EXPORT &MA)
 					}
 
 					if (start == end)
-						temp_list << " f[" << start << "]";
+						temp_list << " \"f[" << start << "]\"";
 					else
-						temp_list << " f[" << start << ":" << end << "]";
+						temp_list << " \"f[" << start << ":" << end << "]\"";
 					i++;
 					counter++;
 				}
