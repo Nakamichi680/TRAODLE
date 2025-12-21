@@ -6,6 +6,7 @@ void MA_Write_Material_Phong(unsigned int m, MA_EXPORT &MA)
 {
 	Material mat = MA.Material[m];
 	stringstream out;
+	out << setprecision(7);
 	if (!mat.transparency.empty() && mat.Blend != Material::BLEND::NORMAL)	// Transparency non funziona con OVERLAY e SUBTRACT
 	{
 		msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "Conflict between transparency and blending type in material " << mat.name << ". Transparency will be ignored.";

@@ -6,6 +6,7 @@ void MA_Write_Material_Empty (unsigned int m, MA_EXPORT &MA)
 {
 	Material mat = MA.Material[m];
 	stringstream out;
+	out << setprecision(7);
 
 	// NODI
 	out << "createNode shadingEngine -n \"" << mat.name << "SG\";\n";

@@ -4,6 +4,9 @@
 #include "Misc_Functions.h"
 
 
+bool exportRoomsBoundingBoxes = false;
+
+
 bool ZONE_Read_Rooms (string filename, vector <RoomInfo> RMX_Rooms, FBX_EXPORT &FBX, MA_EXPORT &MA)
 {
 	ZONE_HEADER zone_header;
@@ -36,7 +39,8 @@ bool ZONE_Read_Rooms (string filename, vector <RoomInfo> RMX_Rooms, FBX_EXPORT &
 	Zone_BB_layer.Label_ARGB = 0xFF0000FF;
 	Zone_BB_layer.Visible = false;
 	Zone_BB_layer.Type = LayerDisplayType::Template;
-	MA.Layer.push_back(Zone_BB_layer);
+	if (exportRoomsBoundingBoxes)
+		MA.Layer.push_back(Zone_BB_layer);
 
 	// Lettura Header
 	zonefile.read(reinterpret_cast<char*>(&zone_header.ZONE_ID), sizeof(zone_header.ZONE_ID));
@@ -105,7 +109,7 @@ bool ZONE_Read_Rooms (string filename, vector <RoomInfo> RMX_Rooms, FBX_EXPORT &
 			element.FBX_parent = hashID(room.name, "Group");
 
 			// Lettura dati elemento
-			XYZ BBmin, BBmax;
+			Vec3 BBmin, BBmax;
 			zonefile.seekg(elements_position + el * 64);
 			zonefile.seekg(4, ios_base::cur);		// Salta nElement_Triangles
 			zonefile.read(reinterpret_cast<char*>(&zone_mesh_element.nElement_Indices), sizeof(zone_mesh_element.nElement_Indices));	// Numero di indici dello strip
@@ -120,8 +124,11 @@ bool ZONE_Read_Rooms (string filename, vector <RoomInfo> RMX_Rooms, FBX_EXPORT &
 			zonefile.read(reinterpret_cast<char*>(&BBmax.x), sizeof(zone_mesh_element.BB_Xmax));										// Bounding box X max
 			zonefile.read(reinterpret_cast<char*>(&BBmax.y), sizeof(zone_mesh_element.BB_Ymax));										// Bounding box Y max
 			zonefile.read(reinterpret_cast<char*>(&BBmax.z), sizeof(zone_mesh_element.BB_Xmax));										// Bounding box Z max
-			FBX.Geometry.push_back(DrawBox(ssbbname.str(), room.name, Zone_BB_layer_name.str(), BBmin, BBmax, 0x35500000));
-			MA.Mesh.push_back(DrawBox(ssbbname.str(), room.name, Zone_BB_layer_name.str(), BBmin, BBmax, 0x35500000));
+			if (exportRoomsBoundingBoxes)
+			{
+				FBX.Geometry.push_back(DrawBox(ssbbname.str(), room.name, Zone_BB_layer_name.str(), BBmin, BBmax, 0x35500000));
+				MA.Mesh.push_back(DrawBox(ssbbname.str(), room.name, Zone_BB_layer_name.str(), BBmin, BBmax, 0x35500000));
+			}
 
 			// Se l'elemento non contiene almeno 1 triangolo (numero indici almeno pari a 3) viene saltato
 			if (zone_mesh_element.nElement_Indices < 3)

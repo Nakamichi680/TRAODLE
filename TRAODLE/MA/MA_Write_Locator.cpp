@@ -5,6 +5,7 @@
 void MA_Write_Locator (unsigned int l, MA_EXPORT &MA)
 {
 	stringstream out;
+	out << setprecision(7);
 	out << "createNode transform -n \"" << MA.Locator[l].name << "\"";
 	if (MA.Locator[l].parent.size() > 0)
 		out << " -p \"" << MA.Locator[l].parent << "\"";

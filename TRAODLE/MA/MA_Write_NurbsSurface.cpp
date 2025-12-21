@@ -4,6 +4,7 @@
 void MA_Write_NurbsSurface (unsigned int n, MA_EXPORT &MA)
 {
 	stringstream out;
+	out << setprecision(7);
 	out << "createNode transform -n \"" << MA.NurbsSurface[n].name << "\"";
 	if (MA.NurbsSurface[n].parent.size() > 0)
 		out << " -p \"" << MA.NurbsSurface[n].parent << "\"";

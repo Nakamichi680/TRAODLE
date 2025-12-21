@@ -99,7 +99,7 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 	// Lettura stanze
 	for (unsigned int r = 0; r < rmx_header.nRooms; r++)
 	{
-		XYZ BBmin, BBmax;
+		Vec3 BBmin, BBmax;
 		rmxfile.seekg(20 + 4 * r, ios_base::beg);
 		rmxfile.read(reinterpret_cast<char*>(&rmx_offsets.Offset), sizeof(rmx_offsets.Offset));
 		rmxfile.seekg(rmx_offsets.Offset + 100);
@@ -119,26 +119,26 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 		rmxfile.seekg(12, ios_base::cur);
 		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Room_ID2), sizeof(rmx_room.Room_ID2));
 		rmxfile.seekg(12, ios_base::cur);
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.P1_Object_First), sizeof(rmx_room.P1_Object_First));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.P1_Object_Last), sizeof(rmx_room.P1_Object_Last));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.P2_Light_First), sizeof(rmx_room.P2_Light_First));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.P2_Light_Last), sizeof(rmx_room.P2_Light_Last));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.P3_Charloc_First), sizeof(rmx_room.P3_Charloc_First));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.P3_Charloc_Last), sizeof(rmx_room.P3_Charloc_Last));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.P4_Trigger_First), sizeof(rmx_room.P4_Trigger_First));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.P4_Trigger_Last), sizeof(rmx_room.P4_Trigger_Last));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Offset6), sizeof(rmx_room.Offset6));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Offset7), sizeof(rmx_room.Offset7));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.P6_Waypoint_First), sizeof(rmx_room.P6_Waypoint_First));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.P6_Waypoint_Last), sizeof(rmx_room.P6_Waypoint_Last));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Offset10), sizeof(rmx_room.Offset10));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Offset11), sizeof(rmx_room.Offset11));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.P8_Water_First), sizeof(rmx_room.P8_Water_First));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.P8_Water_Last), sizeof(rmx_room.P8_Water_Last));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.P9_Fog_First), sizeof(rmx_room.P9_Fog_First));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.P9_Fog_Last), sizeof(rmx_room.P9_Fog_Last));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Offset16), sizeof(rmx_room.Offset16));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Offset17), sizeof(rmx_room.Offset17));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_OBJ_First), sizeof(rmx_room.NL_OBJ_First));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_OBJ_Last), sizeof(rmx_room.NL_OBJ_Last));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_LIGHT_First), sizeof(rmx_room.NL_LIGHT_First));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_LIGHT_Last), sizeof(rmx_room.NL_LIGHT_Last));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_CHARLOC_First), sizeof(rmx_room.NL_CHARLOC_First));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_CHARLOC_Last), sizeof(rmx_room.NL_CHARLOC_Last));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_TRIGGER_First), sizeof(rmx_room.NL_TRIGGER_First));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_TRIGGER_Last), sizeof(rmx_room.NL_TRIGGER_Last));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_PORTAL_First), sizeof(rmx_room.NL_PORTAL_First));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_PORTAL_Last), sizeof(rmx_room.NL_PORTAL_Last));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_WAYPOINT_First), sizeof(rmx_room.NL_WAYPOINT_First));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_WAYPOINT_Last), sizeof(rmx_room.NL_WAYPOINT_Last));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_ACTOR_First), sizeof(rmx_room.NL_ACTOR_First));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_ACTOR_Last), sizeof(rmx_room.NL_ACTOR_Last));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_WATER_First), sizeof(rmx_room.NL_WATER_First));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_WATER_Last), sizeof(rmx_room.NL_WATER_Last));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_EMITTER_First), sizeof(rmx_room.NL_EMITTER_First));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_EMITTER_Last), sizeof(rmx_room.NL_EMITTER_Last));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_CAMERA_First), sizeof(rmx_room.NL_CAMERA_First));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.NL_CAMERA_Last), sizeof(rmx_room.NL_CAMERA_Last));
 		rmxfile.read(reinterpret_cast<char*>(&rmx_room.P11_PS2_Room_Obj_First), sizeof(rmx_room.P11_PS2_Room_Obj_First));
 		rmxfile.read(reinterpret_cast<char*>(&rmx_room.P11_PS2_Room_Obj_Last), sizeof(rmx_room.P11_PS2_Room_Obj_Last));
 		rmxfile.read(reinterpret_cast<char*>(&rmx_room.P12_Audio_Locator_First), sizeof(rmx_room.P12_Audio_Locator_First));
@@ -146,7 +146,7 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Offset22), sizeof(rmx_room.Offset22));
 		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Offset23), sizeof(rmx_room.Offset23));
 		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Offset24), sizeof(rmx_room.Offset24));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Offset25), sizeof(rmx_room.Offset10));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Offset25), sizeof(rmx_room.Offset25));
 		rmxfile.read(reinterpret_cast<char*>(&rmx_room.P15_Portal_First), sizeof(rmx_room.P15_Portal_First));
 		rmxfile.read(reinterpret_cast<char*>(&rmx_room.nPortals), sizeof(rmx_room.nPortals));
 		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Offset28), sizeof(rmx_room.Offset28));
@@ -172,13 +172,14 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 		stringstream room_name, bbox_name;
 		room_name << AOD_IO.levelname << "_ROOM_" << r << "_" << std::hex << rmx_room.Room_ID2 << std::dec;
 		bbox_name << AOD_IO.levelname << "_ROOM_" << r << "_Bounding_Box";
+
 		FBX_MA_room_group.name = room_name.str();
 		FBX.Group.push_back(FBX_MA_room_group);			// Inserimento gruppo stanza nel vettore dei gruppi del file FBX
 		MA.Transform.push_back(FBX_MA_room_group);		// Inserimento gruppo stanza nel vettore dei gruppi del file MA
 		if (Export_Bounding_Box)
 		{
 			FBX.Geometry.push_back(DrawBox(bbox_name.str(), room_name.str(), "", BBmin, BBmax, 0x2A000000));
-			MA.Mesh.push_back(DrawBox(bbox_name.str(), room_name.str(), Bounding_boxes_layer_name.str(), BBmin, BBmax, 0x2A000000));
+			MA.PolyCube.push_back(DrawPolyCube(bbox_name.str(), room_name.str(), Bounding_boxes_layer_name.str(), "", BBmin, BBmax, true, 0x2A000000));
 		}
 
 
@@ -187,39 +188,39 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 		if (rmx_room.P15_Portal_First != 0)
 			out << "Number of portals: " << rmx_room.nPortals << endl;
 
-		if (rmx_room.P1_Object_First != 0)
-			out << "Object first: " << rmx_room.P1_Object_First << endl;
-		if (rmx_room.P1_Object_Last != 0)
-			out << "Object last: " << rmx_room.P1_Object_Last << endl;
-		if (rmx_room.P2_Light_First != 0)
-			out << "Light first: " << rmx_room.P2_Light_First << endl;
-		if (rmx_room.P2_Light_Last != 0)
-			out << "Light last: " << rmx_room.P2_Light_Last << endl;
-		if (rmx_room.P3_Charloc_First != 0)
-			out << "Actor First: " << rmx_room.P3_Charloc_First << endl;
-		if (rmx_room.P3_Charloc_Last != 0)
-			out << "Actor Last: " << rmx_room.P3_Charloc_Last << endl;
-		if (rmx_room.P4_Trigger_First != 0)
-			out << "Trigger first: " << rmx_room.P4_Trigger_First << endl;
-		if (rmx_room.P4_Trigger_Last != 0)
-			out << "Trigger last: " << rmx_room.P4_Trigger_Last << endl;
-		if (rmx_room.P6_Waypoint_First != 0)
-			out << "Waypoint first: " << rmx_room.P6_Waypoint_First << endl;
-		if (rmx_room.P6_Waypoint_Last != 0)
-			out << "Waypoint last: " << rmx_room.P6_Waypoint_Last << endl;
+		if (rmx_room.NL_OBJ_First != 0)
+			out << "Object first: " << rmx_room.NL_OBJ_First << endl;
+		if (rmx_room.NL_OBJ_Last != 0)
+			out << "Object last: " << rmx_room.NL_OBJ_Last << endl;
+		if (rmx_room.NL_LIGHT_First != 0)
+			out << "Light first: " << rmx_room.NL_LIGHT_First << endl;
+		if (rmx_room.NL_LIGHT_Last != 0)
+			out << "Light last: " << rmx_room.NL_LIGHT_Last << endl;
+		if (rmx_room.NL_CHARLOC_First != 0)
+			out << "Actor First: " << rmx_room.NL_CHARLOC_First << endl;
+		if (rmx_room.NL_CHARLOC_Last != 0)
+			out << "Actor Last: " << rmx_room.NL_CHARLOC_Last << endl;
+		if (rmx_room.NL_TRIGGER_First != 0)
+			out << "Trigger first: " << rmx_room.NL_TRIGGER_First << endl;
+		if (rmx_room.NL_TRIGGER_Last != 0)
+			out << "Trigger last: " << rmx_room.NL_TRIGGER_Last << endl;
+		if (rmx_room.NL_WAYPOINT_First != 0)
+			out << "Waypoint first: " << rmx_room.NL_WAYPOINT_First << endl;
+		if (rmx_room.NL_WAYPOINT_Last != 0)
+			out << "Waypoint last: " << rmx_room.NL_WAYPOINT_Last << endl;
 
-		if (rmx_room.Offset6 != 0)
-			out << "Offset 6: " << rmx_room.Offset6 << endl;
-		if (rmx_room.Offset7 != 0)
-			out << "Offset 7: " << rmx_room.Offset7 << endl;
-		if (rmx_room.Offset10 != 0)
-			out << "Offset 10: " << rmx_room.Offset10 << endl;
-		if (rmx_room.Offset11 != 0)
-			out << "Offset 11: " << rmx_room.Offset11 << endl;
-		if (rmx_room.Offset16 != 0)
-			out << "Offset 16: " << rmx_room.Offset16 << endl;
-		if (rmx_room.Offset17 != 0)
-			out << "Offset 17: " << rmx_room.Offset17 << endl;
+		if (rmx_room.NL_PORTAL_First != 0)
+			out << "Offset 6: " << rmx_room.NL_PORTAL_First << endl;
+		if (rmx_room.NL_PORTAL_Last != 0)
+			out << "Offset 7: " << rmx_room.NL_PORTAL_Last << endl;
+		if (rmx_room.NL_ACTOR_First != 0)
+			out << "Offset 10: " << rmx_room.NL_ACTOR_First << endl;
+		if (rmx_room.NL_ACTOR_Last != 0)
+			out << "Offset 11: " << rmx_room.NL_ACTOR_Last << endl;
+		if (rmx_room.NL_CAMERA_First != 0)
+			out << "Offset 16: " << rmx_room.NL_CAMERA_First << endl;
+		if (rmx_room.NL_CAMERA_Last != 0)
+			out << "Offset 17: " << rmx_room.NL_CAMERA_Last << endl;
 
 		if (rmx_room.Offset22 != 0)
 			out << "Offset 22: " << rmx_room.Offset22 << endl;
@@ -251,10 +252,10 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 		out << "Unknown 9: " << rmx_room.Unknown9 << endl;
 		out << "Unknown 10: " << rmx_room.Unknown10 << endl;
 
-		if (rmx_room.P2_Light_First != 0 && Export_Light)						// Lettura ed esportazione luci statiche
+		if (rmx_room.NL_LIGHT_First != 0 && Export_Light)						// Lettura ed esportazione luci statiche
 		{
-			rmxfile.seekg(rmx_offsets.Offset + rmx_room.P2_Light_First, ios_base::beg);
-			for (unsigned int l = 0; l < (rmx_room.P2_Light_Last - rmx_room.P2_Light_First) / 144 + 1; l++)
+			rmxfile.seekg(rmx_offsets.Offset + rmx_room.NL_LIGHT_First, ios_base::beg);
+			for (unsigned int l = 0; l < (rmx_room.NL_LIGHT_Last - rmx_room.NL_LIGHT_First) / 144 + 1; l++)
 			{
 				stringstream temp;
 				temp << AOD_IO.levelname << "_ROOM_" << r << "_LIGHT_" << l;
@@ -263,10 +264,10 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 			}
 		}
 
-		if (rmx_room.P8_Water_First != 0 && Export_Water)						// Lettura ed esportazione acqua
+		if (rmx_room.NL_WATER_First != 0 && Export_Water)						// Lettura ed esportazione acqua
 		{
-			rmxfile.seekg(rmx_offsets.Offset + rmx_room.P8_Water_First, ios_base::beg);
-			for (unsigned int w = 0; w < (rmx_room.P8_Water_Last - rmx_room.P8_Water_First) / 432 + 1; w++)
+			rmxfile.seekg(rmx_offsets.Offset + rmx_room.NL_WATER_First, ios_base::beg);
+			for (unsigned int w = 0; w < (rmx_room.NL_WATER_Last - rmx_room.NL_WATER_First) / 432 + 1; w++)
 			{
 				stringstream temp;
 				temp << AOD_IO.levelname << "_ROOM_" << r << "_WATER_" << w;

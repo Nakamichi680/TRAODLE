@@ -26,15 +26,15 @@ struct RMX_ROOM			// SIZE: 368 bytes
     float Room_Xt;						// Room X position
     float Room_Yt;						// Room Y position
     float Room_Zt;						// Room Z position
-    float null2;
+    float pad1;
     float BB_Xmin;						// Bounding box X min
     float BB_Ymin;						// Bounding box Y min
     float BB_Zmin;						// Bounding box Z min
-    float null3;
+    float pad2;
     float BB_Xmax;						// Bounding box X max
     float BB_Ymax;						// Bounding box Y max
     float BB_Zmax;						// Bounding box Z max
-    float null4;
+    float pad3;
     uint32_t null5;				// Always 0x00000000
     uint32_t null6;				// Always 0x00000000
     uint32_t Room_ID2;					// Room ID 2
@@ -42,26 +42,26 @@ struct RMX_ROOM			// SIZE: 368 bytes
     uint32_t null8;				// Always 0x00000000
     uint32_t null9;				// Always 0x00000000
 	
-	uint32_t P1_Object_First;				// RMX_OBJECT offset from RMX_OFFSET of that room
-    uint32_t P1_Object_Last;
-    uint32_t P2_Light_First;	// RMX_LIGHT offset from RMX_OFFSET of that room
-	uint32_t P2_Light_Last;
-	uint32_t P3_Charloc_First;	// Blocco con i personaggi (Lara e nemici)
-	uint32_t P3_Charloc_Last;
-	uint32_t P4_Trigger_First;
-	uint32_t P4_Trigger_Last;
-	uint32_t Offset6;
-	uint32_t Offset7;
-	uint32_t P6_Waypoint_First;
-	uint32_t P6_Waypoint_Last;
-	uint32_t Offset10;
-	uint32_t Offset11;
-	uint32_t P8_Water_First;
-	uint32_t P8_Water_Last;
-	uint32_t P9_Fog_First;
-	uint32_t P9_Fog_Last;
-	uint32_t Offset16;
-	uint32_t Offset17;
+	uint32_t NL_OBJ_First;
+    uint32_t NL_OBJ_Last;
+    uint32_t NL_LIGHT_First;
+	uint32_t NL_LIGHT_Last;
+	uint32_t NL_CHARLOC_First;			// Blocco con i personaggi (Lara e nemici). Dimensione 416 bytes
+	uint32_t NL_CHARLOC_Last;
+	uint32_t NL_TRIGGER_First;
+	uint32_t NL_TRIGGER_Last;
+	uint32_t NL_PORTAL_First;			// Not used
+	uint32_t NL_PORTAL_Last;			// Not used
+	uint32_t NL_WAYPOINT_First;			// Dimensione 368 bytes (variabile)
+	uint32_t NL_WAYPOINT_Last;
+	uint32_t NL_ACTOR_First;			// Not used
+	uint32_t NL_ACTOR_Last;				// Not used
+	uint32_t NL_WATER_First;
+	uint32_t NL_WATER_Last;
+	uint32_t NL_EMITTER_First;
+	uint32_t NL_EMITTER_Last;
+	uint32_t NL_CAMERA_First;			// Not used
+	uint32_t NL_CAMERA_Last;			// Not used
 	uint32_t P11_PS2_Room_Obj_First;
 	uint32_t P11_PS2_Room_Obj_Last;
 	uint32_t P12_Audio_Locator_First;
@@ -95,7 +95,7 @@ struct RMX_ROOM			// SIZE: 368 bytes
 
 
 
-struct RMX_OBJECT		// SIZE: 528 bytes
+struct RMX_OBJECT		// SIZE: 528 bytes, variabile se presenti MSG/EVENT
 {
     uint32_t BegPrev;										// Pointer to the beginning of the previous object from RMX_OFFSET of that room
     uint32_t BegNext;										// Pointer to the beginning of the following object from RMX_OFFSET of that room
@@ -128,7 +128,7 @@ struct RMX_OBJECT		// SIZE: 528 bytes
     uint32_t Unknown19;			// Always 0x00000000
     uint16_t ObjectID;										// ID of the object
     uint16_t Unknown20;										// Unknown. Used for interaction between Lara and the object
-    uint32_t Trigger2;										// Trigger to a certain event inside the RMX file itself
+    uint32_t Trigger2;										// Trigger to a certain event inside the RMX file itself. Maybe nr of MSG/EVENTS
     char Unknown21[24];			// Always 0x00000000
     uint32_t Unknown22;			// Often 0x0000A000 but variable (sometimes 0x00001500)
     uint32_t Unknown23;			// Always 0x00000000

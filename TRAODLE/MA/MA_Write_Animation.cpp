@@ -5,6 +5,8 @@
 void MA_Write_Animation (unsigned int a, MA_EXPORT &MA)
 {
 	stringstream node, conn;
+	node << setprecision(7);
+	conn << setprecision(7);
 	for (unsigned int b = 0; b < MA.Animation[a].size(); b++)
 	{
 		///////////////		TRASLAZIONI

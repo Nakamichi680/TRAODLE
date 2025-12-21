@@ -5,6 +5,7 @@
 void MA_Write_DefaultNodes (MA_EXPORT &MA)
 {
 	stringstream out;
+	out << setprecision(7);
 	unsigned int Max_frame = 0;
 	for (unsigned int a = 0; a < MA.Animation.size(); a++)			// Ricerca dell'animazione più lunga (per impostare lo slider di Maya su tale valore)
 		for (unsigned int b = 0; b < MA.Animation[a].size(); b++)

@@ -241,11 +241,13 @@
     <ClCompile Include="MA\MA_Write_PointLight.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="MA\MA_Write_PolyCube.cpp" />
     <ClCompile Include="MA\MA_Write_PolyPlane.cpp" />
     <ClCompile Include="MA\MA_Write_Texture.cpp" />
     <ClCompile Include="MA\MA_Write_Transform.cpp" />
     <ClCompile Include="MA\MA_CalculatePerspCamera.cpp" />
     <ClCompile Include="OutMsgInterface.cpp" />
+    <ClCompile Include="DrawPolyCube.cpp" />
     <ClCompile Include="Reverb_presets.cpp" />
     <ClCompile Include="SaveTGAResource.cpp" />
     <ClCompile Include="Texture_DXT1toRGB.cpp" />
@@ -289,6 +291,7 @@
     <ClCompile Include="TRAOD\CLN\CLN_GetAttributeName.cpp" />
     <ClCompile Include="TRAOD\CLZ\Decompress_CLZ.cpp" />
     <ClCompile Include="TRAOD\GMX\AoD_GetFilenameFromHash.cpp" />
+    <ClCompile Include="TRAOD\GMX\Export_BetaGMX.cpp" />
     <ClCompile Include="TRAOD\GMX\Export_GMX.cpp" />
     <ClCompile Include="TRAOD\RMX\Export_RMX.cpp" />
     <ClCompile Include="TRAOD\RMX\Isolate_duplicated_lights.cpp" />

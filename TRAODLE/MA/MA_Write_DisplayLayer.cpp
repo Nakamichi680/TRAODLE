@@ -5,6 +5,7 @@
 void MA_Write_DisplayLayer (unsigned int l, MA_EXPORT &MA)
 {
 	stringstream out;
+	out << setprecision(7);
 	float R = (float)(0xFF & (MA.Layer[l].Label_ARGB >> 16)) / 255;
 	float G = (float)(0xFF & (MA.Layer[l].Label_ARGB >> 8)) / 255;
 	float B = (float)(0xFF & MA.Layer[l].Label_ARGB) / 255;

@@ -5,6 +5,7 @@
 void MA_Write_Camera (unsigned int c, MA_EXPORT &MA)
 {
 	stringstream out;
+	out << setprecision(7);
 	out << "createNode transform -n \"" << MA.Camera[c].name << "\";\n";
 	out << "	setAttr \".s\" -type \"double3\" 120 120 120;\n";
 	out << "createNode camera -n \"" << MA.Camera[c].name << "Shape\" -p \"" << MA.Camera[c].name << "\";\n";

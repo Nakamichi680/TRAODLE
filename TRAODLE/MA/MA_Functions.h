@@ -41,6 +41,8 @@ void MA_Write_Joint (unsigned int j, MA_EXPORT &MA);
 
 void MA_Write_PolyPlane (unsigned int p, MA_EXPORT &MA);
 
+void MA_Write_PolyCube (unsigned int p, MA_EXPORT &MA);
+
 void MA_Write_BossWave (unsigned int b, MA_EXPORT &MA);
 
 Camera MA_CalculatePerspCamera(const vector<Mesh>& meshes, const vector<Transform>& transforms, float azimuthDeg, float elevationDeg, float distanceMultiplier);

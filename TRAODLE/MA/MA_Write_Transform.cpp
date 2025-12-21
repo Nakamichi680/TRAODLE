@@ -5,7 +5,7 @@
 void MA_Write_Transform (unsigned int t, MA_EXPORT &MA)
 {
 	stringstream out;
-
+	out << setprecision(7);
 	out << "createNode transform -n \"" << MA.Transform[t].name << "\"";
 	if (MA.Transform[t].parent.size() > 0)
 		out << " -p \"" << MA.Transform[t].parent << "\"";

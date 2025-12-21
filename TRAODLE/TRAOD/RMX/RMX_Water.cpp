@@ -8,7 +8,7 @@
 void RMX_Water (ifstream &rmxfile, string name, string room_name, string layer, ofstream &out, FBX_EXPORT &FBX, MA_EXPORT &MA)
 {
 	RMX_WATER rmx_water;
-	XYZ WBmin, WBmax;				// Water Box
+	Vec3 WBmin, WBmax;				// Water Box
 
 	// Lettura dati acqua dal file RMX
 	rmxfile.seekg(32, ios_base::cur);

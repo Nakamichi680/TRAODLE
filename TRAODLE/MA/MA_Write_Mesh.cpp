@@ -11,6 +11,7 @@ void MA_Write_Mesh (const Mesh& mesh, MA_EXPORT &MA)
 	vector <unsigned int> normals_array;
 	vector <MA_Face> Fc;
 	stringstream out;
+	out << setprecision(7);
 
 	if (mesh.Face.size() == 0)		// Salta l'estrazione se la mesh non ha facce
 		return;

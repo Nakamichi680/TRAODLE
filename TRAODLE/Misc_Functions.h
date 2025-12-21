@@ -1,5 +1,6 @@
 #pragma once
 #include "Classes.h"
+#include "MA/MA_Classes.h"
 
 
 void FindBestThreadNumber ();
@@ -8,9 +9,10 @@ bool AODRemastered_IO_Init (char **argv);
 bool AE_IO_Init (char **argv);
 bool SaveTGAResource (int resourceID, string filename);
 int Fatal_Error_Terminate ();
-Mesh DrawBox (string name, string parent, string layer, XYZ Vmin, XYZ Vmax, unsigned int VC_ARGB);
-Mesh DrawTriangle (string name, string parent, string layer, XYZ v0, XYZ v1, XYZ v2, unsigned int VC_ARGB);
-Mesh DrawRectangle (string name, string parent, string layer, XYZ v0, XYZ v1, XYZ v2, XYZ v3, unsigned int VC_ARGB);
+Mesh DrawBox (string name, string parent, string layer, Vec3 Vmin, Vec3 Vmax, unsigned int VC_ARGB);
+Mesh DrawTriangle (string name, string parent, string layer, Vec3 v0, Vec3 v1, Vec3 v2, unsigned int VC_ARGB);
+Mesh DrawRectangle (string name, string parent, string layer, Vec3 v0, Vec3 v1, Vec3 v2, Vec3 v3, unsigned int VC_ARGB);
+PolyCube DrawPolyCube (string name, string parent, string layer, string material_name, Vec3 BBmin, Vec3 BBmax, bool visible, unsigned int VC_ARGB);
 void Texture_DXT1toRGB (unsigned int Xsize, unsigned int Ysize, char* input_buffer, char* output_buffer);
 void Texture_DXT3toRGB_A (unsigned int Xsize, unsigned int Ysize, char* input_buffer, char* output_buffer_rgb, char* output_buffer_alpha);
 void Texture_DXT3toRGBA (unsigned int Xsize, unsigned int Ysize, char* input_buffer, char* output_buffer);

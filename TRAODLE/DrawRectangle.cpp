@@ -9,7 +9,7 @@ OUTPUT: Mesh output
 #include "FBX/FBX_Classes.h"
 
 
-Mesh DrawRectangle (string name, string parent, string layer, XYZ v0, XYZ v1, XYZ v2, XYZ v3, unsigned int VC_ARGB)
+Mesh DrawRectangle (string name, string parent, string layer, Vec3 v0, Vec3 v1, Vec3 v2, Vec3 v3, unsigned int VC_ARGB)
 {
 	Mesh output;
 	output.name = name;

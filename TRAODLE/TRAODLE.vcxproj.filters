@@ -593,6 +593,15 @@
     <ClCompile Include="TRAOD\CHR\Export_CHR.cpp">
       <Filter>File di origine\TRAOD\CHR</Filter>
     </ClCompile>
+    <ClCompile Include="MA\MA_Write_PolyCube.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\GMX\Export_BetaGMX.cpp">
+      <Filter>File di origine\TRAOD\GMX</Filter>
+    </ClCompile>
+    <ClCompile Include="DrawPolyCube.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc">

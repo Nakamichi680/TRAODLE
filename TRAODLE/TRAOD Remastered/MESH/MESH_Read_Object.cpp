@@ -65,7 +65,7 @@ bool MESH_Read_Object (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 		element.FBX_parent = hashID(Mesh_group.name, "Group");
 
 		// Lettura dati elemento
-		XYZ BBmin, BBmax;
+		Vec3 BBmin, BBmax;
 		meshfile.seekg(elements_position + el * 64);
 		meshfile.seekg(4, ios_base::cur);		// Salta nElement_Triangles
 		meshfile.read(reinterpret_cast<char*>(&zone_mesh_element.nElement_Indices), sizeof(zone_mesh_element.nElement_Indices));	// Numero di indici dello strip

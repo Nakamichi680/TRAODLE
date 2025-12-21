@@ -5,6 +5,7 @@
 void MA_Write_BossWave (unsigned int b, MA_EXPORT &MA)
 {
 	stringstream out;
+	out << setprecision(7);
 	out << "createNode transform -n \"" << MA.BossWave[b].name << "\"";
 	if (MA.BossWave[b].parent.size() > 0)
 		out << " -p \"" << MA.BossWave[b].parent << "\"";

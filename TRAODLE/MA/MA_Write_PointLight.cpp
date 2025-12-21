@@ -5,6 +5,7 @@
 void MA_Write_PointLight (unsigned int l, MA_EXPORT &MA)
 {
 	stringstream out;
+	out << setprecision(7);
 	out << "createNode transform -n \"" << MA.Light[l].name << "\"";
 	if (MA.Light[l].parent.size() > 0)
 		out << " -p \"" << MA.Light[l].parent << "\"";

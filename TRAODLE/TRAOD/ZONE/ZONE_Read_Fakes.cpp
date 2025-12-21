@@ -4,6 +4,9 @@
 #include "Misc_Functions.h"
 
 
+bool exportFakesBoundingBoxes = false;
+
+
 bool ZONE_Read_Fakes (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 {
 	ZONE_HEADER zone_header;
@@ -62,7 +65,8 @@ bool ZONE_Read_Fakes (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 	Zone_Fakes_BB_layer.Label_ARGB = 0xFF0000FF;
 	Zone_Fakes_BB_layer.Visible = false;
 	Zone_Fakes_BB_layer.Type = LayerDisplayType::Template;
-	MA.Layer.push_back(Zone_Fakes_BB_layer);
+	if (exportFakesBoundingBoxes)
+		MA.Layer.push_back(Zone_Fakes_BB_layer);
 	
 	// Ricerca posizione inizio blocco Objects
 	zonefile.seekg(zone_header.MESH_PTR);
@@ -198,7 +202,7 @@ bool ZONE_Read_Fakes (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 					//msg(msg::TGT::FILE_CONS, msg::TYP::DBG) << "Reading " << ssname.str();
 
 					// Lettura dati elemento
-					XYZ BBmin, BBmax;
+					Vec3 BBmin, BBmax;
 					zonefile.seekg(elements_position + el * 64);
 					zonefile.seekg(4, ios_base::cur);		// Salta nElement_Triangles
 					zonefile.read(reinterpret_cast<char*>(&zone_mesh_element.nElement_Indices), sizeof(zone_mesh_element.nElement_Indices));	// Numero di indici dello strip
@@ -213,8 +217,11 @@ bool ZONE_Read_Fakes (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 					zonefile.read(reinterpret_cast<char*>(&BBmax.x), sizeof(zone_mesh_element.BB_Xmax));										// Bounding box X max
 					zonefile.read(reinterpret_cast<char*>(&BBmax.y), sizeof(zone_mesh_element.BB_Ymax));										// Bounding box Y max
 					zonefile.read(reinterpret_cast<char*>(&BBmax.z), sizeof(zone_mesh_element.BB_Xmax));										// Bounding box Z max
-					FBX.Geometry.push_back(DrawBox(ssbbname.str(), part.name, Zone_Fakes_BB_layer_name.str(), BBmin, BBmax, 0x35500000));
-					MA.Mesh.push_back(DrawBox(ssbbname.str(), part.name, Zone_Fakes_BB_layer_name.str(), BBmin, BBmax, 0x35500000));
+					if (exportFakesBoundingBoxes)
+					{
+						FBX.Geometry.push_back(DrawBox(ssbbname.str(), part.name, Zone_Fakes_BB_layer_name.str(), BBmin, BBmax, 0x35500000));
+						MA.Mesh.push_back(DrawBox(ssbbname.str(), part.name, Zone_Fakes_BB_layer_name.str(), BBmin, BBmax, 0x35500000));
+					}
 
 					// Se l'elemento non contiene almeno 1 triangolo (numero indici almeno pari a 3) viene saltato
 					if (zone_mesh_element.nElement_Indices < 3)

@@ -68,7 +68,7 @@ void RMX_Light (ifstream &rmxfile, string name, string room_name, string layer, 
 	FBX_MA_light.R = rmx_light.R / 255;
 	FBX_MA_light.G = rmx_light.G / 255;
 	FBX_MA_light.B = rmx_light.B / 255;
-	FBX_MA_light.Intensity = rmx_light.extRadius * 10000;
+	FBX_MA_light.Intensity = (TargetRenderer == 1) ? rmx_light.extRadius : rmx_light.extRadius * 10000;
 	FBX_MA_light.Decay_Near_Start = 0;
 	FBX_MA_light.Decay_Near_End = rmx_light.extRadius;
 	FBX_MA_light.Decay_Far_Start = rmx_light.intRadius;

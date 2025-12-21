@@ -53,6 +53,11 @@ void MA_Export (string output_filename, MA_EXPORT &MA)
 	for (unsigned int p = 0; p < MA.PolyPlane.size(); p++)
 		MA_Write_PolyPlane(p, MA);
 
+	if (MA.PolyCube.size() > 0)
+		msg(msg::TGT::FILE, msg::TYP::LOG) << "Writing PolyCube surfaces";
+	for (unsigned int p = 0; p < MA.PolyCube.size(); p++)
+		MA_Write_PolyCube(p, MA);
+
 	if (MA.BossWave.size() > 0)
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Writing Boss waves";
 	for (unsigned int b = 0; b < MA.BossWave.size(); b++)

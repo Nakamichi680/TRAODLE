@@ -8,7 +8,7 @@
 void RMX_Portal (ifstream &rmxfile, string name, string room_name, string layer, ofstream &out, FBX_EXPORT &FBX, MA_EXPORT &MA)
 {
 	RMX_PORTAL rmx_portal;
-	XYZ v0, v1, v2, v3;
+	Vec3 v0, v1, v2, v3;
 
 	// Lettura dati portale dal file RMX
 	rmxfile.read(reinterpret_cast<char*>(&rmx_portal.Unknown1), sizeof(rmx_portal.Unknown1));

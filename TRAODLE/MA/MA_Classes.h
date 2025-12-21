@@ -74,6 +74,29 @@ public:
 };
 
 
+class PolyCube {
+public:
+	string name;
+	string parent;						// Nome del gruppo/oggetto da cui dipende
+	string layer;						// Nome layer di appartenenza, se vuoto non appartiene ad alcun layer (solo file Maya ASCII)
+	string material_name;				// Nome del materiale associato al PolyPlane
+	bool translate_flag = false;
+	bool rotate_flag = false;
+	bool scale_flag = false;
+	bool Visible = true;
+	float tX = 0;						// Traslazione X
+	float tY = 0;						// Traslazione Y
+	float tZ = 0;						// Traslazione Z
+	float rX = 0;						// Rotazione X
+	float rY = 0;						// Rotazione Y
+	float rZ = 0;						// Rotazione Z
+	float sX = 1;						// Scalatura X
+	float sY = 1;						// Scalatura Y
+	float sZ = 1;						// Scalatura Z
+	unsigned int VC_ARGB = 0xFF7F7F7F;	// Vertex color del box
+};
+
+
 class BossWave {
 public:
 	string name;
@@ -164,6 +187,7 @@ public:
 	vector <Joint> Joint;
 	vector < vector <MA_animCurve> > Animation;
 	vector <PolyPlane> PolyPlane;
+	vector <PolyCube> PolyCube;
 	vector <BossWave> BossWave;
 
 	stringstream MA_Header;

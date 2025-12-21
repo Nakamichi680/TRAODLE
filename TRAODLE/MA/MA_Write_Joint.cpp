@@ -5,6 +5,7 @@
 void MA_Write_Joint (unsigned int j, MA_EXPORT &MA)
 {
 	stringstream out;
+	out << setprecision(7);
 	out << "createNode joint -n \"" << MA.Joint[j].name << "\"";
 	if (MA.Joint[j].parent.size() > 0)
 		out << " -p \"" << MA.Joint[j].parent << "\"";

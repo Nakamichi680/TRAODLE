@@ -7,13 +7,16 @@
 #include "resource.h"
 
 
+bool exportOctrees = false;
+
+
 class Octant
 {
 public:
 	string name = "0";				// Valore di default per primo ottante
 	string parent = "";				// Valore di default per primo ottante
-	XYZ Vmin;
-	XYZ Vmax;
+	Vec3 Vmin;
+	Vec3 Vmax;
 	int Ptr_Octant = 0;				// Valore di default per primo ottante
 	int Ptr_TList = -1;				// Valore di default per ottanti con discendenti (vanno ignorati ai fini della lettura dei triangoli)
 };
@@ -59,7 +62,8 @@ bool CLN_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 	octree_layer.name = layername2.str();
 	octree_layer.Label_ARGB = 0xFFFDBC2E;
 	MA.Layer.push_back(collisions_layer);			// Layer collisioni in mesh singola
-	MA.Layer.push_back(octree_layer);				// Layer octree
+	if (exportOctrees)
+		MA.Layer.push_back(octree_layer);				// Layer octree
 
 	vector <string> attribute_list;
 
@@ -115,15 +119,20 @@ bool CLN_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 			octant_group.FBX_parent = hashID(ss2.str(), "Group");
 		}
 		octant_group.layer = octree_layer.name;
-		FBX.Group.push_back(octant_group);
-		MA.Transform.push_back(octant_group);
+		if (exportOctrees)
+		{
+			FBX.Group.push_back(octant_group);
+			MA.Transform.push_back(octant_group);
+		}
 
 		// Creazione parallelepipedo ottante
 		stringstream ss3;
 		ss3 << AOD_IO.levelname << "_CLN_OCTANT_" << octree[o].name << "_box";
-		FBX.Geometry.push_back(DrawBox(ss3.str(), ss1.str(), octree_layer.name, octree[o].Vmin, octree[o].Vmax, 0x25FDBC2E));
-		MA.Mesh.push_back(DrawBox(ss3.str(), ss1.str(), octree_layer.name, octree[o].Vmin, octree[o].Vmax, 0x25FDBC2E));
-
+		if (exportOctrees)
+		{
+			FBX.Geometry.push_back(DrawBox(ss3.str(), ss1.str(), octree_layer.name, octree[o].Vmin, octree[o].Vmax, 0x25FDBC2E));
+			MA.Mesh.push_back(DrawBox(ss3.str(), ss1.str(), octree_layer.name, octree[o].Vmin, octree[o].Vmax, 0x25FDBC2E));
+		}
 
 
 
@@ -173,8 +182,11 @@ bool CLN_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 						triangle.v1 = i * 3;		triangle.v2 = i * 3 + 1;		triangle.v3 = i * 3 + 2;
 						temp_mesh.Face.push_back(triangle);
 					}
-					FBX.Geometry.push_back(temp_mesh);
-					MA.Mesh.push_back(temp_mesh);
+					if (exportOctrees)
+					{
+						FBX.Geometry.push_back(temp_mesh);
+						MA.Mesh.push_back(temp_mesh);
+					}
 				}
 				t += cln_tlist.nIndices;
 			}

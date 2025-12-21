@@ -9,7 +9,7 @@ OUTPUT: Mesh output
 #include "FBX/FBX_Classes.h"
 
 
-Mesh DrawBox (string name, string parent, string layer, XYZ Vmin, XYZ Vmax, unsigned int VC_ARGB)
+Mesh DrawBox (string name, string parent, string layer, Vec3 Vmin, Vec3 Vmax, unsigned int VC_ARGB)
 {
 	Mesh output;
 	output.name = name;

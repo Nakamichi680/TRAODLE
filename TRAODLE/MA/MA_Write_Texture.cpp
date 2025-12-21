@@ -7,6 +7,7 @@ void MA_Write_Texture (unsigned int t, MA_EXPORT &MA)
 	replace(MA.Texture[t].filename.begin(), MA.Texture[t].filename.end(), '\\', '/');		// Sostituisce \ con /
 
 	stringstream out;
+	out << setprecision(7);
 	out << "createNode file -n \"" << MA.Texture[t].name << "\";\n";
 	if (MA.Texture[t].AlphaIsLuminance)
 		out << "	setAttr \".ail\" yes;\n";

@@ -5,6 +5,7 @@
 void MA_Write_PolyPlane (unsigned int p, MA_EXPORT &MA)
 {
 	stringstream out;
+	out << setprecision(7);
 	out << "createNode transform -n \"" << MA.PolyPlane[p].name << "\"";
 	if (MA.PolyPlane[p].parent.size() > 0)
 		out << " -p \"" << MA.PolyPlane[p].parent << "\"";
