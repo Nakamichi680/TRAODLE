@@ -607,5 +607,8 @@
     <ResourceCompile Include="Resource.rc">
       <Filter>File di risorse</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="Icon.rc">
+      <Filter>File di risorse</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
