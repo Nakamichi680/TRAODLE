@@ -47,7 +47,7 @@ int main(int argc, char **argv)
 
 		// INIZIALIZZAZIONE FILES E CARTELLE
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Initializing IO";
-		if (!AE_IO_Init(argv))			// Se c'ï¿½ qualsiasi errore in fase di avvio il programma termina
+		if (!AE_IO_Init(argv))			// Se c'è qualsiasi errore in fase di avvio il programma termina
 			return Fatal_Error_Terminate();
 
 		msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Input filename: " << AE_IO.folder_cluster << AE_IO.file_cluster;
@@ -117,7 +117,7 @@ int main(int argc, char **argv)
 
 		// INIZIALIZZAZIONE FILES E CARTELLE
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Initializing IO";
-		if (!AOD_IO_Init(argv))			// Se c'ï¿½ qualsiasi errore in fase di avvio il programma termina
+		if (!AOD_IO_Init(argv))			// Se c'è qualsiasi errore in fase di avvio il programma termina
 			return Fatal_Error_Terminate();
 
 		msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Input filename: " << AOD_IO.folder_clzgmx << AOD_IO.file_clzgmx;
@@ -209,7 +209,7 @@ int main(int argc, char **argv)
 
 		// INIZIALIZZAZIONE FILES E CARTELLE
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Initializing IO";
-		if (!AODRemastered_IO_Init(argv))			// Se c'ï¿½ qualsiasi errore in fase di avvio il programma termina
+		if (!AODRemastered_IO_Init(argv))			// Se c'è qualsiasi errore in fase di avvio il programma termina
 			return Fatal_Error_Terminate();
 
 		msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Input filename: " << AODRemastered_IO.folder_msh << AODRemastered_IO.file_msh;

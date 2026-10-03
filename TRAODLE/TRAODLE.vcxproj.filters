@@ -230,6 +230,9 @@
     <ClCompile Include="DrawBox.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="DrawPawn.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
     <ClCompile Include="FindBestThreadNumber.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -363,6 +366,15 @@
       <Filter>File di origine\TRAOD\RMX</Filter>
     </ClCompile>
     <ClCompile Include="TRAOD\RMX\RMX_Audio_Locator.cpp">
+      <Filter>File di origine\TRAOD\RMX</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\RMX\RMX_Waypoint.cpp">
+      <Filter>File di origine\TRAOD\RMX</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\RMX\RMX_Charloc.cpp">
+      <Filter>File di origine\TRAOD\RMX</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\RMX\RMX_ActorNames.cpp">
       <Filter>File di origine\TRAOD\RMX</Filter>
     </ClCompile>
     <ClCompile Include="TRAOD\RMX\RMX_Light.cpp">
@@ -612,6 +624,9 @@
       <Filter>File di origine\TRAOD\CHR</Filter>
     </ClCompile>
     <ClCompile Include="MA\MA_Write_PolyCube.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_NurbsCurve.cpp">
       <Filter>File di origine\MA Exporter</Filter>
     </ClCompile>
     <ClCompile Include="TRAOD\GMX\Export_BetaGMX.cpp">

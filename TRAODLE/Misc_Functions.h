@@ -12,6 +12,7 @@ int Fatal_Error_Terminate ();
 Mesh DrawBox (string name, string parent, string layer, Vec3 Vmin, Vec3 Vmax, unsigned int VC_ARGB);
 Mesh DrawTriangle (string name, string parent, string layer, Vec3 v0, Vec3 v1, Vec3 v2, unsigned int VC_ARGB);
 Mesh DrawRectangle (string name, string parent, string layer, Vec3 v0, Vec3 v1, Vec3 v2, Vec3 v3, unsigned int VC_ARGB);
+Mesh DrawPawn (string name, string parent, string layer, float height, float radius, float noseLength, Vec3 forward, unsigned int VC_ARGB);
 PolyCube DrawPolyCube (string name, string parent, string layer, string material_name, Vec3 BBmin, Vec3 BBmax, bool visible, unsigned int VC_ARGB);
 void Texture_DXT1toRGB (unsigned int Xsize, unsigned int Ysize, char* input_buffer, char* output_buffer);
 void Texture_DXT3toRGB_A (unsigned int Xsize, unsigned int Ysize, char* input_buffer, char* output_buffer_rgb, char* output_buffer_alpha);

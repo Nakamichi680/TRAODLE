@@ -20,6 +20,8 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 	bool Export_Audio_Locator = true;
 	bool Export_Fog = true;
 	bool Export_Portals = true;
+	bool Export_Waypoints = true;
+	bool Export_Characters = true;
 	//////////////////////////////////////////////////////////////////
 
 
@@ -55,6 +57,35 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 	MA.Layer.push_back(PS2_room_objects_layer);					// Inserimento layer oggetti PS2 nel file MA
 	MA.Layer.push_back(Audio_locators_layer);					// Inserimento layer audio locators nel file MA
 	MA.Layer.push_back(Portals_layer);							// Inserimento layer portals nel file MA
+
+	// Layers waypoints: locators, archi del grafo e archi percorribili in una sola direzione
+	Layer Waypoints_layer, Waypoint_graph_layer, Waypoint_graph_oneway_layer;
+	Waypoints_layer.name = AOD_IO.levelname + "_waypoints";
+	Waypoints_layer.Label_ARGB = 0xFF00FF00;
+	Waypoint_graph_layer.name = AOD_IO.levelname + "_waypoint_graph";
+	Waypoint_graph_layer.Label_ARGB = 0xFF00C0FF;
+	Waypoint_graph_oneway_layer.name = AOD_IO.levelname + "_waypoint_graph_oneway";
+	Waypoint_graph_oneway_layer.Label_ARGB = 0xFFFF2020;
+	if (Export_Waypoints)
+	{
+		MA.Layer.push_back(Waypoints_layer);
+		MA.Layer.push_back(Waypoint_graph_layer);
+		MA.Layer.push_back(Waypoint_graph_oneway_layer);
+	}
+	vector <RMX_WaypointInfo> waypoints;						// Waypoints di tutte le stanze, per la costruzione del grafo
+
+	// Layers personaggi: locators e pedine
+	Layer Characters_layer, Character_pawns_layer;
+	Characters_layer.name = AOD_IO.levelname + "_characters";
+	Characters_layer.Label_ARGB = 0xFFFF8000;
+	Character_pawns_layer.name = AOD_IO.levelname + "_character_pawns";
+	Character_pawns_layer.Label_ARGB = 0xFFFF8000;
+	if (Export_Characters)
+	{
+		MA.Layer.push_back(Characters_layer);
+		MA.Layer.push_back(Character_pawns_layer);
+	}
+	map <string, unsigned int> character_names;				// Contatore dei personaggi con lo stesso nome (per rendere unici i nomi)
 
 
 	string debug = AOD_IO.levelname;
@@ -312,6 +343,35 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 			}
 		}
 
+		if (rmx_room.NL_WAYPOINT_First != 0 && Export_Waypoints)				// Lettura ed esportazione waypoints (nodi di dimensione variabile: si segue la catena BegNext)
+		{
+			uint32_t w = rmx_room.NL_WAYPOINT_First;
+			for (unsigned int n = 0; w != 0; n++)
+			{
+				rmxfile.seekg(rmx_offsets.Offset + w, ios_base::beg);
+				out << "#WAYPOINT " << n << endl;
+				uint32_t next = RMX_Waypoint(rmxfile, room_name.str(), Waypoints_layer.name, out, FBX, MA, waypoints);
+				if (w == rmx_room.NL_WAYPOINT_Last || !rmxfile)
+					break;
+				w = next;
+			}
+		}
+
+		if (rmx_room.NL_CHARLOC_First != 0 && Export_Characters)				// Lettura ed esportazione posizioni di partenza dei personaggi
+		{
+			uint32_t c = rmx_room.NL_CHARLOC_First;
+			for (unsigned int n = 0; c != 0; n++)
+			{
+				rmxfile.seekg(rmx_offsets.Offset + c, ios_base::beg);
+				out << "#CHARACTER " << n << endl;
+				RMX_Charloc(rmxfile, room_name.str(), Characters_layer.name, Character_pawns_layer.name, out, FBX, MA, character_names);
+				if (c == rmx_room.NL_CHARLOC_Last || !rmxfile)
+					break;
+				rmxfile.seekg(rmx_offsets.Offset + c + 4, ios_base::beg);		// BegNext
+				rmxfile.read(reinterpret_cast<char*>(&c), sizeof(c));
+			}
+		}
+
 		out << endl << endl;
 
 
@@ -320,7 +380,9 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 
 	}
 
-	
+	// Grafo dei waypoints (dopo la lettura di tutte le stanze: i collegamenti possono unire waypoints di stanze diverse)
+	if (Export_Waypoints && !waypoints.empty())
+		RMX_Waypoint_Graph(waypoints, Waypoint_graph_layer.name, Waypoint_graph_oneway_layer.name, MA);
 
 	return true;
 }

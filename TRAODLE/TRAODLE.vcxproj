@@ -242,6 +242,7 @@
     <ClCompile Include="MA\MA_Write_PointLight.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="MA\MA_Write_NurbsCurve.cpp" />
     <ClCompile Include="MA\MA_Write_PolyCube.cpp" />
     <ClCompile Include="MA\MA_Write_PolyPlane.cpp" />
     <ClCompile Include="MA\MA_Write_Texture.cpp" />
@@ -257,6 +258,7 @@
     <ClCompile Include="Texture_RAWtoBMP.cpp" />
     <ClCompile Include="Texture_RAWtoDDS.cpp" />
     <ClCompile Include="DrawBox.cpp" />
+    <ClCompile Include="DrawPawn.cpp" />
     <ClCompile Include="DrawRectangle.cpp" />
     <ClCompile Include="FindBestThreadNumber.cpp" />
     <ClCompile Include="GetHashValue.cpp" />
@@ -301,6 +303,9 @@
     <ClCompile Include="TRAOD\RMX\Isolate_duplicated_lights.cpp" />
     <ClCompile Include="TRAOD\RMX\Isolate_duplicated_water.cpp" />
     <ClCompile Include="TRAOD\RMX\RMX_Audio_Locator.cpp" />
+    <ClCompile Include="TRAOD\RMX\RMX_Waypoint.cpp" />
+    <ClCompile Include="TRAOD\RMX\RMX_Charloc.cpp" />
+    <ClCompile Include="TRAOD\RMX\RMX_ActorNames.cpp" />
     <ClCompile Include="TRAOD\RMX\RMX_Light.cpp" />
     <ClCompile Include="TRAOD\RMX\RMX_Portal.cpp" />
     <ClCompile Include="TRAOD\RMX\RMX_PS2_Room_Obj.cpp" />

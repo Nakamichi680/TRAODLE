@@ -25,6 +25,8 @@ void MA_Write_DisplayLayer (unsigned int l, MA_EXPORT &MA);
 
 void MA_Write_NurbsSurface (unsigned int n, MA_EXPORT &MA);
 
+void MA_Write_NurbsCurve (unsigned int n, MA_EXPORT &MA);
+
 void MA_Write_Texture (unsigned int t, MA_EXPORT &MA);
 
 void MA_Write_Material_Empty(unsigned int m, MA_EXPORT &MA);

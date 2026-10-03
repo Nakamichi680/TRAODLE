@@ -40,6 +40,16 @@ public:
 };
 
 
+class NurbsCurve {
+public:
+	string name;					// Nome della curva
+	string parent;					// Nome del gruppo/oggetto da cui dipende
+	string layer;					// Nome layer di appartenenza, se vuoto non appartiene ad alcun layer
+	unsigned int Degree = 1;		// Grado della curva (1 = spezzata lineare che passa per i punti)
+	vector <Vec3> Points;			// Control vertices (coordinate locali rispetto al parent)
+};
+
+
 class PolyPlane {
 public:
 	string name;
@@ -184,6 +194,7 @@ public:
 	vector <Camera> Camera;
 	vector <Locator> Locator;
 	vector <NurbsSurface> NurbsSurface;
+	vector <NurbsCurve> NurbsCurve;
 	vector <Joint> Joint;
 	vector < vector <MA_animCurve> > Animation;
 	vector <PolyPlane> PolyPlane;

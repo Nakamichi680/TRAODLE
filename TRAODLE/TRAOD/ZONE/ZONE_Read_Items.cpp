@@ -10,10 +10,10 @@ bool exportItemsBoundingBoxes = false;
 
 
 /*------------------------------------------------------------------------------------------------------------------
-Esporta gli Items del file ZONE, cioï¿½ tutti gli oggetti del blocco ZONE_MESH_OBJECT (ZONE_MESH_HEADER2.nObjects) ad
-eccezione di quelli giï¿½ esportati come Fakes e di quelli privi di vertici. Il nome di ogni Item contiene l'indice
-dell'oggetto nel file ZONE. La posizione in world coordinates degli Items non ï¿½ nota, quindi vengono disposti su una
-griglia a fianco della geometria giï¿½ esportata (Rooms e Fakes) e distanziati fra di loro in modo da non sovrapporsi.
+Esporta gli Items del file ZONE, cioè tutti gli oggetti del blocco ZONE_MESH_OBJECT (ZONE_MESH_HEADER2.nObjects) ad
+eccezione di quelli già esportati come Fakes e di quelli privi di vertici. Il nome di ogni Item contiene l'indice
+dell'oggetto nel file ZONE. La posizione in world coordinates degli Items non è nota, quindi vengono disposti su una
+griglia a fianco della geometria già esportata (Rooms e Fakes) e distanziati fra di loro in modo da non sovrapporsi.
 Deve essere chiamata dopo ZONE_Read_Rooms e ZONE_Read_Fakes.
 ------------------------------------------------------------------------------------------------------------------*/
 bool ZONE_Read_Items (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
@@ -45,7 +45,7 @@ bool ZONE_Read_Items (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 	// Lettura Header
 	zonefile.read(reinterpret_cast<char*>(&zone_header.ZONE_ID), sizeof(zone_header.ZONE_ID));
 
-	if (zone_header.ZONE_ID != 32)				// Se il file ZONE non ï¿½ valido
+	if (zone_header.ZONE_ID != 32)				// Se il file ZONE non è valido
 	{
 		msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << filename << " is not a valid ZONE file.";
 		return false;
@@ -56,11 +56,11 @@ bool ZONE_Read_Items (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 	zonefile.read(reinterpret_cast<char*>(&zone_header.MESH_PTR), sizeof(zone_header.MESH_PTR));
 	zonefile.read(reinterpret_cast<char*>(&zone_header.EOF_PTR), sizeof(zone_header.EOF_PTR));
 
-	// Lettura indici degli oggetti usati come Fakes (questi oggetti vengono saltati perchï¿½ giï¿½ esportati da ZONE_Read_Fakes)
+	// Lettura indici degli oggetti usati come Fakes (questi oggetti vengono saltati perché già esportati da ZONE_Read_Fakes)
 	set <unsigned int> Fake_indices;
 	zonefile.seekg(zone_header.EOF_PTR);
 	zonefile.read(reinterpret_cast<char*>(&zone_fakes_header.P1_Fake_First), sizeof(zone_fakes_header.P1_Fake_First));
-	if (!zonefile)								// Se il blocco Fakes ï¿½ assente non ci sono Fakes
+	if (!zonefile)								// Se il blocco Fakes è assente non ci sono Fakes
 	{
 		zonefile.clear();
 		zone_fakes_header.P1_Fake_First = 0;

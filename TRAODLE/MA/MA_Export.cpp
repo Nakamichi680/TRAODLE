@@ -48,6 +48,11 @@ void MA_Export (string output_filename, MA_EXPORT &MA)
 	for (unsigned int n = 0; n < MA.NurbsSurface.size(); n++)
 		MA_Write_NurbsSurface(n, MA);
 
+	if (MA.NurbsCurve.size() > 0)
+		msg(msg::TGT::FILE, msg::TYP::LOG) << "Writing NURBS curves";
+	for (unsigned int n = 0; n < MA.NurbsCurve.size(); n++)
+		MA_Write_NurbsCurve(n, MA);
+
 	if (MA.PolyPlane.size() > 0)
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Writing PolyPlane surfaces";
 	for (unsigned int p = 0; p < MA.PolyPlane.size(); p++)
