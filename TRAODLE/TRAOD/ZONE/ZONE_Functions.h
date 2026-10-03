@@ -19,6 +19,8 @@ bool ZONE_Read_Rooms_MT (string name1, string name2, FBX_EXPORT &FBX, MA_EXPORT 
 
 bool ZONE_Read_Fakes (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA);
 
+bool ZONE_Read_Items (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA);
+
 bool ZONE_Read_Textures (string filename, vector <RoomInfo> RMX_Rooms, FBX_EXPORT &FBX, MA_EXPORT &MA);
 
 bool ZONE_Read_Materials (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA);

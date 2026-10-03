@@ -178,6 +178,7 @@
     <ClInclude Include="TRAOD\GMX\GMX_Struct.h" />
     <ClInclude Include="TRAOD\RMX\RMX_Functions.h" />
     <ClInclude Include="TRAOD\RMX\RMX_Struct.h" />
+    <ClInclude Include="TRAOD\SCX\SCX_Functions.h" />
     <ClInclude Include="TRAOD\SCX\SCX_Struct.h" />
     <ClInclude Include="TRAOD\ZONE\ZONE_Functions.h" />
     <ClInclude Include="TRAOD\ZONE\ZONE_Struct.h" />
@@ -283,6 +284,9 @@
     <ClCompile Include="TRAOD\AOD_IO_Init.cpp" />
     <ClCompile Include="TRAOD\CAM\CAM_Read.cpp" />
     <ClCompile Include="TRAOD\CAM\Export_CAM.cpp" />
+    <ClCompile Include="TRAOD\SCX\AMX_Decompile.cpp" />
+    <ClCompile Include="TRAOD\SCX\AMX_Disassemble.cpp" />
+    <ClCompile Include="TRAOD\SCX\Export_SCX.cpp" />
     <ClCompile Include="TRAOD\CHR\Export_CHR.cpp" />
     <ClCompile Include="TRAOD\CLN\CLN_GetResource.cpp" />
     <ClCompile Include="TRAOD\CLN\CLN_Get_Triangle.cpp" />
@@ -307,6 +311,7 @@
     <ClCompile Include="TRAOD\ZONE\CheckShadowMap.cpp" />
     <ClCompile Include="TRAOD\ZONE\Export_ZONE.cpp" />
     <ClCompile Include="TRAOD\ZONE\ZONE_Read_Fakes.cpp" />
+    <ClCompile Include="TRAOD\ZONE\ZONE_Read_Items.cpp" />
     <ClCompile Include="TRAOD\ZONE\ZONE_Read_Materials_Arnold.cpp" />
     <ClCompile Include="TRAOD\ZONE\ZONE_Read_Materials_MayaHw20.cpp" />
     <ClCompile Include="TRAOD\ZONE\ZONE_Read_Rooms.cpp" />

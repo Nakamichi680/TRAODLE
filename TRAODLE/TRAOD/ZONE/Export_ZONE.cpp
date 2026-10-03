@@ -19,6 +19,8 @@ bool Export_ZONE (string filename)
 		return false;
 	if (!ZONE_Read_Fakes(filename, FBX, MA))					// Lettura Fakes
 		return false;
+	if (!ZONE_Read_Items(filename, FBX, MA))					// Lettura Items (esclusi quelli gia' esportati come Fakes)
+		return false;
 	if (!ZONE_Read_Materials(filename, FBX, MA))				// Esportazione materiali ed aggiunta nei vettori FBX e MA
 		return false;
 	if (!ZONE_Read_Textures(filename, RMX_Rooms, FBX, MA))		// Esportazione textures ed aggiunta nei vettori FBX e MA

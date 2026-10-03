@@ -64,7 +64,9 @@ public:
 	string folder_collisions;							// Cartella in cui verranno salvate le collisioni con backslash \ alla fine del nome
 	LPWSTR folder_characters_lpwstr = new TCHAR[MAX];	// Cartella in cui verranno salvati i personaggi
 	string folder_characters;							// Cartella in cui verranno salvati i personaggi con backslash \ alla fine del nome
-	string file_clzgmx;									// Nome del file del livello (può avere estensione GMX o CLZ, es. PARIS1.GMX o PARIS1.GMX.CLZ)
+	LPWSTR folder_scx_lpwstr = new TCHAR[MAX];			// Cartella in cui verranno salvati gli script (file SCX)
+	string folder_scx;									// Cartella in cui verranno salvati gli script (file SCX) con backslash \ alla fine del nome
+	string file_clzgmx;									// Nome del file del livello (puï¿½ avere estensione GMX o CLZ, es. PARIS1.GMX o PARIS1.GMX.CLZ)
 	string levelname;									// Nome del livello (es. PARIS1)
 	LPWSTR folder_temp_lpwstr = new TCHAR[MAX];			// Cartella temporanea di lavoro per le varie subroutines
 	string folder_temp;									// Cartella temporanea di lavoro per le varie subroutines con backslash \ alla fine del nome
@@ -77,7 +79,7 @@ public:
 		return name;
 	}
 
-	bool SearchFileInGMXList (string name, AoDFileType type)	// Verifica se il file o il tipo di file è presente nell'elenco dei files estratti dal GMX
+	bool SearchFileInGMXList (string name, AoDFileType type)	// Verifica se il file o il tipo di file ï¿½ presente nell'elenco dei files estratti dal GMX
 	{
 		GMXlist temp {name, type};
 		vector<GMXlist>::iterator it = find_if(gmxfiles.begin(), gmxfiles.end(), [&temp] (const GMXlist& current) {return current.name == temp.name || current.type == temp.type;});
@@ -127,9 +129,9 @@ public:
 	LPWSTR folder_exe_lpwstr = new TCHAR[MAX];			// Cartella in cui si trova il programma
 	LPWSTR folder_msh_lpwstr = new TCHAR[MAX];			// Cartella in cui si trova il file MSH
 	string folder_msh;									// Cartella in cui si trova il file MSH con backslash \ alla fine del nome (non usare per cambiare cartella)
-	LPWSTR folder_object_lpwstr = new TCHAR[MAX];		// Cartella in cui verrà estratto il file MSH (es. \50093659)
-	string folder_object;								// Cartella in cui verrà estratto il file MSH (es. \50093659\) con backslash \ alla fine del nome
-	string file_msh;									// Nome del file MESH (può avere solo estensione MSH, es. 50093659.MSH)
+	LPWSTR folder_object_lpwstr = new TCHAR[MAX];		// Cartella in cui verrï¿½ estratto il file MSH (es. \50093659)
+	string folder_object;								// Cartella in cui verrï¿½ estratto il file MSH (es. \50093659\) con backslash \ alla fine del nome
+	string file_msh;									// Nome del file MESH (puï¿½ avere solo estensione MSH, es. 50093659.MSH)
 	string objectname;									// Nome dell'oggetto 3D contenuto nel file MSH (es. 50093659)
 	LPWSTR folder_temp_lpwstr = new TCHAR[MAX];			// Cartella temporanea di lavoro per le varie subroutines
 	string folder_temp;									// Cartella temporanea di lavoro per le varie subroutines con backslash \ alla fine del nome
@@ -163,7 +165,7 @@ public:
 	string folder_geometry;								// Cartella in cui verranno salvate le mesh del livello con backslash \ alla fine del nome
 	LPWSTR folder_models_lpwstr = new TCHAR[MAX];		// Cartella in cui verranno salvate le mesh dei modelli degli oggetti
 	string folder_models;								// Cartella in cui verranno salvate le mesh dei modelli degli oggetti con backslash \ alla fine del nome
-	string file_cluster;								// Nome del file del livello (può avere estensione PS, PC o PSP)
+	string file_cluster;								// Nome del file del livello (puï¿½ avere estensione PS, PC o PSP)
 	string levelname;									// Nome del livello (es. LEVEL3A)
 	LPWSTR folder_temp_lpwstr = new TCHAR[MAX];			// Cartella temporanea di lavoro per le varie subroutines
 	string folder_temp;									// Cartella temporanea di lavoro per le varie subroutines con backslash \ alla fine del nome
@@ -176,7 +178,7 @@ public:
 		return name;
 	}
 
-	bool SearchFileInClusterList (string name, AEFileType type)	// Verifica se il file o il tipo di file è presente nell'elenco dei files estratti dal file cluster
+	bool SearchFileInClusterList (string name, AEFileType type)	// Verifica se il file o il tipo di file ï¿½ presente nell'elenco dei files estratti dal file cluster
 	{
 		CLUSTERlist temp {name, type};
 		vector<CLUSTERlist>::iterator it = find_if(clusterfiles.begin(), clusterfiles.end(), [&temp] (const CLUSTERlist& current) {return current.name == temp.name || current.type == temp.type;});
@@ -192,7 +194,7 @@ public:
 
 class Face {
 public:
-	unsigned char TrisOrQuads = 3;		// Di default è impostato su "Tris"
+	unsigned char TrisOrQuads = 3;		// Di default ï¿½ impostato su "Tris"
 	int v1;
 	int v2;
 	int v3;
@@ -293,7 +295,7 @@ struct MATRIX {
 
 class MA_Face {
 public: 
-	unsigned char TrisOrQuads = 3;		// Di default è impostato su "Tris"
+	unsigned char TrisOrQuads = 3;		// Di default ï¿½ impostato su "Tris"
 	int e1;
 	int e2;
 	int e3;
@@ -328,7 +330,7 @@ public:
 class MESH1_CLASS {
 public:
     string name;										// Nome originale (hash) o ricavato da Get_mesh_name (usato per Null)
-    bool hashed;										// True se "name" è un hash
+    bool hashed;										// True se "name" ï¿½ un hash
     unsigned int nElements;								// Il numero di elementi del gruppo MESH1
     vector <float> X;
     vector <float> Y;
@@ -364,8 +366,8 @@ public:
 class MESH2_CLASS {
 public:
     string name;										// Nome originale (hash) o ricavato da Get_mesh_name (usato per Null)
-    bool hashed;										// True se "name" è un hash
-    int Bone;											// La bone a cui è associato il gruppo MESH2
+    bool hashed;										// True se "name" ï¿½ un hash
+    int Bone;											// La bone a cui ï¿½ associato il gruppo MESH2
     unsigned int nV;									// Il numero di vertici del gruppo MESH2
     unsigned int nElements;								// Il numero di elementi del gruppo MESH2
     vector <float> X;
@@ -398,12 +400,12 @@ public:
 class TMT_CLASS {
 public:
 	string name;										// Nome originale (hash) o ricavato da Get_mesh_name (usato per Null)
-	bool hashed;										// True se "name" è un hash
+	bool hashed;										// True se "name" ï¿½ un hash
 	unsigned int nBlendshapes = 0;						// Numero di blendshapes presenti (a cui va aggiunto 1 per la mesh normale)
 	unsigned int nV;									// Numero di vertici del blendshape
-	unsigned int mesh2_group;							// Indice del gruppo MESH 2 a cui il blendshape è associato
+	unsigned int mesh2_group;							// Indice del gruppo MESH 2 a cui il blendshape ï¿½ associato
 	unsigned int mesh2_bone;							// Indice della bone dello scheletro associata al blendshape
-	//Material TMT_Material;								// Il materiale del TMT è forzato a "Diffuse" (4)
+	//Material TMT_Material;								// Il materiale del TMT ï¿½ forzato a "Diffuse" (4)
 	vector < vector <int> > BLENDSHAPE_vINDX;			// Contiene gli indici dei vertici diversi dalla mesh normale di ogni blendshape (per file FBX)		
 	vector < vector <float> > X;
 	vector < vector <float> > Y;
@@ -489,7 +491,7 @@ public:
 	bool DrawLabel = false;
 	LABELSIDE LabelSide = LABELSIDE::CENTER;
 	LABELTYPE LabelType = LABELTYPE::OTHER;
-	string LabelName = "";				// Il LabelName viene usato solo LabelType è su Other
+	string LabelName = "";				// Il LabelName viene usato solo LabelType ï¿½ su Other
 };
 
 
@@ -497,7 +499,7 @@ class Texture {
 private:
 	class uvChooser {
 	public:
-		unsigned int UVset;						// 1, 2, 3, 4... (l'UVset 0 non va inserito, non è necessario l'uvChooser). MA Exporter al momento supporta solo UVset 0 e 1
+		unsigned int UVset;						// 1, 2, 3, 4... (l'UVset 0 non va inserito, non ï¿½ necessario l'uvChooser). MA Exporter al momento supporta solo UVset 0 e 1
 		string mesh_name;
 	};
 
@@ -552,12 +554,12 @@ public:
 	float sX = 1;						// Scalatura X
 	float sY = 1;						// Scalatura Y
 	float sZ = 1;						// Scalatura Z
-	float Intensity = 100;				// Intensità luce
-	float R = 1;						// Intensità colore rosso (0-1)
-	float G = 1;						// Intensità colore verde (0-1)
-	float B = 1;						// Intensità colore blu (0-1)
-	float Decay_Near_Start = 0;			// Di regola è sempre 0 in AoD
-	float Decay_Near_End = 0;			// Per luce più diffusa in Arnolds impostare come Attenuation_Far_End
+	float Intensity = 100;				// Intensitï¿½ luce
+	float R = 1;						// Intensitï¿½ colore rosso (0-1)
+	float G = 1;						// Intensitï¿½ colore verde (0-1)
+	float B = 1;						// Intensitï¿½ colore blu (0-1)
+	float Decay_Near_Start = 0;			// Di regola ï¿½ sempre 0 in AoD
+	float Decay_Near_End = 0;			// Per luce piï¿½ diffusa in Arnolds impostare come Attenuation_Far_End
 	float Decay_Far_Start = 0;			// Dove la luce inizia a sbiadirsi
 	float Decay_Far_End = 0;			// Distanza massima raggiunta dalla sfera di luce
 };

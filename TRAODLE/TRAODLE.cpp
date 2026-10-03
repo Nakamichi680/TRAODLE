@@ -5,6 +5,7 @@
 #include "TRAE/MDC/MDC_Functions.h"
 #include "TRAE/TEXSET/TEXSET_Functions.h"
 #include "TRAOD/CAM/CAM_Functions.h"
+#include "TRAOD/SCX/SCX_Functions.h"
 #include "TRAOD/ZONE/ZONE_Functions.h"
 #include "TRAOD/GMX/GMX_Functions.h"
 #include "TRAOD/RMX/RMX_Functions.h"
@@ -46,7 +47,7 @@ int main(int argc, char **argv)
 
 		// INIZIALIZZAZIONE FILES E CARTELLE
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Initializing IO";
-		if (!AE_IO_Init(argv))			// Se c'è qualsiasi errore in fase di avvio il programma termina
+		if (!AE_IO_Init(argv))			// Se c'ï¿½ qualsiasi errore in fase di avvio il programma termina
 			return Fatal_Error_Terminate();
 
 		msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Input filename: " << AE_IO.folder_cluster << AE_IO.file_cluster;
@@ -116,7 +117,7 @@ int main(int argc, char **argv)
 
 		// INIZIALIZZAZIONE FILES E CARTELLE
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Initializing IO";
-		if (!AOD_IO_Init(argv))			// Se c'è qualsiasi errore in fase di avvio il programma termina
+		if (!AOD_IO_Init(argv))			// Se c'ï¿½ qualsiasi errore in fase di avvio il programma termina
 			return Fatal_Error_Terminate();
 
 		msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Input filename: " << AOD_IO.folder_clzgmx << AOD_IO.file_clzgmx;
@@ -153,6 +154,8 @@ int main(int argc, char **argv)
 			CreateDirectory(AOD_IO.folder_animations_lpwstr, NULL);		// Crea la cartella \NOMELIVELLO\Animations
 		if (AOD_IO.SearchFileInGMXList("", AoDFileType::CLN))
 			CreateDirectory(AOD_IO.folder_collisions_lpwstr, NULL);		// Crea la cartella \NOMELIVELLO\Collisions
+		if (AOD_IO.SearchFileInGMXList("", AoDFileType::SCX))
+			CreateDirectory(AOD_IO.folder_scx_lpwstr, NULL);			// Crea la cartella \NOMELIVELLO\SCX
 
 		// BLOCCO CONVERSIONE FILES ESTRATTI DAL GMX
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "*********************************";
@@ -183,6 +186,11 @@ int main(int argc, char **argv)
 					msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "CLN exporting completed with error(s)";
 				msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "";
 				break;
+			case(AoDFileType::SCX):
+				if (!Export_SCX(AOD_IO.gmxfiles[i].name))
+					msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "SCX exporting completed with error(s)";
+				msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "";
+				break;
 			}
 		}
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "*********************************";
@@ -201,7 +209,7 @@ int main(int argc, char **argv)
 
 		// INIZIALIZZAZIONE FILES E CARTELLE
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Initializing IO";
-		if (!AODRemastered_IO_Init(argv))			// Se c'è qualsiasi errore in fase di avvio il programma termina
+		if (!AODRemastered_IO_Init(argv))			// Se c'ï¿½ qualsiasi errore in fase di avvio il programma termina
 			return Fatal_Error_Terminate();
 
 		msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Input filename: " << AODRemastered_IO.folder_msh << AODRemastered_IO.file_msh;

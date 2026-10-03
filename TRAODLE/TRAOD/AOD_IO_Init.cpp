@@ -23,7 +23,7 @@ bool AOD_IO_Init (char **argv)
 		GetCurrentDirectory(MAX, AOD_IO.folder_exe_lpwstr);												/*		C:\Cartella_EXE_CLZGMX				*/
 		AOD_IO.folder_clzgmx_lpwstr = AOD_IO.folder_exe_lpwstr;											/*		C:\Cartella_EXE_CLZGMX				*/
 		AOD_IO.folder_clzgmx = CW2A(AOD_IO.folder_exe_lpwstr);											/*      C:\Cartella_EXE_CLZGMX				*/	
-		if (AOD_IO.folder_clzgmx.back() != '\\')					// Aggiunge "\" se assente alla fine del percorso (i files nel root dell'unità ce l'hanno già)
+		if (AOD_IO.folder_clzgmx.back() != '\\')					// Aggiunge "\" se assente alla fine del percorso (i files nel root dell'unitï¿½ ce l'hanno giï¿½)
 			AOD_IO.folder_clzgmx.append("\\");															/*		C:\Cartella_EXE_CLZGMX\				*/
 		AOD_IO.file_clzgmx = input;																		/*		Nome_livello(.CLZ/.GMX)				*/
     }
@@ -32,11 +32,11 @@ bool AOD_IO_Init (char **argv)
 		GetModuleFileName(NULL, AOD_IO.folder_exe_lpwstr, MAX);											/*		C:\Cartella_EXE\TRAODLE.EXE			*/
 		string temp = CW2A(AOD_IO.folder_exe_lpwstr);
 		temp = temp.substr(0, temp.find_last_of("\\"));													/*      C:\Cartella_EXE	(o C:)				*/
-		if (temp.find("\\") == string::npos)					// Aggiunge "\" se non ne trova nemmeno uno (per il root dell'unità)
+		if (temp.find("\\") == string::npos)					// Aggiunge "\" se non ne trova nemmeno uno (per il root dell'unitï¿½)
 			temp.append("\\");
 		std::mbstowcs(AOD_IO.folder_exe_lpwstr, temp.c_str(), MAX);										/*		C:\Cartella_EXE	(o C:\)				*/
 		temp = input.substr(0, input.find_last_of("\\"));												/*      C:\Cartella_CLZGMX (o C:)			*/	
-		if (temp.find("\\") == string::npos)					// Aggiunge "\" se non ne trova nemmeno uno (per il root dell'unità)
+		if (temp.find("\\") == string::npos)					// Aggiunge "\" se non ne trova nemmeno uno (per il root dell'unitï¿½)
 			temp.append("\\");
 		std::mbstowcs(AOD_IO.folder_clzgmx_lpwstr, temp.c_str(), MAX);									/*		C:\Cartella_CLZGMX (o C:\)			*/
 		AOD_IO.folder_clzgmx = input.substr(0, input.find_last_of("\\") + 1);							/*		C:\Cartella_CLZGMX\					*/
@@ -77,7 +77,7 @@ bool AOD_IO_Init (char **argv)
 	AOD_IO.folder_level.append("\\");
 
 	/////////////////////// PREPARAZIONE NOMI SOTTOCARTELLE (es. PARIS1\Cameras, PARIS1\Animations, PARIS1\Zones)
-	AOD_IO.folder_cameras = AOD_IO.folder_animations = AOD_IO.folder_zones = AOD_IO.folder_rooms = AOD_IO.folder_blendshapes = AOD_IO.folder_collisions = AOD_IO.folder_characters = AOD_IO.folder_level;
+	AOD_IO.folder_cameras = AOD_IO.folder_animations = AOD_IO.folder_zones = AOD_IO.folder_rooms = AOD_IO.folder_blendshapes = AOD_IO.folder_collisions = AOD_IO.folder_characters = AOD_IO.folder_scx = AOD_IO.folder_level;
 	AOD_IO.folder_cameras.append("Cameras");
 	AOD_IO.folder_animations.append("Animations");
 	AOD_IO.folder_zones.append("Zones");
@@ -85,6 +85,7 @@ bool AOD_IO_Init (char **argv)
 	AOD_IO.folder_blendshapes.append("Blendshapes");
 	AOD_IO.folder_collisions.append("Collisions");
 	AOD_IO.folder_characters.append("Characters");
+	AOD_IO.folder_scx.append("Scripts");
 	std::mbstowcs(AOD_IO.folder_cameras_lpwstr, AOD_IO.folder_cameras.c_str(), MAX);
 	std::mbstowcs(AOD_IO.folder_animations_lpwstr, AOD_IO.folder_animations.c_str(), MAX);
 	std::mbstowcs(AOD_IO.folder_zones_lpwstr, AOD_IO.folder_zones.c_str(), MAX);
@@ -92,6 +93,7 @@ bool AOD_IO_Init (char **argv)
 	std::mbstowcs(AOD_IO.folder_blendshapes_lpwstr, AOD_IO.folder_blendshapes.c_str(), MAX);
 	std::mbstowcs(AOD_IO.folder_collisions_lpwstr, AOD_IO.folder_collisions.c_str(), MAX);
 	std::mbstowcs(AOD_IO.folder_characters_lpwstr, AOD_IO.folder_characters.c_str(), MAX);
+	std::mbstowcs(AOD_IO.folder_scx_lpwstr, AOD_IO.folder_scx.c_str(), MAX);
 	AOD_IO.folder_cameras.append("\\");
 	AOD_IO.folder_animations.append("\\");
 	AOD_IO.folder_zones.append("\\");
@@ -99,6 +101,7 @@ bool AOD_IO_Init (char **argv)
 	AOD_IO.folder_blendshapes.append("\\");
 	AOD_IO.folder_collisions.append("\\");
 	AOD_IO.folder_characters.append("\\");
+	AOD_IO.folder_scx.append("\\");
 
 	/////////////////////// AVVIO INTERFACCIA GRAFICA UTENTE
 	GetConsoleTitle(AOD_IO.Console_OldTitle, MAX_PATH);		// Legge il nome iniziale dalla barra della console. Serve per ripristinarlo quando il programma termina
@@ -110,7 +113,7 @@ bool AOD_IO_Init (char **argv)
 	cfi.dwFontSize.Y = 14;									// Dimensione caratteri
 	cfi.FontFamily = FF_DONTCARE;
 	cfi.FontWeight = FW_NORMAL;
-	std::wcscpy(cfi.FaceName, L"Lucida Console");			// Seleziona il carattere Lucida Console (in questo momento non è ancora impostato!!!)
+	std::wcscpy(cfi.FaceName, L"Lucida Console");			// Seleziona il carattere Lucida Console (in questo momento non ï¿½ ancora impostato!!!)
 	SetCurrentConsoleFontEx(GetStdHandle(STD_OUTPUT_HANDLE), FALSE, &cfi);		// Imposta dimensione caratteri e font
 	//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 0xf0);				// Imposta il colore di testo e sfondo
 	std::system("chcp 437 >nul");												// Imposta il codepage americano
