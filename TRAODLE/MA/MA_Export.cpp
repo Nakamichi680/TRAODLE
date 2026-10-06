@@ -99,6 +99,14 @@ void MA_Export (string output_filename, MA_EXPORT &MA)
 	for (unsigned int j = 0; j < MA.Joint.size(); j++)
 		MA_Write_Joint(j, MA);
 
+	for (unsigned int m = 0; m < MA.Mesh.size(); m++)			// Blend shapes (solo mesh deformate da uno scheletro: servono ShapeOrig e skinCluster)
+		if (!MA.Mesh[m].BlendShape.empty() && !MA.Mesh[m].Skin.empty())
+			MA_Write_BlendShape(MA.Mesh[m], MA);
+
+	for (unsigned int m = 0; m < MA.Mesh.size(); m++)			// Skinning delle mesh deformate da uno scheletro
+		if (!MA.Mesh[m].Skin.empty())
+			MA_Write_SkinCluster(MA.Mesh[m], MA);
+
 	if (MA.Layer.size() > 0)
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Writing layers";
 	for (unsigned int l = 0; l < MA.Layer.size(); l++)			// Questo può andare per ultimo

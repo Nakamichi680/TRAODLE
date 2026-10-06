@@ -35,6 +35,41 @@ void FBX_Export (string output_filename, FBX_EXPORT &FBX)
 	for (unsigned int j = 0; j < FBX.Joint.size(); j++)				// Scrittura joints
 		FBX_Write_Joint(FBX.Joint[j], FBX);
 
+	for (unsigned int g = 0; g < FBX.Geometry.size(); g++)			// Scrittura blend shapes
+		if (!FBX.Geometry[g].BlendShape.empty())
+			FBX_Write_BlendShape(FBX.Geometry[g], FBX);
+
+	if (FBX.BlendShapeAnimation.size() > 0)							// Animazioni dei blend shapes (una take per animazione)
+		msg(msg::TGT::FILE, msg::TYP::LOG) << "Writing blend shape animations";
+	for (unsigned int a = 0; a < FBX.BlendShapeAnimation.size(); a++)
+		FBX_Write_BlendShapeAnimation(FBX.BlendShapeAnimation[a], FBX);
+	set <string> animated;											// Gruppi di canali animati in almeno una take
+	for (const SkeletalAnimation &anim : FBX.SkeletalAnimation)
+		for (const NodeAnimation &node : anim.nodes)
+		{
+			if (!node.tX.empty())
+				animated.insert(node.node + "|T");
+			if (!node.rX.empty())
+				animated.insert(node.node + "|R");
+			if (!node.sX.empty())
+				animated.insert(node.node + "|S");
+		}
+	for (unsigned int a = 0; a < FBX.SkeletalAnimation.size(); a++)			// Animazioni scheletriche (una take per animazione)
+		FBX_Write_SkeletalAnimation(FBX.SkeletalAnimation[a], animated, FBX);
+
+	bool skinned = false;
+	for (unsigned int g = 0; g < FBX.Geometry.size(); g++)			// Scrittura skinning delle mesh deformate da uno scheletro
+		if (!FBX.Geometry[g].Skin.empty())
+		{
+			FBX_Write_Skin(FBX.Geometry[g], FBX);
+			skinned = true;
+		}
+	if (skinned)
+	{
+		msg(msg::TGT::FILE, msg::TYP::LOG) << "Writing skin deformers and bind pose";
+		FBX_Write_SkinBindPose(FBX);
+	}
+
 	/*for (unsigned int l = 0; l < FBX.Light.size(); l++)				// Scrittura luci (WIP!!!!!!!!!!!!!!)
 	{
 		if (FBX.Light[l].type == "Point")
@@ -60,6 +95,7 @@ void FBX_Export (string output_filename, FBX_EXPORT &FBX)
 	out << FBX.FBX_Definitions.str();
 	out << FBX.FBX_Properties.str();
 	out << FBX.FBX_Connections.str();
+	out << FBX_Write_Takes(FBX);
 	out.close();
 
-}
+}

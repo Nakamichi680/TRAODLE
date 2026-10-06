@@ -556,7 +556,7 @@ bool CAM_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 
 		//////// FBX
 		// Scrittura traslazione X
-		FBX_animCurveNode.tX.KeyTime.push_back((unsigned long long)f * FBXframe1 + FBXframe1);			// Tempo
+		FBX_animCurveNode.tX.KeyTime.push_back((unsigned long long)f * FBXframe1);			// Tempo
 		FBX_animCurveNode.tX.KeyValueFloat.push_back(Xfrom[f]);
 		FBX_animCurveNode.tX.KeyAttrFlags.push_back(24840);												// Cubic|TangeantAuto|GenericTimeIndependent|GenericClampProgressive
         FBX_animCurveNode.tX.KeyAttrDataFloat.push_back(0);												// RightSlope:0
@@ -564,7 +564,7 @@ bool CAM_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
         FBX_animCurveNode.tX.KeyAttrDataFloat.push_back(218434821);										// RightWeight:0.333333, NextLeftWeight:0.333333
         FBX_animCurveNode.tX.KeyAttrDataFloat.push_back(0);												// RightVelocity:0, NextLeftVelocity:0		
 		// Scrittura traslazione Y
-		FBX_animCurveNode.tY.KeyTime.push_back((unsigned long long)f * FBXframe1 + FBXframe1);			// Tempo
+		FBX_animCurveNode.tY.KeyTime.push_back((unsigned long long)f * FBXframe1);			// Tempo
 		FBX_animCurveNode.tY.KeyValueFloat.push_back(Yfrom[f]);
 		FBX_animCurveNode.tY.KeyAttrFlags.push_back(24840);												// Cubic|TangeantAuto|GenericTimeIndependent|GenericClampProgressive
         FBX_animCurveNode.tY.KeyAttrDataFloat.push_back(0);												// RightSlope:0
@@ -572,7 +572,7 @@ bool CAM_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
         FBX_animCurveNode.tY.KeyAttrDataFloat.push_back(218434821);										// RightWeight:0.333333, NextLeftWeight:0.333333
         FBX_animCurveNode.tY.KeyAttrDataFloat.push_back(0);												// RightVelocity:0, NextLeftVelocity:0
 		// Scrittura traslazione Z
-		FBX_animCurveNode.tZ.KeyTime.push_back((unsigned long long)f * FBXframe1 + FBXframe1);			// Tempo
+		FBX_animCurveNode.tZ.KeyTime.push_back((unsigned long long)f * FBXframe1);			// Tempo
 		FBX_animCurveNode.tZ.KeyValueFloat.push_back(Zfrom[f]);
 		FBX_animCurveNode.tZ.KeyAttrFlags.push_back(24840);												// Cubic|TangeantAuto|GenericTimeIndependent|GenericClampProgressive
         FBX_animCurveNode.tZ.KeyAttrDataFloat.push_back(0);												// RightSlope:0
@@ -580,7 +580,7 @@ bool CAM_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
         FBX_animCurveNode.tZ.KeyAttrDataFloat.push_back(218434821);										// RightWeight:0.333333, NextLeftWeight:0.333333
         FBX_animCurveNode.tZ.KeyAttrDataFloat.push_back(0);												// RightVelocity:0, NextLeftVelocity:0
 		// Scrittura rotazione X
-		FBX_animCurveNode.rX.KeyTime.push_back((unsigned long long)f * FBXframe1 + FBXframe1);			// Tempo
+		FBX_animCurveNode.rX.KeyTime.push_back((unsigned long long)f * FBXframe1);			// Tempo
 		FBX_animCurveNode.rX.KeyValueFloat.push_back(Xrot[f]);
 		FBX_animCurveNode.rX.KeyAttrFlags.push_back(24840);												// Cubic|TangeantAuto|GenericTimeIndependent|GenericClampProgressive
         FBX_animCurveNode.rX.KeyAttrDataFloat.push_back(0);												// RightSlope:0
@@ -588,7 +588,7 @@ bool CAM_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
         FBX_animCurveNode.rX.KeyAttrDataFloat.push_back(218434821);										// RightWeight:0.333333, NextLeftWeight:0.333333
         FBX_animCurveNode.rX.KeyAttrDataFloat.push_back(0);												// RightVelocity:0, NextLeftVelocity:0		
 		// Scrittura rotazione Y
-		FBX_animCurveNode.rY.KeyTime.push_back((unsigned long long)f * FBXframe1 + FBXframe1);			// Tempo
+		FBX_animCurveNode.rY.KeyTime.push_back((unsigned long long)f * FBXframe1);			// Tempo
 		FBX_animCurveNode.rY.KeyValueFloat.push_back(-Yrot[f]);
 		FBX_animCurveNode.rY.KeyAttrFlags.push_back(24840);												// Cubic|TangeantAuto|GenericTimeIndependent|GenericClampProgressive
         FBX_animCurveNode.rY.KeyAttrDataFloat.push_back(0);												// RightSlope:0
@@ -596,7 +596,7 @@ bool CAM_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
         FBX_animCurveNode.rY.KeyAttrDataFloat.push_back(218434821);										// RightWeight:0.333333, NextLeftWeight:0.333333
         FBX_animCurveNode.rY.KeyAttrDataFloat.push_back(0);												// RightVelocity:0, NextLeftVelocity:0
 		// Scrittura rotazione Z
-		FBX_animCurveNode.rZ.KeyTime.push_back((unsigned long long)f * FBXframe1 + FBXframe1);			// Tempo
+		FBX_animCurveNode.rZ.KeyTime.push_back((unsigned long long)f * FBXframe1);			// Tempo
 		FBX_animCurveNode.rZ.KeyValueFloat.push_back(Zrot[f]);
 		FBX_animCurveNode.rZ.KeyAttrFlags.push_back(24840);												// Cubic|TangeantAuto|GenericTimeIndependent|GenericClampProgressive
         FBX_animCurveNode.rZ.KeyAttrDataFloat.push_back(0);												// RightSlope:0
@@ -607,24 +607,24 @@ bool CAM_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 
 		//////// MA
 		// Scrittura traslazioni
-		MA_animCurve.tX.Time.push_back(f + 1);
+		MA_animCurve.tX.Time.push_back(f);
 		MA_animCurve.tX.Value.push_back(Xfrom[f]);
-		MA_animCurve.tY.Time.push_back(f + 1);
+		MA_animCurve.tY.Time.push_back(f);
 		MA_animCurve.tY.Value.push_back(Yfrom[f]);
-		MA_animCurve.tZ.Time.push_back(f + 1);
+		MA_animCurve.tZ.Time.push_back(f);
 		MA_animCurve.tZ.Value.push_back(Zfrom[f]);
 		// Scrittura rotazioni
-		MA_animCurve.rX.Time.push_back(f + 1);
+		MA_animCurve.rX.Time.push_back(f);
 		MA_animCurve.rX.Value.push_back(Xrot[f]);
-		MA_animCurve.rY.Time.push_back(f + 1);
+		MA_animCurve.rY.Time.push_back(f);
 		MA_animCurve.rY.Value.push_back(Yrot[f]);
-		MA_animCurve.rZ.Time.push_back(f + 1);
+		MA_animCurve.rZ.Time.push_back(f);
 		MA_animCurve.rZ.Value.push_back(Zrot[f]);
 		// Scrittura lunghezza focale
-		MA_animCurve.fl.Time.push_back(f + 1);
+		MA_animCurve.fl.Time.push_back(f);
 		MA_animCurve.fl.Value.push_back(Focal_lenght[f]);
 		// Scrittura center of interest
-		MA_animCurve.coi.Time.push_back(f + 1);
+		MA_animCurve.coi.Time.push_back(f);
 		MA_animCurve.coi.Value.push_back(COI[f]);
 	}
 	

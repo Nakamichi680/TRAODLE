@@ -7,8 +7,11 @@ public:
 	enum class TGT {FILE, CONS, FILE_CONS};
 	enum class TYP {OVR, LOG, DBG, WARN, ERR, FATAL};
 	msg (const char* function_caller, TGT output_target, TYP message_type) : first(true), caller(function_caller), output(output_target), type(message_type) {}
+	static bool &Quiet () { static bool quiet = false; return quiet; }	// Vero: mostra solo errori (letture ripetute dei file)
 	template <typename T> msg& operator<<(const T &text)
 	{
+		if (Quiet() && type != TYP::ERR && type != TYP::FATAL)
+			return *this;
 		if (!first)									// Questo blocco viene eseguito solo per i dati che seguono il secondo "<<"
 		{
 			if (output == TGT::FILE || output == TGT::FILE_CONS || type == TYP::FATAL)
@@ -80,6 +83,8 @@ public:
 	typedef ostream& (*STRFUNC)(ostream&);
 	msg& operator<< (STRFUNC func)
 	{
+		if (Quiet() && type != TYP::ERR && type != TYP::FATAL)
+			return *this;
 		func(cout);
 		func(msg_file_stream);
 		return *this;

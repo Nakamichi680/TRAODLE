@@ -327,8 +327,12 @@ void MA_Write_Mesh (const Mesh& mesh, MA_EXPORT &MA)
 	if (mesh.parent.size() > 0)
 		out << " -p \"" << mesh.parent << "\"";
 	out << ";\n";
-	out << "createNode mesh -n \"" << mesh.name << "Shape\" -p \"" << mesh.name << "\";\n";
+	// Le mesh deformate da uno scheletro hanno la geometria nella shape intermedia "ShapeOrig", che alimenta lo skinCluster
+	bool skinned = !mesh.Skin.empty();
+	out << "createNode mesh -n \"" << mesh.name << (skinned ? "ShapeOrig" : "Shape") << "\" -p \"" << mesh.name << "\";\n";
 	out << "	setAttr -k off \".v\";\n";
+	if (skinned)
+		out << "	setAttr \".io\" yes;\n";
 	out << "	setAttr \".vir\" yes;\n";
 	out << "	setAttr \".vif\" yes;\n";
 
@@ -642,6 +646,15 @@ void MA_Write_Mesh (const Mesh& mesh, MA_EXPORT &MA)
 			out << "	setAttr \".ihi\" 0;\n";
 		}
 	
+	// Mesh deformata: shape di output (la geometria viene calcolata dallo skinCluster, vedi MA_Write_SkinCluster)
+	if (skinned)
+	{
+		out << "createNode mesh -n \"" << mesh.name << "Shape\" -p \"" << mesh.name << "\";\n";
+		out << "	setAttr -k off \".v\";\n";
+		out << "	setAttr \".vir\" yes;\n";
+		out << "	setAttr \".vif\" yes;\n";
+	}
+
 	MA.MA_Nodes << out.str();
 	out.str("");
 

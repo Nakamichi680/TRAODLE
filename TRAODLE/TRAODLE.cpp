@@ -6,6 +6,8 @@
 #include "TRAE/TEXSET/TEXSET_Functions.h"
 #include "TRAOD/CAM/CAM_Functions.h"
 #include "TRAOD/SCX/SCX_Functions.h"
+#include "TRAOD/CHR/CHR_Functions.h"
+#include "TRAOD/CAL/CAL_Functions.h"
 #include "TRAOD/ZONE/ZONE_Functions.h"
 #include "TRAOD/GMX/GMX_Functions.h"
 #include "TRAOD/RMX/RMX_Functions.h"
@@ -155,7 +157,12 @@ int main(int argc, char **argv)
 		if (AOD_IO.SearchFileInGMXList("", AoDFileType::CLN))
 			CreateDirectory(AOD_IO.folder_collisions_lpwstr, NULL);		// Crea la cartella \NOMELIVELLO\Collisions
 		if (AOD_IO.SearchFileInGMXList("", AoDFileType::SCX))
-			CreateDirectory(AOD_IO.folder_scx_lpwstr, NULL);			// Crea la cartella \NOMELIVELLO\SCX
+		{
+			if (!CreateDirectory(AOD_IO.folder_scx_lpwstr, NULL) && GetLastError() != ERROR_ALREADY_EXISTS)	// Crea la cartella NOMELIVELLO\Scripts
+				msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "Unable to create folder " << AOD_IO.folder_scx << " (error " << GetLastError() << ")";
+			else
+				msg(msg::TGT::FILE, msg::TYP::DBG) << "Scripts folder: " << AOD_IO.folder_scx;
+		}
 
 		// BLOCCO CONVERSIONE FILES ESTRATTI DAL GMX
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "*********************************";
@@ -184,6 +191,16 @@ int main(int argc, char **argv)
 			case(AoDFileType::CLN):
 				if (!Export_CLN(AOD_IO.gmxfiles[i].name))
 					msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "CLN exporting completed with error(s)";
+				msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "";
+				break;
+			case(AoDFileType::CHR):
+				if (!Export_CHR(AOD_IO.gmxfiles[i].name))
+					msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "CHR exporting completed with error(s)";
+				msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "";
+				break;
+			case(AoDFileType::CAL):
+				if (!Export_CAL(AOD_IO.gmxfiles[i].name))
+					msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "CAL exporting completed with error(s)";
 				msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "";
 				break;
 			case(AoDFileType::SCX):

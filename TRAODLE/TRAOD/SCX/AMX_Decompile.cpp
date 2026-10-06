@@ -3,6 +3,7 @@
 #include <set>
 #include <memory>
 #include "TRAOD/SCX/SCX_Functions.h"
+#include "hash_Functions.h"
 
 
 /*------------------------------------------------------------------------------------------------------------------
@@ -57,6 +58,39 @@ string Hex (uint32_t value, int width)
 }
 
 
+/*------------------------------------------------------------------------------------------------------------------
+Costanti con nome: se il valore e' l'hash di un nome noto (SCX_HashNames.cpp) viene scritto il nome, dichiarato in testa
+al file come costante. Se il nome non e' un identificatore valido o il valore non e' esattamente il suo hash (copie
+rinominate delle animazioni) viene scritto il numero seguito dal nome in commento.
+------------------------------------------------------------------------------------------------------------------*/
+set <uint32_t> usedNames;				// Hash il cui nome e' stato usato come costante
+
+
+bool IsIdentifier (const string &s)
+{
+	if (s.empty() || isdigit((unsigned char)s[0]))
+		return false;
+	for (unsigned char c : s)
+		if (!isalnum(c) && c != '_')
+			return false;
+	return true;
+}
+
+
+string RenderValue (int32_t value)
+{
+	string name = AMX_HashName(value);
+	if (name.empty())
+		return AMX_RenderNumber(value);
+	if (IsIdentifier(name) && (uint32_t)GetHashValue(name.c_str()) == (uint32_t)value)
+	{
+		usedNames.insert((uint32_t)value);
+		return name;
+	}
+	return "0x" + Hex((uint32_t)value, 8) + " /* " + name + " */";
+}
+
+
 ExprP Atom (const string &text, int prec = P_ATOM)
 {
 	ExprP e = make_shared <Expr> ();
@@ -68,7 +102,8 @@ ExprP Atom (const string &text, int prec = P_ATOM)
 
 ExprP Const (int32_t value)
 {
-	ExprP e = Atom(AMX_RenderNumber(value), value < 0 ? P_UNARY : P_ATOM);
+	string text = RenderValue(value);
+	ExprP e = Atom(text, text[0] == '-' ? P_UNARY : P_ATOM);
 	e->isConst = true;
 	e->value = value;
 	return e;
@@ -1101,7 +1136,7 @@ int Decompiler::Switch (int i, int to, State &st, int indent)
 		{
 			string label = "case ";
 			for (unsigned int c = 0; c < cases[*it].size(); c++)
-				label += (c ? ", " : "") + AMX_RenderNumber(cases[*it][c]);
+				label += (c ? ", " : "") + RenderValue(cases[*it][c]);
 			AddLine(indent + 1, label + ":");
 		}
 		if (*it == def)
@@ -1391,6 +1426,7 @@ void Decompiler::DecompileFunction (int first, int end, Function &f)
 bool Decompiler::Run (string filename)
 {
 	funcNames = AMX_FunctionNames(amx);
+	usedNames.clear();
 	for (unsigned int i = 0; i < amx.publics.size(); i++)
 		publicAddresses.insert(amx.publics[i].address);
 	for (unsigned int i = 0; i < code.size(); i++)
@@ -1453,6 +1489,8 @@ bool Decompiler::Run (string filename)
 		file << "\n";
 	}
 
+	// Variabili globali (preparate prima della scrittura: anche i valori iniziali possono usare costanti con nome)
+	stringstream gl;
 	if (!globals.empty())
 	{
 		for (set <int32_t>::iterator it = globals.begin(); it != globals.end(); ++it)
@@ -1466,19 +1504,30 @@ bool Decompiler::Run (string filename)
 			else if (globalArrays.count(*it))
 				cells = ((next == globals.end() ? (int32_t)amx.data_size : *next) - *it) / 4;
 			if (amx.ReadString(*it, s))
-				file << "new g_" << Hex(*it, 4) << "[] = " << Quote(s) << ";\n";
+				gl << "new g_" << Hex(*it, 4) << "[] = " << Quote(s) << ";\n";
 			else if (cells > 1)
 			{
-				file << "new g_" << Hex(*it, 4) << "[" << cells << "] = {";
+				gl << "new g_" << Hex(*it, 4) << "[" << cells << "] = {";
 				for (int c = 0; c < cells; c++)
-					file << (c ? "," : "") << (c % 8 == 0 ? "\n\t" : " ") << AMX_RenderNumber(amx.GetDataCell(*it + c * 4));
-				file << "\n};\n";
+					gl << (c ? "," : "") << (c % 8 == 0 ? "\n\t" : " ") << RenderValue(amx.GetDataCell(*it + c * 4));
+				gl << "\n};\n";
 			}
 			else
-				file << "new g_" << Hex(*it, 4) << " = " << AMX_RenderNumber(amx.GetDataCell(*it)) << ";\n";
+				gl << "new g_" << Hex(*it, 4) << " = " << RenderValue(amx.GetDataCell(*it)) << ";\n";
 		}
+		gl << "\n";
+	}
+
+	// Costanti con nome: hash di animazioni, bones, personaggi e file del livello
+	if (!usedNames.empty())
+	{
+		file << "// Hashed names (GetHashValue) found in the level files\n";
+		for (uint32_t h : usedNames)
+			file << "const " << AMX_HashName(h) << " = 0x" << Hex(h, 8) << ";\n";
 		file << "\n";
 	}
+
+	file << gl.str();
 
 	for (unsigned int i = 0; i < functions.size(); i++)
 	{

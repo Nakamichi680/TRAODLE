@@ -7,9 +7,9 @@
 
 
 // Dimensioni della pedina (unita' del gioco) e direzione frontale di un personaggio con rotazione 0
-static const float PAWN_HEIGHT = 800;
-static const float PAWN_RADIUS = 160;
-static const float PAWN_NOSE = 200;
+static const float PAWN_HEIGHT = 1000;				// Lara (LARAC2.CHR) e' alta circa 1080 unita'
+static const float PAWN_RADIUS = 200;
+static const float PAWN_NOSE = 250;
 static const Vec3 CHARLOC_FORWARD(0, -1, 0);			// Asse verso cui guarda un personaggio con Zrot = 0 (verificato in Maya)
 
 

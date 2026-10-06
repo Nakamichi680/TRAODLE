@@ -17,14 +17,41 @@ void FBX_Write_Object_definitions (FBX_EXPORT &FBX)
     if (FBX.FBX_Count.AnimationStack > 0)   {
         out << "	ObjectType: \"AnimationStack\" {\n";
         out << "		Count: " << FBX.FBX_Count.AnimationStack << "\n";
+        out << "		PropertyTemplate: \"FbxAnimStack\" {\n";		// Valori di default (come nei file di Maya)
+        out << "			Properties70:  {\n";
+        out << "				P: \"Description\", \"KString\", \"\", \"\", \"\"\n";
+        out << "				P: \"LocalStart\", \"KTime\", \"Time\", \"\",0\n";
+        out << "				P: \"LocalStop\", \"KTime\", \"Time\", \"\",0\n";
+        out << "				P: \"ReferenceStart\", \"KTime\", \"Time\", \"\",0\n";
+        out << "				P: \"ReferenceStop\", \"KTime\", \"Time\", \"\",0\n";
+        out << "			}\n";
+        out << "		}\n";
         out << "	}\n";   }
     if (FBX.FBX_Count.AnimationLayer > 0)   {
         out << "	ObjectType: \"AnimationLayer\" {\n";
         out << "		Count: " << FBX.FBX_Count.AnimationLayer << "\n";
+        out << "		PropertyTemplate: \"FbxAnimLayer\" {\n";		// Senza Weight = 100 il layer non ha effetto
+        out << "			Properties70:  {\n";
+        out << "				P: \"Weight\", \"Number\", \"\", \"A\",100\n";
+        out << "				P: \"Mute\", \"bool\", \"\", \"\",0\n";
+        out << "				P: \"Solo\", \"bool\", \"\", \"\",0\n";
+        out << "				P: \"Lock\", \"bool\", \"\", \"\",0\n";
+        out << "				P: \"Color\", \"ColorRGB\", \"Color\", \"\",0.8,0.8,0.8\n";
+        out << "				P: \"BlendMode\", \"enum\", \"\", \"\",0\n";
+        out << "				P: \"RotationAccumulationMode\", \"enum\", \"\", \"\",0\n";
+        out << "				P: \"ScaleAccumulationMode\", \"enum\", \"\", \"\",0\n";
+        out << "				P: \"BlendModeBypass\", \"ULongLong\", \"\", \"\",0\n";
+        out << "			}\n";
+        out << "		}\n";
         out << "	}\n";   }
     if (FBX.FBX_Count.AnimationCurveNode > 0)   {
         out << "	ObjectType: \"AnimationCurveNode\" {\n";
         out << "		Count: " << FBX.FBX_Count.AnimationCurveNode << "\n";
+        out << "		PropertyTemplate: \"FbxAnimCurveNode\" {\n";
+        out << "			Properties70:  {\n";
+        out << "				P: \"d\", \"Compound\", \"\", \"\"\n";
+        out << "			}\n";
+        out << "		}\n";
         out << "	}\n";   }
     if (FBX.FBX_Count.AnimationCurve > 0)   {
         out << "	ObjectType: \"AnimationCurve\" {\n";

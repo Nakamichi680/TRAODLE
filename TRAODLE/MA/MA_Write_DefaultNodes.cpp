@@ -122,7 +122,7 @@ void MA_Write_DefaultNodes (MA_EXPORT &MA)
 
 	// VALORI MIN/MAX SLIDER ANIMAZIONE
 	out << "createNode script -n \"sceneConfigurationScriptNode\";\n";
-	out << "	setAttr \".b\" -type \"string\" \"playbackOptions -min 1 -max " << Max_frame << " -ast 1 -aet " << Max_frame << " \";\n";
+	out << "	setAttr \".b\" -type \"string\" \"playbackOptions -min 0 -max " << (Max_frame > 0 ? Max_frame - 1 : 0) << " -ast 0 -aet " << (Max_frame > 0 ? Max_frame - 1 : 0) << " \";\n";
 	out << "	setAttr \".st\" 6;\n";
 	MA.MA_Nodes << out.str();
 	out.str("");

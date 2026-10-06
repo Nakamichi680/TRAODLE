@@ -6,7 +6,7 @@
 class AOD_IO_CLASS;
 class AODRemastered_IO_CLASS;
 class AE_IO_CLASS;
-static const unsigned long long FBXframe1 = 1924423250;			// First frame (valore arbitrario del file FBX associato al frame numero 1)
+static const unsigned long long FBXframe1 = 1539538600;			// Durata di un frame nel file FBX (1/30 di secondo: le animazioni di AoD sono a 30 fps)
 extern int MaxThreadLimit;
 extern AOD_IO_CLASS AOD_IO;
 extern AODRemastered_IO_CLASS AODRemastered_IO;

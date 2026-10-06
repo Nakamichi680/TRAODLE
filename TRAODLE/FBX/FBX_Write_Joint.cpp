@@ -20,7 +20,7 @@ void FBX_Write_Joint (Joint input, FBX_EXPORT &FBX)
 	out << "		Version: 232\n";
 	out << "		Properties70:  {\n";
 	out << "			P: \"RotationActive\", \"bool\", \"\", \"\",1\n";
-	out << "			P: \"InheritType\", \"enum\", \"\", \"\",1\n";
+	out << "			P: \"InheritType\", \"enum\", \"\", \"\",2\n";			// Rrs: la scala del padre non si applica (segment scale compensate dei joints Maya e del runtime TRAOD)
 	out << "			P: \"ScalingMax\", \"Vector3D\", \"Vector\", \"\",0,0,0\n";
 	out << "			P: \"DefaultAttributeIndex\", \"int\", \"Integer\", \"\",0\n";
 	if (input.translate_flag)

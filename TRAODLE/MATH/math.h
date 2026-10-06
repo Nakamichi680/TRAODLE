@@ -8,6 +8,8 @@ XYZ mathMatrixGetAngles(MATRIX matrix);										// Restituisce gli angoli in ra
 MATRIX mathMatrixLookAt(VECTOR camera, VECTOR target, float roll);			// Restituisce una matrice di rotazione dalla camera al target
 XYZ mathMatrixToEuler(MATRIX matrix);										// Restituisce gli angoli euleriani partendo da una matrice
 MATRIX mathMulMatrices(MATRIX a, MATRIX b);									// Moltiplica la matrice a per la matrice b
+MATRIX mathMatrixInverse(MATRIX m);											// Restituisce l'inversa di una matrice 4x4
+void mathMatrixDecompose(MATRIX m, Vec3 *translation, Vec3 *rotation_deg, Vec3 *scale);	// Scompone una matrice in traslazione, rotazione (gradi, ordine XYZ) e scala
 VECTOR mathMulQuaternions(VECTOR a, VECTOR b);								// Moltiplica il quaternione a per il quaternione b
 void mathQuatNormalise(VECTOR *quat);										// Normalizza il quaternione
 MATRIX mathQuatToMatrix(VECTOR quat);										// Converte il quaternione in matrice
@@ -27,3 +29,4 @@ float mathVectorDot(VECTOR a, VECTOR b);									// Effettua il prodotto scalare
 VECTOR mathVectorCross(VECTOR a, VECTOR b);									// Effettua il prodotto vettoriale tra un vettore "a" ed un vettore "b"
 VECTOR mathVectorNormalise(VECTOR v);										// Normalizza un vettore "v"
 void mathWrapAngle180(float *angle);										// Blocca l'angolo euleriano nel range -180/+180 gradi
+vector <unsigned int> mathCurveKeys (const vector <float> &v, float tolerance);	// Frames chiave di una curva (interpolazione lineare entro tolerance)

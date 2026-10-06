@@ -35,15 +35,19 @@ void RMX_Waypoint_Graph (const vector <RMX_WaypointInfo> &waypoints, string laye
 struct RMX_Actor {						// Record del database dei personaggi (ACTOR.DB)
 	uint32_t ID;						// Identificativo (RMX_CHARLOC.ActorID)
 	int Health;							// Salute iniziale (-1 = non uccidibile)
-	uint32_t Type;						// 1 = Lara giocabile, 2 = non giocante / cutscene, 3 = nemico
+	uint32_t Type;						// 1 = player, 2 = neutral (non giocante / cutscene), 3 = enemy, 4 = obj
 	uint32_t BaseID;					// ID del modello base
 	const char *Name;					// Nome del personaggio
 };
 
 const RMX_Actor *RMX_GetActor (uint32_t id);
 
+const RMX_Actor *RMX_GetActorByHash (uint32_t hash);
+
+void RMX_AddActorNames (map <uint32_t, string> &names);
+
 void RMX_Charloc (ifstream &rmxfile, string room_name, string layer, string pawn_layer, ofstream &out, FBX_EXPORT &FBX, MA_EXPORT &MA, map <string, unsigned int> &name_count);
 
 unsigned int Isolate_duplicated_lights (MA_EXPORT &MA);
 
-unsigned int Isolate_duplicated_water (MA_EXPORT &MA);
+unsigned int Isolate_duplicated_water (MA_EXPORT &MA);

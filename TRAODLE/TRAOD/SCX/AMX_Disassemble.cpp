@@ -324,6 +324,8 @@ bool AMX_Disassemble (const AMX_SCRIPT &amx, string filename)
 			string s;
 			if (amx.ReadString(ins.param[0], s))
 				comment = "\"" + s + "\"";
+			else if (!AMX_HashName(ins.param[0]).empty())
+				comment = AMX_HashName(ins.param[0]);
 			else if (AMX_RenderNumber(ins.param[0]) != to_string(ins.param[0]))
 				comment = AMX_RenderNumber(ins.param[0]);
 		}
@@ -342,7 +344,8 @@ bool AMX_Disassemble (const AMX_SCRIPT &amx, string filename)
 		for (uint32_t c = a; c < a + 16 && c < amx.data_size; c += 4)
 		{
 			out << " " << Hex(amx.GetDataCell(c), 8);
-			render += "  " + AMX_RenderNumber(amx.GetDataCell(c));
+			string name = AMX_HashName(amx.GetDataCell(c));
+			render += "  " + (name.empty() ? AMX_RenderNumber(amx.GetDataCell(c)) : name);
 		}
 		out << "    ;" << render << "\n";
 	}

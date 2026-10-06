@@ -491,6 +491,8 @@ public:
 	bool DrawLabel = false;
 	LABELSIDE LabelSide = LABELSIDE::CENTER;
 	LABELTYPE LabelType = LABELTYPE::OTHER;
+	bool bindmatrix_flag = false;		// Se vero, BindMatrix contiene la matrice globale del joint nella posa di bind (necessaria per lo skinning)
+	float BindMatrix[16];				// Matrice globale di bind (convenzione a vettore riga, scritta per righe: traslazione negli elementi 12-14)
 	string LabelName = "";				// Il LabelName viene usato solo LabelType è su Other
 };
 
@@ -621,6 +623,53 @@ public:
 };
 
 
+class SkinCluster {						// Influenza di un joint su una mesh deformata da uno scheletro (skinning)
+public:
+	string joint;						// Nome del joint
+	vector <unsigned int> Vertex;		// Indici dei vertici influenzati dal joint
+	vector <float> Weight;				// Pesi corrispondenti (la somma dei pesi di ogni vertice su tutti i joints e' 1)
+};
+
+
+class BlendShapeTarget {				// Target di un blend shape (mesh base + offset dei vertici, es. espressioni facciali)
+public:
+	string name;						// Nome del target
+	vector <float> dX;					// Offset di ogni vertice della mesh rispetto alla posizione base (stesso ordine di Mesh.X)
+	vector <float> dY;
+	vector <float> dZ;
+};
+
+
+class BlendShapeAnimation {				// Animazione dei pesi dei blend shapes (es. animazione facciale)
+public:
+	string name;						// Nome dell'animazione
+	unsigned int nFrames = 0;			// Numero di frames (30 fps)
+	uint32_t id = 0;					// Id della sequenza (hash del nome, es. TRACK_KEY FIRE_MORPH_TRIGGER delle animazioni CAL)
+	vector <string> meshes;				// Mesh con il blend shape animato (stessi target, es. elementi della mesh del volto)
+	vector <string> targets;			// Nomi dei target (stesso ordine di Mesh.BlendShape)
+	vector <vector <float>> weight;		// Peso (0-1) di ogni target per ogni frame: weight[target][frame]
+};
+
+
+class NodeAnimation {					// Curve di animazione di un nodo (joint o gruppo): un valore per frame, vettore vuoto = canale non animato
+public:
+	string node;						// Nome del nodo
+	bool joint = true;					// Vero se il nodo e' un joint (falso: gruppo/transform)
+	vector <float> tX, tY, tZ;			// Traslazione
+	vector <float> rX, rY, rZ;			// Rotazione in gradi (ordine XYZ)
+	vector <float> sX, sY, sZ;			// Scala
+};
+
+
+class SkeletalAnimation {				// Animazione di uno scheletro (es. animazioni CAL)
+public:
+	string name;						// Nome dell'animazione
+	string character;					// Nome del personaggio (file CHR / MA referenziato)
+	unsigned int nFrames = 0;			// Numero di frames (30 fps)
+	vector <NodeAnimation> nodes;		// Nodi animati
+};
+
+
 class Mesh {
 public:
 	string name;					// Nome del modello geometrico
@@ -660,4 +709,6 @@ public:
 	vector <float> A;
 	vector <Face> Face;				// utilizzato da FBX (tris e quads) e MA (solo tris)
 	vector <ObjectGroup> Groups;	// utilizzato per le mesh con materiali multipli
+	vector <SkinCluster> Skin;		// Skinning: un elemento per ogni joint che deforma la mesh (vuoto se la mesh non e' deformata). La mesh deve essere in posa di bind con trasformazione identita'
+	vector <BlendShapeTarget> BlendShape;	// Blend shapes della mesh (vuoto se assenti). Deformazione applicata prima dello skinning
 };

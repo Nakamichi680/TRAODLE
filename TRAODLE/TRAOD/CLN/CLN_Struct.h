@@ -44,10 +44,29 @@ struct CLN_TRIANGLE		// Size: 48 bytes
 };
 
 
+/*------------------------------------------------------------------------------------------------------------------
+Attributo di collisione. Definizioni originali (Tools\CollisionProducer\CollisionSpec.h e Tools\worldedit\Sys\collision.csc):
+	bits 0-7	composition [CF_GETSURFACETYPE 0xFF]
+	bits 8-9	mapping     [CF_GETMAPPINGTYPE 0x300, CF_MAPPINGSHIFT 8]: 0 NONE (parete), 1 FLOOR, 2 CEILING
+	bits 10-21	bitattrib   [CF_BITATTRSTART 10]: DEADLY, HARMFUL, CLIMBABLE, MONKEY_SWING, SHOT_PERMEABLE, VIEW_PERMEABLE,
+				WALL_CLIMB, STAIRS, SLIDE, NO_SLIDE, CAMERA_PERMEABLE, NO_GRAB
+	composition (indice nella lista [COMPOSITION] di collision.csc):
+		 0- 2 STONE1-3			 3- 5 MARBLE1-3			 6- 8 GRAVEL1-3			 9-11 SAND1-3
+		12-14 MUD1-3			15-17 GRASS1-3			18-20 TALL_GRASS1-3		21-23 CARPET1-3
+		24-26 WOOD1-3			27-29 CREAKY_WOOD1-3	30-32 METAL1-3			33-35 CREAKY_METAL1-3
+		36-38 ROCK1-3			39-41 UNSAFE_ROCK1-3	42-44 WATER_PUDDLE1-3	45 WET_WOOD
+		46 WET_METAL			47 WET_STONE			48-50 SNOW1-3			51 RUBBER
+		52 SKIP					53 GLASS_PANEL			54 ICE					55 WET_GRAVEL
+		56 WET_CARPET			57 WET_GRASS			58 WET_SAND				59 WET_RUBBER
+		60 WET_SKIP
+	CLN_GetAttributeName usa la texture "stone" per 51-54 e "wetstone" per 59-60 (non esistono texture dedicate).
+------------------------------------------------------------------------------------------------------------------*/
+
+
 struct CLN_TLIST		// Size: variable
 {
 	uint32_t attribute;
 	uint16_t padding;
 	uint16_t nIndices;
 	uint16_t Index;
-};
+};

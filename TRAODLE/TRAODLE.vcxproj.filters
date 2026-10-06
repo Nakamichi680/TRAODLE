@@ -49,6 +49,9 @@
     <Filter Include="File di origine\TRAOD\CAM">
       <UniqueIdentifier>{c110a123-f03f-406c-89ac-495db105f982}</UniqueIdentifier>
     </Filter>
+    <Filter Include="File di origine\TRAOD\CAL">
+      <UniqueIdentifier>{3f6d2a71-8c4e-4b1a-9e57-6a0c2d9b81f4}</UniqueIdentifier>
+    </Filter>
     <Filter Include="File di intestazione\Functions\TRAOD">
       <UniqueIdentifier>{b089c533-8923-4835-89a9-2b711b1dd04d}</UniqueIdentifier>
     </Filter>
@@ -153,6 +156,42 @@
     <ClInclude Include="TRAOD\CHR\CHR_Struct.h">
       <Filter>File di intestazione\Structs\TRAOD</Filter>
     </ClInclude>
+    <ClInclude Include="TRAOD\CHR\TMT_Struct.h">
+      <Filter>File di intestazione\Structs\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\CAL\CAL_Struct.h">
+      <Filter>File di intestazione\Structs\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\CAL\POS_Struct.h">
+      <Filter>File di intestazione\Structs\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\CHR\CHR_Functions.h">
+      <Filter>File di intestazione\Functions\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\CAL\CAL_Functions.h">
+      <Filter>File di intestazione\Functions\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\CHR\TMS_Struct.h">
+      <Filter>File di intestazione\Structs\TRAOD</Filter>
+    </ClInclude>
+    <ClCompile Include="TRAOD\CAL\CAL_DecodeTrack.cpp">
+      <Filter>File di origine\TRAOD\CAL</Filter>
+    </ClCompile>
+    <ClCompile Include="FBX\FBX_Write_BlendShapeAnimation.cpp">
+      <Filter>File di origine\FBX Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\CAL\Export_CAL.cpp">
+      <Filter>File di origine\TRAOD\CAL</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\CAL\CAL_Read_Positions.cpp">
+      <Filter>File di origine\TRAOD\CAL</Filter>
+    </ClCompile>
+    <ClCompile Include="FBX\FBX_Write_SkeletalAnimation.cpp">
+      <Filter>File di origine\FBX Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_SkeletalAnimation.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
     <ClInclude Include="TRAOD\CAM\CAM_Struct.h">
       <Filter>File di intestazione\Structs\TRAOD</Filter>
     </ClInclude>
@@ -344,6 +383,9 @@
     <ClCompile Include="TRAOD\SCX\Export_SCX.cpp">
       <Filter>File di origine\TRAOD\SCX</Filter>
     </ClCompile>
+    <ClCompile Include="TRAOD\SCX\SCX_HashNames.cpp">
+      <Filter>File di origine\TRAOD\SCX</Filter>
+    </ClCompile>
     <ClCompile Include="TRAOD\SCX\AMX_Disassemble.cpp">
       <Filter>File di origine\TRAOD\SCX</Filter>
     </ClCompile>
@@ -452,7 +494,19 @@
     <ClCompile Include="FBX\FBX_Write_Joint.cpp">
       <Filter>File di origine\FBX Exporter</Filter>
     </ClCompile>
+    <ClCompile Include="FBX\FBX_Write_Skin.cpp">
+      <Filter>File di origine\FBX Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="FBX\FBX_Write_BlendShape.cpp">
+      <Filter>File di origine\FBX Exporter</Filter>
+    </ClCompile>
     <ClCompile Include="MA\MA_Write_Joint.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_SkinCluster.cpp">
+      <Filter>File di origine\MA Exporter</Filter>
+    </ClCompile>
+    <ClCompile Include="MA\MA_Write_BlendShape.cpp">
       <Filter>File di origine\MA Exporter</Filter>
     </ClCompile>
     <ClCompile Include="MATH\mathQuatNormalise.cpp">
@@ -522,6 +576,15 @@
       <Filter>File di origine\TRAOD\ZONE</Filter>
     </ClCompile>
     <ClCompile Include="MATH\mathMulMatrices.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathMatrixInverse.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathMatrixDecompose.cpp">
+      <Filter>File di origine\math</Filter>
+    </ClCompile>
+    <ClCompile Include="MATH\mathCurveKeys.cpp">
       <Filter>File di origine\math</Filter>
     </ClCompile>
     <ClCompile Include="MATH\mathMulQuaternions.cpp">
@@ -621,6 +684,21 @@
       <Filter>File di origine\TRAOD\ZONE</Filter>
     </ClCompile>
     <ClCompile Include="TRAOD\CHR\Export_CHR.cpp">
+      <Filter>File di origine\TRAOD\CHR</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\CHR\CHR_Read_Skeleton.cpp">
+      <Filter>File di origine\TRAOD\CHR</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\CHR\CHR_Read_Meshes.cpp">
+      <Filter>File di origine\TRAOD\CHR</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\CHR\CHR_Read_Morphs.cpp">
+      <Filter>File di origine\TRAOD\CHR</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\CHR\CHR_Read_Materials.cpp">
+      <Filter>File di origine\TRAOD\CHR</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\CHR\CHR_Read_Textures.cpp">
       <Filter>File di origine\TRAOD\CHR</Filter>
     </ClCompile>
     <ClCompile Include="MA\MA_Write_PolyCube.cpp">

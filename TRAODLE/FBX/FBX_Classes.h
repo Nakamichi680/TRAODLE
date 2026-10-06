@@ -147,6 +147,8 @@ public:
 	vector <Light> Light;
 	vector <Animation> Animation;
 	vector <Joint> Joint;
+	vector <BlendShapeAnimation> BlendShapeAnimation;	// Animazioni dei blend shapes (una take FBX per animazione)
+	vector <SkeletalAnimation> SkeletalAnimation;		// Animazioni degli scheletri (una take FBX per animazione)
 
 	stringstream FBX_Header;
 	stringstream FBX_Definitions;

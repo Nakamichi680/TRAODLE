@@ -1,53 +1,63 @@
-/* Tomb Raider - The Angel of Darkness Animation Exporter
-Copyright (c) 2017-2018 Nakamichi680
-
-This file is part of "Tomb Raider - The Angel of Darkness Animation Exporter".
-
-"Tomb Raider - The Angel of Darkness Animation Exporter" is free software: you can redistribute it and/or modify it under the terms of the
-GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-
-"Tomb Raider - The Angel of Darkness Animation Exporter" is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with "Tomb Raider - The Angel of Darkness Animation Exporter".
-If not, see <http://www.gnu.org/licenses/>.
-
-Copyright (c) Square Enix Ltd. Lara Croft and Tomb Raider are trademarks or registered trademarks of Square Enix Ltd.*/
+#include "stdafx.h"
+#include "TRAOD/CHR/CHR_Functions.h"
+#include "TRAOD/ZONE/ZONE_Functions.h"
+#include "TRAOD/ZONE/ZONE_Struct.h"
 
 
 /*------------------------------------------------------------------------------------------------------------------
-Lettura lista materiali file CHR
-INPUT: ifstream &chrfile
-OUTPUT: vector <Material> &Materials
+Legge i materiali del file CHR e li aggiunge al file MA. Il record dei materiali ha lo stesso formato di quello dei
+file ZONE, quindi vengono riutilizzate le funzioni di conversione dei materiali della ZONE (il nome del personaggio
+prende il posto del nome della zona nei nomi di materiali e textures).
 ------------------------------------------------------------------------------------------------------------------*/
-
-#include "stdafx.h"
-#include "CHR_Struct.h"
-#include "Classes.h"
-
-
-void CHR_Read_Materials (vector <Material> &Materials, ifstream &chrfile)
+bool CHR_Read_Materials (ifstream &chrfile, const CHR_HEADER &chr_header, string chrname, MA_EXPORT &MA)
 {
-    CHR_HEADER chr_header;
-    CHR_MATERIALS_HEADER chr_materials_header;
-    CHR_MATERIALS_LIST chr_materials_list;
+	CHR_MATERIALS_HEADER chr_materials_header;
+	CHR_TEXTURES_HEADER chr_textures_header;
+	CHR_TEXTURES_LIST chr_textures_list;
 
-    streamoff original_position = chrfile.tellg();	// Memorizza la posizione iniziale del cursore nel file per poterci tornare alla fine della funzione
-    chrfile.seekg(4, chrfile.beg);					// Posiziona il cursore di lettura all'inizio del file, con offset di 4 bytes per leggere l'offset del blocco textures
-    chrfile.read(reinterpret_cast<char*>(&chr_header.TEXTURE_PTR), sizeof(chr_header.TEXTURE_PTR));
-    chrfile.seekg(chr_header.TEXTURE_PTR);
-    chrfile.read(reinterpret_cast<char*>(&chr_materials_header.nMaterials), sizeof(chr_materials_header.nMaterials));  // Legge il numero di materiali
+	chrfile.seekg(chr_header.TEXTURE_PTR);
+	chrfile.read(reinterpret_cast<char*>(&chr_materials_header.nMaterials), sizeof(chr_materials_header.nMaterials));
+	vector <ZONE_MATERIALS_LIST> materials(chr_materials_header.nMaterials);
+	static_assert(sizeof(ZONE_MATERIALS_LIST) == sizeof(CHR_MATERIALS_LIST), "Materiali CHR e ZONE devono avere lo stesso formato");
+	if (!materials.empty())
+		chrfile.read(reinterpret_cast<char*>(materials.data()), materials.size() * sizeof(ZONE_MATERIALS_LIST));
 
-    for (unsigned int m = 0; m < chr_materials_header.nMaterials; m++)
-    {
-        Materials.resize(m+1);
-		Materials[m].Number = m;
-        chrfile.read(reinterpret_cast<char*>(&Materials[m].Type), sizeof(chr_materials_list.TextureMode));		// Legge il tipo di materiale
-        chrfile.seekg(6, ios_base::cur);																		// Salta DoubleSided ed Unknown1
-        chrfile.read(reinterpret_cast<char*>(&Materials[m].Diffuse), sizeof(chr_materials_list.DiffuseID));		// Legge l'ID diffuse
-        chrfile.read(reinterpret_cast<char*>(&Materials[m].Shadow), sizeof(chr_materials_list.ShadowMapID));	// Legge l'ID shadowmap (inutile nei CHR)
-        chrfile.read(reinterpret_cast<char*>(&Materials[m].BumpSpec), sizeof(chr_materials_list.BumpSpecID));	// Legge l'ID del bump mapping e dello specular/envelope
-        chrfile.read(reinterpret_cast<char*>(&Materials[m].Fur), sizeof(chr_materials_list.FurID));				// Legge l'ID del fur
-    }
-    chrfile.seekg(original_position);				// Riporta il cursore di lettura dove si trovava prima di entrare in questa funzione
+	// Formato di ogni texture (le textures DXT3 e ARGB hanno il canale alfa, usato per la trasparenza)
+	chrfile.read(reinterpret_cast<char*>(&chr_textures_header.nTextures), sizeof(chr_textures_header.nTextures));
+	vector <uint32_t> texture_format;
+	for (unsigned int t = 0; t < chr_textures_header.nTextures && chrfile; t++)
+	{
+		chrfile.read(reinterpret_cast<char*>(&chr_textures_list), sizeof(chr_textures_list));
+		texture_format.push_back(chr_textures_list.DXT);
+		chrfile.seekg(chr_textures_list.RAWsize, ios_base::cur);
+	}
+	if (!chrfile)
+	{
+		msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "Error reading materials.";
+		return false;
+	}
+	msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Number of materials: " << materials.size();
+
+	for (unsigned int m = 0; m < materials.size(); m++)
+	{
+		bool diffuse_transparent = false;
+		int diffuse = materials[m].DiffuseID;
+		if (diffuse >= 0 && (unsigned int)diffuse < texture_format.size())
+			diffuse_transparent = (texture_format[diffuse] == 861165636 || texture_format[diffuse] == 894720068 || texture_format[diffuse] == 21);	// DXT3/DXT5/ARGB
+
+		stringstream material_name;
+		material_name << AOD_IO.levelname << "_" << chrname << "_Material_" << m;
+		Material mat;
+		switch (TargetRenderer)			// Switch per tipo di output (Maya Hardware 2.0 o Arnold)
+		{
+		case (1):
+			mat = ZONE_Read_Materials_MayaHw20(chrname, diffuse_transparent, material_name.str(), materials[m]);
+			break;
+		case (2):
+			mat = ZONE_Read_Materials_Arnold(chrname, diffuse_transparent, material_name.str(), materials[m]);
+			break;
+		}
+		MA.Material.push_back(mat);
+	}
+	return true;
 }

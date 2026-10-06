@@ -2,15 +2,17 @@
 #include "FBX/FBX_Classes.h"
 #include "MA/MA_Classes.h"
 #include "TRAOD/RMX/RMX_Functions.h"
+#include "hash_Functions.h"
 
 
 /*------------------------------------------------------------------------------------------------------------------
 Database dei personaggi del gioco (contenuto del file ACTOR.DB: uint32_t nActors + nActors record da 36 bytes).
-Record: ID, salute, tipo, ID del modello base, nome (20 caratteri).
-	ID			Identificativo usato da RMX_CHARLOC.ActorID
-	Health		Salute iniziale (-1 = personaggio non uccidibile)
-	Type		1 = Lara giocabile, 2 = personaggio non giocante / versione da cutscene, 3 = nemico
-	BaseID		ID del modello base (tutte le varianti di Lara hanno 22)
+Record originale [struct ActorDb in Tools\Db2Game\db2game.cpp, generato da "Character List.txt"]:
+	ID			[nKey] Identificativo usato da RMX_CHARLOC.ActorID
+	Health		[iLifeMax] Salute iniziale (-1 = personaggio non uccidibile)
+	Type		[iClassID] 1 = player, 2 = neutral (personaggio non giocante / versione da cutscene), 3 = enemy, 4 = obj
+	BaseID		[iCloneOf] ID del modello base (tutte le varianti di Lara hanno 22)
+	Name		[resource] Nome della risorsa (16 caratteri), seguito da iFlags (1 = RAGDOLL_DEATH, 2 = RAGDOLL_HIT)
 ------------------------------------------------------------------------------------------------------------------*/
 static const RMX_Actor Actors[] = {
 	{ 99,     -1, 2,  99, "ANTON"},
@@ -133,6 +135,24 @@ const RMX_Actor *RMX_GetActor (uint32_t id)
 {
 	for (unsigned int i = 0; i < sizeof(Actors) / sizeof(Actors[0]); i++)
 		if (Actors[i].ID == id)
+			return &Actors[i];
+	return nullptr;
+}
+
+
+// Aggiunge alla mappa hash del nome -> nome tutti i personaggi del database
+void RMX_AddActorNames (map <uint32_t, string> &names)
+{
+	for (unsigned int i = 0; i < sizeof(Actors) / sizeof(Actors[0]); i++)
+		names[(uint32_t)GetHashValue(Actors[i].Name)] = Actors[i].Name;
+}
+
+
+// Restituisce il personaggio il cui nome ha l'hash indicato (GetHashValue), nullptr se non presente nel database
+const RMX_Actor *RMX_GetActorByHash (uint32_t hash)
+{
+	for (unsigned int i = 0; i < sizeof(Actors) / sizeof(Actors[0]); i++)
+		if ((uint32_t)GetHashValue(Actors[i].Name) == hash)
 			return &Actors[i];
 	return nullptr;
 }

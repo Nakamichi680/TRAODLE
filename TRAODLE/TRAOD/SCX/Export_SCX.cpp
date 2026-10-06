@@ -1,13 +1,17 @@
 #include "stdafx.h"
 #include "Classes.h"
 #include "TRAOD/SCX/SCX_Functions.h"
+#include "FBX/FBX_Classes.h"
+#include "MA/MA_Classes.h"
+#include "TRAOD/RMX/RMX_Functions.h"
 
 
 /*------------------------------------------------------------------------------------------------------------------
-Esporta gli script contenuti in un file SCX. Per ogni script vengono salvati nella cartella \NOMELIVELLO\SCX:
+Esporta gli script contenuti in un file SCX. Per ogni script vengono salvati nella cartella \NOMELIVELLO\Scripts:
  - il file AMX originale (.amx)
  - il disassemblato (.asm)
  - lo pseudo-codice Pawn decompilato (.p)
+In piu' viene salvato NOMELIVELLO_SCRIPTS.txt con l'elenco degli oggetti del livello che eseguono ogni script.
 ------------------------------------------------------------------------------------------------------------------*/
 bool Export_SCX (string filename)
 {
@@ -36,8 +40,54 @@ bool Export_SCX (string filename)
 		msg(msg::TGT::FILE_CONS, msg::TYP::WARN) << filename << ": unexpected header value " << scx_header.MAGIC << ".";
 	msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Number of scripts: " << scx_header.nScriptFiles;
 
-	SetCurrentDirectory(AOD_IO.folder_scx_lpwstr);				// \NOMELIVELLO\SCX
+	// Nomi reali degli hash usati negli script, dai file estratti nella cartella del livello (cartella corrente)
+	SCX_CollectHashNames();
+
+	// Tabella dei simboli in coda agli script: associa ogni oggetto del livello al suo script (vedi SCX_Struct.h)
+	map <uint32_t, vector <uint32_t>> owners;					// Hash dello script -> hash degli oggetti che lo eseguono
+	{
+		streamoff p = sizeof(SCX_HEADER);
+		bool valid = true;
+		for (unsigned int s = 0; s < scx_header.nScriptFiles && valid; s++)
+		{
+			p = (p + 3) & ~3;
+			if (p + (streamoff)sizeof(SCX_ENTRY) > filesize)
+				valid = false;
+			else
+			{
+				SCX_ENTRY e;
+				memcpy(&e, data.data() + p, sizeof(SCX_ENTRY));
+				p = ((p + sizeof(SCX_ENTRY) + 15) & ~15) + e.Size;
+			}
+		}
+		p = (p + 3) & ~3;
+		uint32_t nSymbols = 0;
+		if (valid && p + 4 <= filesize)
+			memcpy(&nSymbols, data.data() + p, 4);
+		if (!valid || p + 4 + (streamoff)nSymbols * (streamoff)sizeof(SCX_SYMBOL) > filesize)
+			msg(msg::TGT::FILE_CONS, msg::TYP::WARN) << filename << ": symbol table not found.";
+		else
+			for (uint32_t i = 0; i < nSymbols; i++)
+			{
+				SCX_SYMBOL symbol;
+				memcpy(&symbol, data.data() + p + 4 + i * sizeof(SCX_SYMBOL), sizeof(SCX_SYMBOL));
+				owners[symbol.Link].push_back(symbol.Hash);
+			}
+	}
+
+	// \NOMELIVELLO\Scripts (se la cartella non esiste ancora, ad esempio perche' appena cancellata, si riprova a crearla)
+	if (!SetCurrentDirectory(AOD_IO.folder_scx_lpwstr))
+	{
+		CreateDirectory(AOD_IO.folder_scx_lpwstr, NULL);
+		if (!SetCurrentDirectory(AOD_IO.folder_scx_lpwstr))
+		{
+			msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "Unable to access folder " << AOD_IO.folder_scx << " (error " << GetLastError() << ").";
+			return false;
+		}
+	}
 	string basename = filename.substr(0, filename.find(".SCX"));
+	ofstream index(basename + "_SCRIPTS.txt");					// Elenco degli script con gli oggetti che li eseguono
+	index << "Script\tObjects\n";
 	bool result = true;
 	streamoff pos = sizeof(SCX_HEADER);
 	for (unsigned int s = 0; s < scx_header.nScriptFiles; s++)
@@ -61,6 +111,22 @@ bool Export_SCX (string filename)
 		stringstream ssname;
 		ssname << basename << "_SCRIPT_" << setw(2) << setfill('0') << s << "_" << hex << uppercase << setw(8) << scx_entry.Hash;
 		string scriptname = ssname.str();
+
+		// Oggetti che eseguono lo script (nome dal database dei personaggi, altrimenti hash)
+		stringstream ssowners;
+		for (uint32_t h : owners[scx_entry.Hash])
+		{
+			const RMX_Actor *actor = RMX_GetActorByHash(h);
+			if (ssowners.tellp() > 0)
+				ssowners << ", ";
+			if (actor)
+				ssowners << actor->Name;
+			else
+				ssowners << "0x" << hex << uppercase << setw(8) << setfill('0') << h;
+		}
+		index << scriptname << "\t" << (ssowners.tellp() > 0 ? ssowners.str() : "-") << "\n";
+		if (ssowners.tellp() > 0)
+			msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << scriptname << " is run by: " << ssowners.str();
 
 		// Lettura AMX
 		AMX_SCRIPT amx;
@@ -93,5 +159,7 @@ bool Export_SCX (string filename)
 
 		pos += scx_entry.Size;
 	}
+	index.close();
+	msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Output filename: " << basename << "_SCRIPTS.txt";
 	return result;
 }

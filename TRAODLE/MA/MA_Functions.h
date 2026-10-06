@@ -41,10 +41,16 @@ void MA_Write_Material_Arnold(unsigned int m, MA_EXPORT &MA);
 
 void MA_Write_Joint (unsigned int j, MA_EXPORT &MA);
 
+void MA_Write_SkinCluster (const Mesh &mesh, MA_EXPORT &MA);
+
+void MA_Write_BlendShape (const Mesh &mesh, MA_EXPORT &MA);
+
+void MA_Write_SkeletalAnimationFile (const SkeletalAnimation &anim, string reference_path, const BlendShapeAnimation *facial = nullptr, const vector <Mesh> *targets = nullptr);		// File MA di un'animazione scheletrica (personaggio come riferimento)
+
 void MA_Write_PolyPlane (unsigned int p, MA_EXPORT &MA);
 
 void MA_Write_PolyCube (unsigned int p, MA_EXPORT &MA);
 
 void MA_Write_BossWave (unsigned int b, MA_EXPORT &MA);
 
-Camera MA_CalculatePerspCamera(const vector<Mesh>& meshes, const vector<Transform>& transforms, float azimuthDeg, float elevationDeg, float distanceMultiplier);
+Camera MA_CalculatePerspCamera(const vector<Mesh>& meshes, const vector<Transform>& transforms, float azimuthDeg, float elevationDeg, float distanceMultiplier);

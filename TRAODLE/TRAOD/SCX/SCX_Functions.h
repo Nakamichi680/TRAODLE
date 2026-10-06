@@ -89,3 +89,7 @@ bool AMX_Decompile (const AMX_SCRIPT &amx, string filename);
 string AMX_RenderNumber (int32_t value);
 
 map <uint32_t, string> AMX_FunctionNames (const AMX_SCRIPT &amx);
+
+void SCX_CollectHashNames ();				// Raccoglie i nomi degli hash dai file del livello (SCX_HashNames.cpp)
+
+string AMX_HashName (int32_t value);		// Nome dell'hash indicato, "" se sconosciuto

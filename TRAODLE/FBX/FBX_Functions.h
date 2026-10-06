@@ -1,6 +1,7 @@
 #pragma once
 #include "Classes.h"
 #include "FBX/FBX_Classes.h"
+#include <set>
 #include "TRAOD/CHR/CHR_Struct.h"
 
 
@@ -14,6 +15,12 @@ void FBX_Write_SpotLight (Light input, FBX_EXPORT &FBX);
 void FBX_Write_Geometry (Mesh input, FBX_EXPORT &FBX);
 void FBX_Write_Texture (Texture input, FBX_EXPORT &FBX);
 void FBX_Write_Joint (Joint input, FBX_EXPORT &FBX);
+void FBX_Write_Skin (const Mesh &input, FBX_EXPORT &FBX);						// Skinning di una mesh (Skin + Clusters)
+void FBX_Write_SkinBindPose (FBX_EXPORT &FBX);									// BindPose delle mesh deformate e dei joints
+void FBX_Write_BlendShape (const Mesh &input, FBX_EXPORT &FBX);						// Blend shapes di una mesh (BlendShape + BlendShapeChannel + Shape)
+void FBX_Write_BlendShapeAnimation (const BlendShapeAnimation &anim, FBX_EXPORT &FBX);	// Animazione dei pesi dei blend shapes (una take)
+void FBX_Write_SkeletalAnimation (const SkeletalAnimation &anim, const set <string> &animated, FBX_EXPORT &FBX);				// Animazione scheletrica (una take)
+string FBX_Write_Takes (const FBX_EXPORT &FBX);											// Sezione Takes (elenco delle animazioni)
 
 
 // Scrittura AnimationStack, AnimationLayer, AnimationCurveNode ed AnimationCurve

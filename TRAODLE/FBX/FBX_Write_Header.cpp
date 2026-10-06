@@ -11,7 +11,7 @@ OUTPUT: stringstream &Header
 void FBX_Write_Header (FBX_EXPORT &FBX)
 {
 	stringstream out;
-    out << "; FBX 7.1.0 project file\n";
+    out << "; FBX 7.5.0 project file\n";		// Deve coincidere con FBXVersion: i plugin FBX recenti (es. Maya 2025) rifiutano i file incoerenti
     out << "; Copyright (C) 1997-2010 Autodesk Inc. and/or its licensors.\n";
     out << "; All rights reserved.\n";
     out << "; ----------------------------------------------------\n\n";
@@ -52,9 +52,14 @@ void FBX_Write_Header (FBX_EXPORT &FBX)
     out << "		P: \"OriginalUnitScaleFactor\", \"double\", \"Number\", \"\",1\n";
     out << "		P: \"AmbientColor\", \"ColorRGB\", \"Color\", \"\",0,0,0\n";
     out << "		P: \"DefaultCamera\", \"KString\", \"\", \"\", \"Producer Perspective\"\n";
-    out << "		P: \"TimeMode\", \"enum\", \"\", \"\",6\n";
+    out << "		P: \"TimeMode\", \"enum\", \"\", \"\",6\n";						// 30 fps
+    out << "		P: \"TimeProtocol\", \"enum\", \"\", \"\",2\n";
+    out << "		P: \"SnapOnFrameMode\", \"enum\", \"\", \"\",0\n";
     out << "		P: \"TimeSpanStart\", \"KTime\", \"Time\", \"\",0\n";
     out << "		P: \"TimeSpanStop\", \"KTime\", \"Time\", \"\",15395386000000\n";
+    out << "		P: \"CustomFrameRate\", \"double\", \"Number\", \"\",-1\n";		// Senza questo valore Maya legge il file come 24 fps
+    out << "		P: \"TimeMarker\", \"Compound\", \"\", \"\"\n";
+    out << "		P: \"CurrentTimeMarker\", \"int\", \"Integer\", \"\",-1\n";
     out << "	}\n";
     out << "}\n\n";
 	

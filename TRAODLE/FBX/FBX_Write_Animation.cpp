@@ -8,12 +8,12 @@ void FBX_Write_Animation (int a, FBX_EXPORT &FBX)
 	stringstream out;
 
 	/////////////////////// SCRITTURA ANIMATIONSTACK
-	unsigned long long time = FBX.Animation[a].nFrames * FBXframe1;
+	unsigned long long time = (unsigned long long)(FBX.Animation[a].nFrames > 0 ? FBX.Animation[a].nFrames - 1 : 0) * FBXframe1;	// Frames da 0 a nFrames - 1 (30 fps)
     out << "	AnimationStack: " << hashID(FBX.Animation[a].name, "AnimStack") << ", \"AnimStack::" << FBX.Animation[a].name << "\", \"\" {\n";
 	out << "		Properties70:  {\n";
-	out << "			P: \"LocalStart\", \"KTime\", \"Time\", \"\"," << FBXframe1 << endl;
+	out << "			P: \"LocalStart\", \"KTime\", \"Time\", \"\",0" << endl;
 	out << "			P: \"LocalStop\", \"KTime\", \"Time\", \"\"," << time << endl;
-	out << "			P: \"ReferenceStart\", \"KTime\", \"Time\", \"\"," << FBXframe1 << endl;
+	out << "			P: \"ReferenceStart\", \"KTime\", \"Time\", \"\",0" << endl;
 	out << "			P: \"ReferenceStop\", \"KTime\", \"Time\", \"\"," << time << endl;
 	out << "		}\n";
 	out << "	}\n";
