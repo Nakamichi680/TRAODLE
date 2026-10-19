@@ -8,6 +8,8 @@
 #include "TRAOD/SCX/SCX_Functions.h"
 #include "TRAOD/CHR/CHR_Functions.h"
 #include "TRAOD/CAL/CAL_Functions.h"
+#include "TRAOD/EVX/EVX_Functions.h"
+#include "TRAOD/CSS/CSS_Functions.h"
 #include "TRAOD/ZONE/ZONE_Functions.h"
 #include "TRAOD/GMX/GMX_Functions.h"
 #include "TRAOD/RMX/RMX_Functions.h"
@@ -156,7 +158,7 @@ int main(int argc, char **argv)
 			CreateDirectory(AOD_IO.folder_animations_lpwstr, NULL);		// Crea la cartella \NOMELIVELLO\Animations
 		if (AOD_IO.SearchFileInGMXList("", AoDFileType::CLN))
 			CreateDirectory(AOD_IO.folder_collisions_lpwstr, NULL);		// Crea la cartella \NOMELIVELLO\Collisions
-		if (AOD_IO.SearchFileInGMXList("", AoDFileType::SCX))
+		if (AOD_IO.SearchFileInGMXList("", AoDFileType::SCX) || AOD_IO.SearchFileInGMXList("", AoDFileType::EVX))
 		{
 			if (!CreateDirectory(AOD_IO.folder_scx_lpwstr, NULL) && GetLastError() != ERROR_ALREADY_EXISTS)	// Crea la cartella NOMELIVELLO\Scripts
 				msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "Unable to create folder " << AOD_IO.folder_scx << " (error " << GetLastError() << ")";
@@ -188,6 +190,11 @@ int main(int argc, char **argv)
 					msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "CAM exporting completed with error(s)";
 				msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "";
 				break;
+			case(AoDFileType::CBH):
+				if (!Export_CBH(AOD_IO.gmxfiles[i].name))
+					msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "CBH exporting completed with error(s)";
+				msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "";
+				break;
 			case(AoDFileType::CLN):
 				if (!Export_CLN(AOD_IO.gmxfiles[i].name))
 					msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "CLN exporting completed with error(s)";
@@ -208,8 +215,25 @@ int main(int argc, char **argv)
 					msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "SCX exporting completed with error(s)";
 				msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "";
 				break;
+			case(AoDFileType::EVX):
+				if (!Export_EVX(AOD_IO.gmxfiles[i].name))
+					msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "EVX exporting completed with error(s)";
+				msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "";
+				break;
+			case(AoDFileType::TXT):
+				if (!Export_TXT(AOD_IO.gmxfiles[i].name))
+					msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "TXT exporting completed with error(s)";
+				msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "";
+				break;
+			case(AoDFileType::CSS):
+				if (!Export_CSS(AOD_IO.gmxfiles[i].name))
+					msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "CSS exporting completed with error(s)";
+				msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "";
+				break;
 			}
 		}
+		if (!Export_CutsceneScenes())								// Scena unica di ogni filmato (attori, oggetti, telecamera)
+			msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "Cutscene scenes exporting completed with error(s)";
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "*********************************";
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "*      Exporting files END      *";
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "*********************************";

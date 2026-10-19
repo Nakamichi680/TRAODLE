@@ -1,9 +1,25 @@
 #include "stdafx.h"
 #include "Misc_Functions.h"
+#include "AOD_Names.h"
 #include "FBX/FBX_Classes.h"
 #include "MA/MA_Classes.h"
 #include "TRAOD/RMX/RMX_Struct.h"
 #include "TRAOD/RMX/RMX_Functions.h"
+#include "TRAOD/SCX/SCX_Functions.h"
+
+
+// "_<nome originale>" del nodo che inizia alla posizione corrente del file (hash a +100), "" se il nome non e' noto
+static string RMX_NodeSuffix (ifstream &rmxfile)
+{
+	streamoff pos = rmxfile.tellg();
+	uint32_t hash = 0;
+	rmxfile.seekg(pos + 100);
+	rmxfile.read(reinterpret_cast<char*>(&hash), sizeof(hash));
+	rmxfile.clear();
+	rmxfile.seekg(pos);
+	string name = AOD_NodeName(hash);
+	return name.empty() ? "" : "_" + AOD_MayaName(name);
+}
 
 
 bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
@@ -18,7 +34,8 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 	bool Export_Water = true;
 	bool Export_PS2_Room_Obj = true;
 	bool Export_Audio_Locator = true;
-	bool Export_Fog = true;
+	bool Export_Emitters = true;
+	bool Export_Triggers = true;
 	bool Export_Portals = true;
 	bool Export_Waypoints = true;
 	bool Export_Characters = true;
@@ -85,6 +102,21 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 		MA.Layer.push_back(Characters_layer);
 		MA.Layer.push_back(Character_pawns_layer);
 	}
+	// Layers emitter (effetti) e trigger, nascosti
+	Layer Emitters_layer, Triggers_layer;
+	Emitters_layer.name = AOD_IO.levelname + "_emitters";
+	Emitters_layer.Label_ARGB = 0xFFFF6000;
+	Triggers_layer.name = AOD_IO.levelname + "_triggers";
+	Triggers_layer.Label_ARGB = 0xFF00FF40;
+	Emitters_layer.Visible = Triggers_layer.Visible = false;
+	if (Export_Emitters)
+		MA.Layer.push_back(Emitters_layer);
+	if (Export_Triggers)
+		MA.Layer.push_back(Triggers_layer);
+	stringstream triggers_text;									// File <LIVELLO>_TRIGGERS.txt
+	unsigned int nEmitters = 0, nTriggers = 0;
+	SCX_CollectHashNames();										// Nomi degli hash noti agli script (destinatari di trigger ed emitter)
+
 	map <string, unsigned int> character_names;				// Contatore dei personaggi con lo stesso nome (per rendere unici i nomi)
 
 
@@ -127,6 +159,7 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 	out << "\nNumber of rooms: " << rmx_header.nRooms;
 	out << "\n------------\n\n";
 
+	vector <vector <uint32_t>> room_masks;			// Maschera di visibilita' di ogni stanza
 	// Lettura stanze
 	for (unsigned int r = 0; r < rmx_header.nRooms; r++)
 	{
@@ -182,29 +215,58 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 		rmxfile.read(reinterpret_cast<char*>(&rmx_room.nPortals), sizeof(rmx_room.nPortals));
 		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Offset28), sizeof(rmx_room.Offset28));
 		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Offset29), sizeof(rmx_room.Offset29));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Offset30), sizeof(rmx_room.Offset30));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Indoor), sizeof(rmx_room.Indoor));
 		rmxfile.read(reinterpret_cast<char*>(&rmx_room.ReverbID), sizeof(rmx_room.ReverbID));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Collision_set), sizeof(rmx_room.Collision_set));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Collision_set_current), sizeof(rmx_room.Collision_set_current));
 		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Offset32), sizeof(rmx_room.Offset32));
 		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Offset33), sizeof(rmx_room.Offset33));
 
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Unknown1), sizeof(rmx_room.Unknown1));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Unknown2), sizeof(rmx_room.Unknown2));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Unknown3), sizeof(rmx_room.Unknown3));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Unknown4), sizeof(rmx_room.Unknown4));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Unknown5), sizeof(rmx_room.Unknown5));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Unknown6), sizeof(rmx_room.Unknown6));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Unknown7), sizeof(rmx_room.Unknown7));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Unknown8), sizeof(rmx_room.Unknown8));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Unknown9), sizeof(rmx_room.Unknown9));
-		rmxfile.read(reinterpret_cast<char*>(&rmx_room.Unknown10), sizeof(rmx_room.Unknown10));
+		rmxfile.read(reinterpret_cast<char*>(rmx_room.iFlipRooms), sizeof(rmx_room.iFlipRooms));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.bIsFlipRoom), sizeof(rmx_room.bIsFlipRoom));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.nFlipRooms), sizeof(rmx_room.nFlipRooms));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.FlipIndex), sizeof(rmx_room.FlipIndex));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.OriginalStripCount), sizeof(rmx_room.OriginalStripCount));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.OriginalStripIndices), sizeof(rmx_room.OriginalStripIndices));
+		rmxfile.read(reinterpret_cast<char*>(&rmx_room.RoomFlags), sizeof(rmx_room.RoomFlags));
+
+		// Visibilita' delle stanze: maschera di bit con un bit per stanza (RoomMask_Begin, vedi RMX_Struct.h)
+		vector <uint32_t> room_mask((rmx_header.nRooms + 31) / 32, 0);
+		if (rmx_room.Offset32 != 0 && rmx_room.Offset33 > rmx_room.Offset32)
+		{
+			rmxfile.seekg(rmx_offsets.Offset + rmx_room.Offset32, ios_base::beg);
+			rmxfile.read(reinterpret_cast<char*>(room_mask.data()), room_mask.size() * sizeof(uint32_t));
+			if (!((room_mask[r >> 5] >> (r & 31)) & 1))
+				msg(msg::TGT::FILE, msg::TYP::WARN) << "Room " << r << ": own bit not set in the room visibility mask.";
+		}
+		room_masks.push_back(room_mask);
 
 		// Esportazione gruppo stanza nei file FBX e MA
 		Transform FBX_MA_room_group;
 		stringstream room_name, bbox_name;
-		room_name << AOD_IO.levelname << "_ROOM_" << r << "_" << std::hex << rmx_room.Room_ID2 << std::dec;
+		room_name << AOD_IO.levelname << "_ROOM_" << r << "_";					// Nome originale della stanza se noto, altrimenti hash
+		if (AOD_NodeName(rmx_room.Room_ID2).empty())
+			room_name << std::hex << rmx_room.Room_ID2 << std::dec;
+		else
+			room_name << AOD_MayaName(AOD_NodeName(rmx_room.Room_ID2));
 		bbox_name << AOD_IO.levelname << "_ROOM_" << r << "_Bounding_Box";
 
 		FBX_MA_room_group.name = room_name.str();
+		FBX_MA_room_group.int_attributes.push_back(make_pair(string("roomIndex"), (int)r));		// Attributi: indice della stanza e stanze visibili
+		string visible_rooms;
+		for (uint32_t o = 0; o < rmx_header.nRooms; o++)
+			if (o != r && ((room_mask[o >> 5] >> (o & 31)) & 1))
+				visible_rooms += (visible_rooms.empty() ? "" : " ") + to_string(o);
+		FBX_MA_room_group.string_attributes.push_back(make_pair(string("visibleRooms"), visible_rooms));
+		string flip_rooms;																// Versioni alternative della stanza (stanze flip)
+		for (uint32_t f = 0; f < min(rmx_room.nFlipRooms, 4u); f++)
+			flip_rooms += (flip_rooms.empty() ? "" : " ") + to_string(rmx_room.iFlipRooms[f]);
+		if (!flip_rooms.empty())
+			FBX_MA_room_group.string_attributes.push_back(make_pair(string("flipRooms"), flip_rooms));
+		if (rmx_room.bIsFlipRoom)
+			FBX_MA_room_group.int_attributes.push_back(make_pair(string("isFlipRoom"), 1));
+		if (rmx_room.Indoor)
+			FBX_MA_room_group.int_attributes.push_back(make_pair(string("indoor"), 1));
 		FBX.Group.push_back(FBX_MA_room_group);			// Inserimento gruppo stanza nel vettore dei gruppi del file FBX
 		MA.Transform.push_back(FBX_MA_room_group);		// Inserimento gruppo stanza nel vettore dei gruppi del file MA
 		if (Export_Bounding_Box)
@@ -265,23 +327,15 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 			out << "Offset 28: " << rmx_room.Offset28 << endl;
 		if (rmx_room.Offset29 != 0)
 			out << "Offset 29: " << rmx_room.Offset29 << endl;
-		if (rmx_room.Offset30 != 0)
-			out << "Offset 30: " << rmx_room.Offset30 << endl;
+		if (rmx_room.Indoor != 0)
+			out << "Indoor: " << rmx_room.Indoor << endl;
 		if (rmx_room.Offset32 != 0)
 			out << "Offset 32: " << rmx_room.Offset32 << endl;
 		if (rmx_room.Offset33 != 0)
 			out << "Offset 33: " << rmx_room.Offset33 << endl;
 
-		out << "Unknown 1: " << rmx_room.Unknown1 << endl;
-		out << "Unknown 2: " << rmx_room.Unknown2 << endl;
-		out << "Unknown 3: " << rmx_room.Unknown3 << endl;
-		out << "Unknown 4: " << rmx_room.Unknown4 << endl;
-		out << "Unknown 5: " << rmx_room.Unknown5 << endl;
-		out << "Unknown 6: " << rmx_room.Unknown6 << endl;
-		out << "Unknown 7: " << rmx_room.Unknown7 << endl;
-		out << "Unknown 8: " << rmx_room.Unknown8 << endl;
-		out << "Unknown 9: " << rmx_room.Unknown9 << endl;
-		out << "Unknown 10: " << rmx_room.Unknown10 << endl;
+		out << "Flip rooms: " << rmx_room.iFlipRooms[0] << " " << rmx_room.iFlipRooms[1] << " " << rmx_room.iFlipRooms[2] << " " << rmx_room.iFlipRooms[3];
+		out << " (" << rmx_room.nFlipRooms << "), is flip room: " << rmx_room.bIsFlipRoom << endl;
 
 		if (rmx_room.NL_LIGHT_First != 0 && Export_Light)						// Lettura ed esportazione luci statiche
 		{
@@ -289,7 +343,7 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 			for (unsigned int l = 0; l < (rmx_room.NL_LIGHT_Last - rmx_room.NL_LIGHT_First) / 144 + 1; l++)
 			{
 				stringstream temp;
-				temp << AOD_IO.levelname << "_ROOM_" << r << "_LIGHT_" << l;
+				temp << AOD_IO.levelname << "_ROOM_" << r << "_LIGHT_" << l << RMX_NodeSuffix(rmxfile);
 				out << "#LIGHT " << l << endl;
 				RMX_Light(rmxfile, temp.str(), room_name.str(), Lights_layer_name.str(), out, FBX, MA);
 			}
@@ -301,7 +355,7 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 			for (unsigned int w = 0; w < (rmx_room.NL_WATER_Last - rmx_room.NL_WATER_First) / 432 + 1; w++)
 			{
 				stringstream temp;
-				temp << AOD_IO.levelname << "_ROOM_" << r << "_WATER_" << w;
+				temp << AOD_IO.levelname << "_ROOM_" << r << "_WATER_" << w << RMX_NodeSuffix(rmxfile);
 				out << "#WATER " << w << endl;
 				RMX_Water(rmxfile, temp.str(), room_name.str(), Water_boxes_layer_name.str(), out, FBX, MA);
 			}
@@ -313,7 +367,7 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 			for (unsigned int o = 0; o < (rmx_room.P11_PS2_Room_Obj_Last - rmx_room.P11_PS2_Room_Obj_First) / 144 + 1; o++)
 			{
 				stringstream temp;
-				temp << AOD_IO.levelname << "_ROOM_" << r << "_PS2OBJ_" << o;
+				temp << AOD_IO.levelname << "_ROOM_" << r << "_PS2OBJ_" << o << RMX_NodeSuffix(rmxfile);
 				out << "#PS2OBJ " << o << endl;
 				RMX_PS2_Room_Obj(rmxfile, temp.str(), room_name.str(), PS2_room_objects_layer_name.str(), out, FBX, MA);
 			}
@@ -325,7 +379,7 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 			for (unsigned int a = 0; a < (rmx_room.P12_Audio_Locator_Last - rmx_room.P12_Audio_Locator_First) / 368 + 1; a++)
 			{
 				stringstream temp;
-				temp << AOD_IO.levelname << "_ROOM_" << r << "_AUDIO_LOCATOR_" << a;
+				temp << AOD_IO.levelname << "_ROOM_" << r << "_AUDIO_LOCATOR_" << a << RMX_NodeSuffix(rmxfile);
 				out << "#AUDIO LOCATOR " << a << endl;
 				RMX_Audio_Locator(rmxfile, temp.str(), room_name.str(), Audio_locators_layer_name.str(), out, FBX, MA);
 			}
@@ -372,12 +426,79 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 			}
 		}
 
+		if (rmx_room.NL_EMITTER_First != 0 && Export_Emitters)					// Lettura ed esportazione emitter (nodi di dimensione variabile: catena BegNext)
+		{
+			uint32_t e = rmx_room.NL_EMITTER_First;
+			for (unsigned int n = 0; e != 0 && n < 100000; n++)
+			{
+				rmxfile.seekg(rmx_offsets.Offset + e, ios_base::beg);
+				stringstream temp;
+				temp << AOD_IO.levelname << "_ROOM_" << r << "_EMITTER_" << n << RMX_NodeSuffix(rmxfile);
+				out << "#EMITTER " << n << endl;
+				uint32_t next = RMX_Emitter(rmxfile, temp.str(), room_name.str(), Emitters_layer.name, out, FBX, MA);
+				nEmitters++;
+				if (e == rmx_room.NL_EMITTER_Last || next <= e || !rmxfile)
+					break;
+				e = next;
+			}
+		}
+
+		if (rmx_room.NL_TRIGGER_First != 0 && Export_Triggers)					// Lettura ed esportazione trigger (nodi di dimensione variabile: catena BegNext)
+		{
+			uint32_t t = rmx_room.NL_TRIGGER_First;
+			for (unsigned int n = 0; t != 0 && n < 100000; n++)
+			{
+				rmxfile.seekg(rmx_offsets.Offset + t, ios_base::beg);
+				stringstream temp;
+				temp << AOD_IO.levelname << "_ROOM_" << r << "_TRIGGER_" << n << RMX_NodeSuffix(rmxfile);
+				out << "#TRIGGER " << n << endl;
+				uint32_t next = RMX_Trigger(rmxfile, temp.str(), room_name.str(), r, Triggers_layer.name, out, triggers_text, FBX, MA);
+				nTriggers++;
+				if (t == rmx_room.NL_TRIGGER_Last || next <= t || !rmxfile)
+					break;
+				t = next;
+			}
+		}
+
 		out << endl << endl;
 
 
 
 
 
+	}
+
+	// Coppie di stanze con visibilita' non simmetrica (A vede B ma B non vede A)
+	unsigned int asymmetric = 0;
+	auto HasMask = [&](uint32_t room) { for (uint32_t w : room_masks[room]) if (w) return true; return false; };	// Stanze senza maschera escluse
+	for (uint32_t a = 0; a < room_masks.size(); a++)
+		for (uint32_t b = a + 1; b < room_masks.size(); b++)
+			if (HasMask(a) && HasMask(b) && ((room_masks[a][b >> 5] >> (b & 31)) & 1) != ((room_masks[b][a >> 5] >> (a & 31)) & 1))
+			{
+				msg(msg::TGT::FILE, msg::TYP::LOG) << "Room visibility not symmetric: rooms " << a << " and " << b;
+				asymmetric++;
+			}
+	if (asymmetric)
+		msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Room visibility: " << asymmetric << " room pairs are not symmetric (see log).";
+
+	// Emitter e trigger: conteggi e file di testo dei trigger nella cartella \NOMELIVELLO\Scripts
+	msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Emitters: " << nEmitters << ", triggers: " << nTriggers;
+	if (nTriggers)
+	{
+		CreateDirectory(AOD_IO.folder_scx_lpwstr, NULL);
+		string triggers_file = AOD_IO.folder_scx + AOD_IO.levelname + "_TRIGGERS.txt";
+		ofstream txt(triggers_file);
+		if (txt.is_open())
+		{
+			txt << "// Trigger del livello " << AOD_IO.levelname << " (" << filename << "): " << nTriggers << " trigger\n";
+			txt << "// Formato: nome {stanza, posizione, dimensioni del volume, rotazione, flags}. Le righe \"<=\" sono i messaggi ricevuti dal\n";
+			txt << "// trigger e il gruppo di eventi avviato (file _EVENTS.txt); le altre righe sono le azioni eseguite quando il trigger si\n";
+			txt << "// attiva: messaggio -> destinatario [parametro]. Hash senza nome: nomi non noti.\n\n";
+			txt << triggers_text.str();
+			msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Output filename: " << AOD_IO.levelname << "_TRIGGERS.txt";
+		}
+		else
+			msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "Unable to create " << triggers_file;
 	}
 
 	// Grafo dei waypoints (dopo la lettura di tutte le stanze: i collegamenti possono unire waypoints di stanze diverse)

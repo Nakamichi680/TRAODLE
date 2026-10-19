@@ -19,7 +19,9 @@ bool Export_ZONE (string filename)
 		return false;
 	if (!ZONE_Read_Fakes(filename, FBX, MA))					// Lettura Fakes
 		return false;
-	if (!ZONE_Read_Items(filename, FBX, MA))					// Lettura Items (esclusi quelli gia' esportati come Fakes)
+	if (!ZONE_Read_Instances(filename, FBX, MA))				// Istanze degli oggetti (nodi RMX_PS2_ROOM_OBJ del file RMX)
+		return false;
+	if (!ZONE_Read_Items(filename, FBX, MA))					// Oggetti senza posizione (ne' istanze ne' Fakes), disposti su una griglia
 		return false;
 	if (!ZONE_Read_Materials(filename, FBX, MA))				// Esportazione materiali ed aggiunta nei vettori FBX e MA
 		return false;

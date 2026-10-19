@@ -86,6 +86,8 @@ bool AMX_Disassemble (const AMX_SCRIPT &amx, string filename);
 
 bool AMX_Decompile (const AMX_SCRIPT &amx, string filename);
 
+bool SCX_ExportCameraTracks (const AMX_SCRIPT &amx, string scriptname);		// Sequenze animate della telecamera (Camera_SetScriptCamera)
+
 string AMX_RenderNumber (int32_t value);
 
 map <uint32_t, string> AMX_FunctionNames (const AMX_SCRIPT &amx);

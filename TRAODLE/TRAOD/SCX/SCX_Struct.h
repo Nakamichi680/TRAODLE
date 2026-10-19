@@ -3,7 +3,7 @@
 
 /*------------------------------------------------------------------------------------------------------------------
 Formato SCX (archivio degli script di un livello). Nomi originali tra parentesi quadre, dallo ScriptProducer
-(TRAOD\CHR\Reference_TRAODAE\Tools\ScriptProducer\ScriptProducerDlg.cpp, CScriptProducerDlg::Archive):
+(TRAOD\Reference\Tools\ScriptProducer\ScriptProducerDlg.cpp, CScriptProducerDlg::Archive):
 	SCX_HEADER
 	SCX_ENTRY + script AMX, x nScriptFiles	[scriptRelEntry::Archive]: entry, padding fino a 16 bytes, dati, padding
 											fino a 4 bytes. Il padding e' riempito con 0xDEADBEEF

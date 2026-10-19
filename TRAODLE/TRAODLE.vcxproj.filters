@@ -52,6 +52,12 @@
     <Filter Include="File di origine\TRAOD\CAL">
       <UniqueIdentifier>{3f6d2a71-8c4e-4b1a-9e57-6a0c2d9b81f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="File di origine\TRAOD\EVX">
+      <UniqueIdentifier>{8c2e4f6a-1d3b-4e7a-b5c9-2f0e6d4a8b31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="File di origine\TRAOD\CSS">
+      <UniqueIdentifier>{5b7d9e21-4a6c-4f3e-8d1b-9c2a7e5f3d64}</UniqueIdentifier>
+    </Filter>
     <Filter Include="File di intestazione\Functions\TRAOD">
       <UniqueIdentifier>{b089c533-8923-4835-89a9-2b711b1dd04d}</UniqueIdentifier>
     </Filter>
@@ -165,6 +171,21 @@
     <ClInclude Include="TRAOD\CAL\POS_Struct.h">
       <Filter>File di intestazione\Structs\TRAOD</Filter>
     </ClInclude>
+    <ClInclude Include="TRAOD\CAL\XXX_Struct.h">
+      <Filter>File di intestazione\Structs\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\EVX\EVX_Struct.h">
+      <Filter>File di intestazione\Structs\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\EVX\EVX_Functions.h">
+      <Filter>File di origine\TRAOD\EVX</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\CSS\CSS_Struct.h">
+      <Filter>File di intestazione\Structs\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\CSS\CSS_Functions.h">
+      <Filter>File di origine\TRAOD\CSS</Filter>
+    </ClInclude>
     <ClInclude Include="TRAOD\CHR\CHR_Functions.h">
       <Filter>File di intestazione\Functions\TRAOD</Filter>
     </ClInclude>
@@ -186,6 +207,12 @@
     <ClCompile Include="TRAOD\CAL\CAL_Read_Positions.cpp">
       <Filter>File di origine\TRAOD\CAL</Filter>
     </ClCompile>
+    <ClCompile Include="TRAOD\EVX\Export_EVX.cpp">
+      <Filter>File di origine\TRAOD\EVX</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\CSS\Export_CSS.cpp">
+      <Filter>File di origine\TRAOD\CSS</Filter>
+    </ClCompile>
     <ClCompile Include="FBX\FBX_Write_SkeletalAnimation.cpp">
       <Filter>File di origine\FBX Exporter</Filter>
     </ClCompile>
@@ -193,6 +220,9 @@
       <Filter>File di origine\MA Exporter</Filter>
     </ClCompile>
     <ClInclude Include="TRAOD\CAM\CAM_Struct.h">
+      <Filter>File di intestazione\Structs\TRAOD</Filter>
+    </ClInclude>
+    <ClInclude Include="TRAOD\CAM\CBH_Struct.h">
       <Filter>File di intestazione\Structs\TRAOD</Filter>
     </ClInclude>
     <ClInclude Include="TRAE\GEOM_Struct.h">
@@ -232,6 +262,9 @@
       <Filter>File di intestazione\Functions</Filter>
     </ClInclude>
     <ClInclude Include="Misc_Functions.h">
+      <Filter>File di intestazione\Functions</Filter>
+    </ClInclude>
+    <ClInclude Include="AOD_Names.h">
       <Filter>File di intestazione\Functions</Filter>
     </ClInclude>
     <ClInclude Include="picosha2.h">
@@ -380,6 +413,15 @@
     <ClCompile Include="TRAOD\CAM\Export_CAM.cpp">
       <Filter>File di origine\TRAOD\CAM</Filter>
     </ClCompile>
+    <ClCompile Include="TRAOD\CAM\Export_CBH.cpp">
+      <Filter>File di origine\TRAOD\CAM</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\CSS\CS_Switches.cpp">
+      <Filter>File di origine\TRAOD\CSS</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\CAL\CAL_CutsceneScene.cpp">
+      <Filter>File di origine\TRAOD\CAL</Filter>
+    </ClCompile>
     <ClCompile Include="TRAOD\SCX\Export_SCX.cpp">
       <Filter>File di origine\TRAOD\SCX</Filter>
     </ClCompile>
@@ -390,6 +432,9 @@
       <Filter>File di origine\TRAOD\SCX</Filter>
     </ClCompile>
     <ClCompile Include="TRAOD\SCX\AMX_Decompile.cpp">
+      <Filter>File di origine\TRAOD\SCX</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\SCX\SCX_CameraTracks.cpp">
       <Filter>File di origine\TRAOD\SCX</Filter>
     </ClCompile>
     <ClCompile Include="TRAOD\CLN\CLN_Read.cpp">
@@ -420,6 +465,9 @@
       <Filter>File di origine\TRAOD\RMX</Filter>
     </ClCompile>
     <ClCompile Include="TRAOD\RMX\RMX_Light.cpp">
+      <Filter>File di origine\TRAOD\RMX</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\RMX\RMX_Effects.cpp">
       <Filter>File di origine\TRAOD\RMX</Filter>
     </ClCompile>
     <ClCompile Include="TRAOD\RMX\RMX_Portal.cpp">
@@ -566,6 +614,9 @@
     <ClCompile Include="TRAOD\ZONE\ZONE_Read_Items.cpp">
       <Filter>File di origine\TRAOD\ZONE</Filter>
     </ClCompile>
+    <ClCompile Include="TRAOD\ZONE\ZONE_Objects.cpp">
+      <Filter>File di origine\TRAOD\ZONE</Filter>
+    </ClCompile>
     <ClCompile Include="TRAOD\ZONE\ZONE_Read_Rooms.cpp">
       <Filter>File di origine\TRAOD\ZONE</Filter>
     </ClCompile>
@@ -653,6 +704,9 @@
     <ClCompile Include="SaveTGAResource.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="AOD_Names.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
     <ClCompile Include="TRAOD\CLN\CLN_GetAttributeName.cpp">
       <Filter>File di origine\TRAOD\CLN</Filter>
     </ClCompile>
@@ -689,10 +743,16 @@
     <ClCompile Include="TRAOD\CHR\CHR_Read_Skeleton.cpp">
       <Filter>File di origine\TRAOD\CHR</Filter>
     </ClCompile>
+    <ClCompile Include="TRAOD\CHR\CHR_Read_Attachments.cpp">
+      <Filter>File di origine\TRAOD\CHR</Filter>
+    </ClCompile>
     <ClCompile Include="TRAOD\CHR\CHR_Read_Meshes.cpp">
       <Filter>File di origine\TRAOD\CHR</Filter>
     </ClCompile>
     <ClCompile Include="TRAOD\CHR\CHR_Read_Morphs.cpp">
+      <Filter>File di origine\TRAOD\CHR</Filter>
+    </ClCompile>
+    <ClCompile Include="TRAOD\CHR\CHR_Nodes.cpp">
       <Filter>File di origine\TRAOD\CHR</Filter>
     </ClCompile>
     <ClCompile Include="TRAOD\CHR\CHR_Read_Materials.cpp">

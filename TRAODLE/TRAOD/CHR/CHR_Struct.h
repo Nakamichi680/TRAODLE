@@ -11,13 +11,27 @@
 	ESISTONO DUE FORMATI CON ESTENSIONE CHR
 		- Personaggi (Magic = 0): descritti in questo file
 		- Oggetti animati (porte, leve, cassetti, interruttori, ...): iniziano con la stringa "NODE" e hanno una
-		  struttura a blocchi completamente diversa, non ancora decodificata (684 file su 901)
+		  struttura diversa (684 file su 901), descritta in fondo a questo file (CHR_NODE_HEADER, CHR_NODE_DATA): solo
+		  nodi con pivot, senza geometria. Ogni nodo e' una mesh degli oggetti del file ZONE del livello
+		  (ZONE_OBJECT_INFO.Hash = GetHashValue(nome in maiuscolo), 3251 nodi su 3497), animata dal CAL omonimo
+
+	OGGETTI AGGANCIATI [OK su tutti i 217 CHR][SRC: SKIN.Hierachy, AO_AnimateItems, CMeshFile::ExportToGame]
+		Sequenza di gruppi fino a SKELETON_PTR (il resto e' riempito di 0; i gruppi con nNodes = 0 vanno saltati):
+			CHR_ATTACH_GROUP (8 bytes): numero di nodi, hash della bone di aggancio [HIERACHY.flags]
+			per ogni nodo: nome (terminato da 0, allineato a 4 bytes), uint32_t GetHashValue(nome) [boneID], uint32_t
+			flags (CHR_BONEFLAG_MATRIXPUSH / POP come per le bones), padding fino a 16 bytes (offset nel file),
+			CHR_ATTACH_NODE (176 bytes)
+		Ogni nodo e' un transform di Maya con pivot (stessa matrice dei nodi dei CHR "NODE"), figlio della bone di aggancio
+		(o del nodo precedente, secondo i flags). Le MESH2 con MESHFLAG_ANIMATED (CHR_MESH2_HEADER.Unknown2 = 5) sono le
+		mesh dei nodi: Unknown3 [animidx] e' l'indice del nodo (contando tutti i gruppi in ordine) e i loro vertici sono
+		nello spazio del nodo (verificato: fondina e pistola dei poliziotti sul fianco, fucile nella mano di Lara).
+		Nei CAL le ParentTracks con l'hash del nome del nodo lo animano (traslazione e scala assolute, ANIM_SET*SCALE);
+		senza traccia il nodo resta nella posa del CHR.
 
 	STRUTTURA DEL FILE (personaggi)
 		CHR_HEADER (48 bytes)
-		Blocco punti di aggancio (da HeaderSize a SKELETON_PTR)	[?] Record da 448 bytes con nomi come "HOLSTER", "BAG",
-																	"SHOTGUN", "SHOTGUN_PUMP" (punti di aggancio di oggetti
-																	e armi), oppure 0-64 bytes non decodificati
+		Blocco degli oggetti agganciati (da HeaderSize a SKELETON_PTR)	[OK] Gerarchie di nodi agganciate alle bones (armi,
+																	fondine, borse, ...), vedi OGGETTI AGGANCIATI
 		CHR_BONE x nBONES (da SKELETON_PTR)							SKELETON_PTR + nBONES * 448 = MESH_PTR [OK]
 		Blocco mesh (da MESH_PTR):
 			uint32_t SizeMESH12										Dimensione del blocco mesh, esclusa questa cella [OK]
@@ -268,3 +282,71 @@ static_assert(sizeof(CHR_MESH2_HEADER) == 24, "CHR_MESH2_HEADER");
 static_assert(sizeof(CHR_MESH2_VERTEX) == 19, "CHR_MESH2_VERTEX");
 static_assert(sizeof(CHR_MATERIALS_LIST) == 24, "CHR_MATERIALS_LIST");
 static_assert(sizeof(CHR_TEXTURES_LIST) == 28, "CHR_TEXTURES_LIST");
+
+
+/*==================================================================================================================
+	FORMATO CHR DEGLI OGGETTI ANIMATI ("NODE") [OK] (684 file, 3497 nodi)
+
+	Fonti: [SRC] runtime Libs\AnimLib\AnimAPI.c (struttura NODE, APBFLAG_ANIMATEDSET: calcolo delle matrici dei nodi in
+	AO_ProcessHierachy, AT_GetSetFrameData2) e AnimEdit\EditorToGame.cpp (CPropHierachy::ExportToGame).
+
+	STRUTTURA DEL FILE
+		CHR_NODE_HEADER (12 bytes)
+		Per ogni nodo: uint32_t lunghezza del nome (multiplo di 4, NUL compreso), nome, CHR_NODE_DATA (120 bytes)
+		Il resto del file fino a multiplo di 2048 bytes e' [GARBAGE] (memoria del builder)
+
+	Ogni nodo e' un transform di Maya: nessuna geometria nel CHR, le mesh sono quelle degli oggetti del file ZONE del
+	livello con lo stesso nome (ZONE_OBJECT_INFO.Hash = GetHashValue(nome del nodo in maiuscolo)), con i vertici nello
+	spazio dell'oggetto. Matrice di un nodo (vettore riga, come Maya):
+		Tr(-SP) * S * Tr(SP) * Tr(ST) * Tr(-RP) * RO * R * Tr(RP) * Tr(RT) * Tr(T) * matrice del padre
+	con T, R (quaternione) e S dalla traccia del CAL di indice uguale al nodo (ANIM_SETTSCALE 1, ANIM_SETRSCALE 16383,
+	ANIM_SETSSCALE 255: traslazione e scala assolute) e i pivot dal CHR. Gerarchia: come per le bones (BONEFLAG_MATRIXPOP
+	ripristina la matrice salvata, BONEFLAG_MATRIXPUSH salva la matrice corrente prima di applicare il nodo).
+==================================================================================================================*/
+struct CHR_NODE_HEADER			// SIZE: 12 bytes
+{
+	uint32_t Magic;						// [OK] "NODE" (0x45444F4E)
+	uint32_t Size;						// [OK] Dimensione dei nodi (header escluso: 12 + Size = fine dell'ultimo nodo)
+	uint32_t nNodes;					// [OK] Numero di nodi (= tracce delle animazioni del CAL omonimo)
+};
+
+
+struct CHR_NODE_DATA			// SIZE: 120 bytes, dopo la lunghezza ed il nome del nodo
+{
+	uint32_t Hash;						// [OK] GetHashValue(nome) [SRC: boneID]
+	uint32_t Flags;						// [OK] CHR_NODEFLAG_PUSH / CHR_NODEFLAG_POP [SRC: BONEFLAG_MATRIXPUSH / BONEFLAG_MATRIXPOP]
+	float RotatePivot[3];				// [SRC] rotatePivot di Maya
+	float ScalePivot[3];				// [SRC] scalePivot (uguale a RotatePivot in 3486 nodi su 3497)
+	float RotatePivotTranslate[3];		// [SRC] rotateTranslate (diverso da 0 in 210 nodi)
+	float ScalePivotTranslate[3];		// [SRC] scaleTranslate (sempre 0)
+	float RotateOrient[16];				// [SRC] rotateOrient: matrice 4x4 (rotate axis di Maya, identita' tranne 14 nodi)
+};
+
+
+#define CHR_NODE_MAGIC			0x45444F4E
+#define CHR_NODEFLAG_PUSH		1
+#define CHR_NODEFLAG_POP		2
+
+static_assert(sizeof(CHR_NODE_HEADER) == 12, "CHR_NODE_HEADER");
+static_assert(sizeof(CHR_NODE_DATA) == 120, "CHR_NODE_DATA");
+
+struct CHR_ATTACH_GROUP			// SIZE: 8 bytes [HIERACHY]: gruppo di nodi agganciati ad una bone (vedi OGGETTI AGGANCIATI)
+{
+	uint32_t nNodes;					// [OK] Numero di nodi del gruppo [nNodes] (0 = voce vuota da saltare)
+	uint32_t BoneHash;					// [OK] GetHashValue del nome della bone di aggancio (es. PALM_R, HIP) [flags]
+};
+
+
+struct CHR_ATTACH_NODE			// SIZE: 176 bytes, dopo nome, hash, flags e padding [NODE]
+{
+	float RotatePivot[4];				// [OK] rotatePivot di Maya (x, y, z, 1)
+	float ScalePivot[4];				// [OK] scalePivot
+	float RotatePivotTranslate[4];		// [SRC] rotateTranslate
+	float ScalePivotTranslate[4];		// [SRC] scaleTranslate
+	float RotateOrient[16];				// [SRC] rotate axis (matrice 4x4 a vettore riga)
+	float Rotate[4];					// [OK] Rotazione di riposo: quaternione x, y, z, w
+	float Translate[4];					// [OK] Traslazione di riposo
+	float Scale[4];						// [OK] Scala di riposo
+};
+static_assert(sizeof(CHR_ATTACH_GROUP) == 8, "CHR_ATTACH_GROUP");
+static_assert(sizeof(CHR_ATTACH_NODE) == 176, "CHR_ATTACH_NODE");

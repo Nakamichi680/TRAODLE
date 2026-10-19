@@ -3,7 +3,7 @@
 
 /*------------------------------------------------------------------------------------------------------------------
 Formato GMX (archivio dei file di un livello). Nomi originali tra parentesi quadre, dal "GMX Masher"
-(TRAOD\CHR\Reference_TRAODAE\Tools\GMX Masher\GMX MasherDlg.h): l'archivio e' un WAD_DIRECTORY di 2048 bytes
+(TRAOD\Reference\Tools\GMX Masher\GMX MasherDlg.h): l'archivio e' un WAD_DIRECTORY di 2048 bytes
 seguito dai file, ognuno allineato a 2048 bytes. Il GMX Masher aggiunge in coda l'audio del livello (file .AWD).
 ------------------------------------------------------------------------------------------------------------------*/
 

@@ -42,8 +42,9 @@ Vec3 TransformNormal (const MATRIX &m, float x, float y, float z)
 Legge strip ed elementi di una mesh (MESH1 o MESH2) e crea una Mesh per ogni elemento, con skinning sulle bones
 dello scheletro. I vertici in ingresso sono gia' nella posa di bind (coordinate del mondo).
 Se target_names non e' vuoto i vertici contengono gli offset dei blend shapes, che vengono aggiunti ad ogni Mesh.
+Se parent non e' vuoto le Mesh sono figlie di quel gruppo, senza skinning (MESH2 dei nodi agganciati: vertici locali).
 ------------------------------------------------------------------------------------------------------------------*/
-bool ReadElements (ifstream &chrfile, const vector <CHR_Vertex> &vertices, string basename, string chrname, const CHR_Skeleton &skeleton, const vector <string> &target_names, FBX_EXPORT &FBX, MA_EXPORT &MA)
+bool ReadElements (ifstream &chrfile, const vector <CHR_Vertex> &vertices, string basename, string chrname, const CHR_Skeleton &skeleton, const vector <string> &target_names, FBX_EXPORT &FBX, MA_EXPORT &MA, string parent = "")
 {
 	CHR_MESH_STRIP_HEADER chr_mesh_strip_header;
 	CHR_MESH_ELEMENT_HEADER chr_mesh_element_header;
@@ -92,8 +93,8 @@ bool ReadElements (ifstream &chrfile, const vector <CHR_Vertex> &vertices, strin
 		ssname << basename << "_" << el;
 		ssmaterial << AOD_IO.levelname << "_" << chrname << "_Material_" << element.Material_Ref;
 		mesh.name = ssname.str();
-		mesh.parent = chrname;
-		mesh.FBX_parent = hashID(chrname, "Group");
+		mesh.parent = parent.empty() ? chrname : parent;
+		mesh.FBX_parent = hashID(mesh.parent, "Group");
 		mesh.material_name = ssmaterial.str();
 		mesh.uv_set2_flag = false;
 		mesh.tangents_flag = false;
@@ -133,6 +134,8 @@ bool ReadElements (ifstream &chrfile, const vector <CHR_Vertex> &vertices, strin
 			mesh.X.push_back(vertex.pos.x);		mesh.Y.push_back(vertex.pos.y);		mesh.Z.push_back(vertex.pos.z);
 			mesh.Xn.push_back(vertex.normal.x);	mesh.Yn.push_back(vertex.normal.y);	mesh.Zn.push_back(vertex.normal.z);
 			mesh.U1.push_back(vertex.u);		mesh.V1.push_back(vertex.v);
+			if (!parent.empty())										// Mesh rigida figlia di un nodo agganciato
+				continue;
 			if (vertex.bone1 == vertex.bone2)
 				AddWeight(vertex.bone1, v, 1);
 			else
@@ -169,7 +172,7 @@ Legge il blocco mesh del file CHR:
  - MESH2: mesh rigide, ognuna nello spazio di una sola bone
 I vertici vengono portati nella posa di bind (coordinate del mondo) usando le matrici globali dello scheletro.
 ------------------------------------------------------------------------------------------------------------------*/
-bool CHR_Read_Meshes (ifstream &chrfile, const CHR_HEADER &chr_header, string chrname, const CHR_Skeleton &skeleton, const map <uint32_t, CHR_Morph> &morphs, FBX_EXPORT &FBX, MA_EXPORT &MA)
+bool CHR_Read_Meshes (ifstream &chrfile, const CHR_HEADER &chr_header, string chrname, const CHR_Skeleton &skeleton, const map <uint32_t, CHR_Morph> &morphs, FBX_EXPORT &FBX, MA_EXPORT &MA, map <uint32_t, vector <string>> *mesh_names)
 {
 	const vector <string> no_targets;
 	CHR_MESH12_HEADER chr_mesh12_header;
@@ -247,7 +250,15 @@ bool CHR_Read_Meshes (ifstream &chrfile, const CHR_HEADER &chr_header, string ch
 		vector <CHR_MESH2_VERTEX> raw2(chr_mesh2_header.nVertices);
 		if (!raw2.empty())
 			chrfile.read(reinterpret_cast<char*>(raw2.data()), raw2.size() * sizeof(CHR_MESH2_VERTEX));
-		const MATRIX &g = skeleton.global[chr_mesh2_header.Bone_ref];
+		// MESH2 di un nodo agganciato (MESHFLAG_ANIMATED, Unknown3 = indice del nodo): vertici nello spazio del nodo, la
+		// mesh viene esportata come figlia del suo gruppo (vedi CHR_Read_Attachments)
+		const CHR_Attachment *attachment = nullptr;
+		if ((chr_mesh2_header.Unknown2 & 4) && chr_mesh2_header.Unknown3 >= 0 && (size_t)chr_mesh2_header.Unknown3 < skeleton.attachments.size())
+			attachment = &skeleton.attachments[chr_mesh2_header.Unknown3];
+		else if (chr_mesh2_header.Unknown2 & 4)
+			msg(msg::TGT::FILE_CONS, msg::TYP::WARN) << "MESH2 " << m << ": attached object node " << chr_mesh2_header.Unknown3 << " not found. Placed on its bone.";
+		const MATRIX identity;
+		const MATRIX &g = attachment ? identity : skeleton.global[chr_mesh2_header.Bone_ref];
 		vector <CHR_Vertex> vertices2(raw2.size());
 		for (unsigned int v = 0; v < raw2.size(); v++)
 		{
@@ -262,7 +273,10 @@ bool CHR_Read_Meshes (ifstream &chrfile, const CHR_HEADER &chr_header, string ch
 		}
 		// Nome: bone di appartenenza + numero progressivo delle mesh di quella bone
 		stringstream mesh2_name;
-		mesh2_name << skeleton.joint_name[chr_mesh2_header.Bone_ref] << "_MESH2_" << meshes_per_bone[chr_mesh2_header.Bone_ref]++;
+		if (attachment)
+			mesh2_name << attachment->group << "_MESH2";
+		else
+			mesh2_name << skeleton.joint_name[chr_mesh2_header.Bone_ref] << "_MESH2_" << meshes_per_bone[chr_mesh2_header.Bone_ref]++;
 
 		// Blend shapes: TMT il cui BaseId e' l'ID di questa mesh (stessi vertici nello stesso ordine, vedi TMT_Struct.h)
 		vector <string> target_names;
@@ -291,7 +305,7 @@ bool CHR_Read_Meshes (ifstream &chrfile, const CHR_HEADER &chr_header, string ch
 			}
 		}
 		size_t first_mesh = FBX.Geometry.size();
-		if (!ReadElements(chrfile, vertices2, mesh2_name.str(), chrname, skeleton, target_names, FBX, MA))
+		if (!ReadElements(chrfile, vertices2, mesh2_name.str(), chrname, skeleton, target_names, FBX, MA, attachment ? attachment->group : ""))
 		{
 			msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << "Error reading MESH2 " << m << ".";
 			return false;
@@ -299,6 +313,9 @@ bool CHR_Read_Meshes (ifstream &chrfile, const CHR_HEADER &chr_header, string ch
 		if (!target_names.empty())								// Mesh con il blend shape (per le animazioni facciali)
 			for (size_t g = first_mesh; g < FBX.Geometry.size(); g++)
 				morph->second.meshes.push_back(FBX.Geometry[g].name);
+		if (mesh_names)											// Mesh esportate per ID (chiavi MAKE_VISIBLE / INVISIBLE dei CAL)
+			for (size_t g = first_mesh; g < FBX.Geometry.size(); g++)
+				(*mesh_names)[chr_mesh2_header.ID].push_back(FBX.Geometry[g].name);
 	}
 	if (chrfile.tellg() != mesh_end)
 		msg(msg::TGT::FILE_CONS, msg::TYP::WARN) << "Mesh block size mismatch (" << chrfile.tellg() << " instead of " << mesh_end << ").";

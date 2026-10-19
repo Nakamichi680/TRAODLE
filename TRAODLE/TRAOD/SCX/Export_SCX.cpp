@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "AOD_Names.h"
 #include "Classes.h"
 #include "TRAOD/SCX/SCX_Functions.h"
 #include "FBX/FBX_Classes.h"
@@ -87,7 +88,7 @@ bool Export_SCX (string filename)
 	}
 	string basename = filename.substr(0, filename.find(".SCX"));
 	ofstream index(basename + "_SCRIPTS.txt");					// Elenco degli script con gli oggetti che li eseguono
-	index << "Script\tObjects\n";
+	index << "Script\tObjects\n";											// Script: nome originale se noto (log di WorldEdit), altrimenti hash
 	bool result = true;
 	streamoff pos = sizeof(SCX_HEADER);
 	for (unsigned int s = 0; s < scx_header.nScriptFiles; s++)
@@ -109,10 +110,15 @@ bool Export_SCX (string filename)
 		}
 
 		stringstream ssname;
-		ssname << basename << "_SCRIPT_" << setw(2) << setfill('0') << s << "_" << hex << uppercase << setw(8) << scx_entry.Hash;
+		string original = AOD_ScriptName(s, scx_header.nScriptFiles);
+		ssname << basename << "_SCRIPT_" << setw(2) << setfill('0') << s << "_";
+		if (original.empty())
+			ssname << hex << uppercase << setw(8) << scx_entry.Hash;
+		else
+			ssname << AOD_MayaName(original);
 		string scriptname = ssname.str();
 
-		// Oggetti che eseguono lo script (nome dal database dei personaggi, altrimenti hash)
+		// Oggetti che eseguono lo script (nome dal database dei personaggi o nome originale del nodo, altrimenti hash)
 		stringstream ssowners;
 		for (uint32_t h : owners[scx_entry.Hash])
 		{
@@ -121,6 +127,8 @@ bool Export_SCX (string filename)
 				ssowners << ", ";
 			if (actor)
 				ssowners << actor->Name;
+			else if (!AOD_NodeName(h).empty())
+				ssowners << AOD_NodeName(h);
 			else
 				ssowners << "0x" << hex << uppercase << setw(8) << setfill('0') << h;
 		}
@@ -156,6 +164,9 @@ bool Export_SCX (string filename)
 			result = false;
 		else
 			msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Output filename: " << scriptname << ".p";
+
+		if (!SCX_ExportCameraTracks(amx, scriptname))			// Sequenze animate della telecamera
+			result = false;
 
 		pos += scx_entry.Size;
 	}

@@ -8,6 +8,7 @@
 #include "TRAOD/CAL/CAL_Struct.h"
 #include "TRAOD/CHR/CHR_Struct.h"
 #include "TRAOD/SCX/SCX_Functions.h"
+#include "AOD_Names.h"
 
 
 /*------------------------------------------------------------------------------------------------------------------
@@ -15,9 +16,9 @@ Nomi reali degli hash usati negli script. Gli script identificano animazioni, pe
 nome (GetHashValue): i nomi vengono ricavati dai file estratti dal GMX del livello e usati da AMX_Decompile (costanti
 con nome) e da AMX_Disassemble (commenti).
 Fonti, in ordine di priorita': nomi delle animazioni dei file CAL, nomi delle bones dei file CHR, personaggi del
-database ACTOR.DB, nomi dei file contenuti nel GMX.
-I nodi della mappa e i waypoint (mapFindHashedNodeTypedAMX, AddWaypoint, ...) restano hash: i loro nomi non sono
-salvati in nessun file del gioco.
+database ACTOR.DB, nomi dei file contenuti nel GMX (con e senza estensione), nomi originali dei nodi della mappa, dei
+waypoint e dei gruppi di eventi (mapFindHashedNodeTypedAMX, AddWaypoint, NM_DISPATCHEVENT, ...), che non sono salvati nei
+file del gioco ma nel dizionario ricavato dai log di WorldEdit (AOD_Names.cpp).
 ------------------------------------------------------------------------------------------------------------------*/
 map <uint32_t, string> AMX_HashNames;
 
@@ -97,7 +98,14 @@ void SCX_CollectHashNames ()
 	for (const pair <const uint32_t, string> &a : actors)
 		AddName(a.second, a.first);
 	for (const auto &f : AOD_IO.gmxfiles)
+	{
 		AddName(f.name);
+		AddName(f.name.substr(0, f.name.find('.')));				// Nome senza estensione (es. il filmato IG_1_27 di NM_CUTSCENE)
+	}
+	for (const pair <const uint32_t, string> &n : AOD_NodeNames())		// Nomi originali dei nodi e dei gruppi di eventi
+		AddName(n.second, n.first);
+	for (const pair <const uint32_t, string> &e : AOD_EventNames())
+		AddName(e.second, e.first);
 	msg(msg::TGT::FILE, msg::TYP::LOG) << AMX_HashNames.size() << " hash names collected for scripts.";
 }
 

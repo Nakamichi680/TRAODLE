@@ -613,6 +613,15 @@ public:
 	float sX = 1;					// Scalatura X
 	float sY = 1;					// Scalatura Y
 	float sZ = 1;					// Scalatura Z
+	bool pivot_flag = false;		// Vero se il gruppo ha pivot, traslazioni dei pivot o rotate axis (oggetti animati CHR "NODE")
+	Vec3 rotate_pivot;				// Rotate pivot (coordinate locali)
+	Vec3 scale_pivot;				// Scale pivot (coordinate locali)
+	Vec3 rotate_pivot_translate;	// Rotate pivot translate
+	Vec3 scale_pivot_translate;		// Scale pivot translate
+	Vec3 rotate_axis;				// Rotate axis (gradi, ordine XYZ)
+	vector <pair <string, int>> int_attributes;			// Attributi personalizzati interi in sola lettura (nome, valore): Extra Attributes bloccati in Maya, proprieta' utente nell'FBX
+	vector <pair <string, string>> string_attributes;	// Attributi personalizzati di testo (nome, valore)
+	vector <pair <string, float>> float_attributes;		// Attributi personalizzati numerici in sola lettura (nome, valore)
 };
 
 
@@ -658,6 +667,7 @@ public:
 	vector <float> tX, tY, tZ;			// Traslazione
 	vector <float> rX, rY, rZ;			// Rotazione in gradi (ordine XYZ)
 	vector <float> sX, sY, sZ;			// Scala
+	vector <float> vis;					// Visibilita' (0 / 1, solo file MA)
 };
 
 

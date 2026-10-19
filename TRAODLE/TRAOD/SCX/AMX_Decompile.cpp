@@ -256,16 +256,110 @@ ExprP MakeAddress (const string &base, bool isArray, ExprP index, int32_t offset
 }
 
 
-string Quote (const string &s)
+/*------------------------------------------------------------------------------------------------------------------
+Testo di una stringa per il sorgente. Il compilatore Small 2.x usa '^' come carattere di escape (il file .p dichiara
+#pragma ctrlchar '^'): '\' resta un carattere normale (es. "Friendship=%d\n" negli script contiene davvero '\' e 'n').
+Le stringhe packed (4 caratteri per cella) vengono scritte con il prefisso '!'.
+------------------------------------------------------------------------------------------------------------------*/
+string Quote (const string &s, bool packed = false)
 {
-	string q = "\"";
+	string q = packed ? "!\"" : "\"";
 	for (unsigned int i = 0; i < s.size(); i++)
 	{
-		if (s[i] == '"' || s[i] == '\\')
-			q.push_back('\\');
+		if (s[i] == '"' || s[i] == '^')
+			q.push_back('^');
 		q.push_back(s[i]);
 	}
 	return q + "\"";
+}
+
+
+/*------------------------------------------------------------------------------------------------------------------
+Stringa all'indirizzo indicato del blocco dati: testo, formato (packed) e celle occupate, terminatore compreso.
+Ritorna false se non e' una stringa o se non puo' essere riprodotta esattamente (bytes non nulli dopo il terminatore
+nell'ultima cella di una stringa packed).
+------------------------------------------------------------------------------------------------------------------*/
+bool DataString (const AMX_SCRIPT &amx, int32_t address, string &s, bool &packed, int &cells)
+{
+	if (!amx.ReadString(address, s))
+		return false;
+	packed = (uint32_t)amx.GetDataCell(address) > 0xFFFFFF;
+	if (!packed)
+	{
+		cells = (int)s.size() + 1;
+		return true;
+	}
+	cells = (int)s.size() / 4 + 1;
+	uint32_t last = (uint32_t)amx.GetDataCell(address + 4 * (cells - 1));
+	int used = (int)s.size() % 4;								// Caratteri nell'ultima cella prima del terminatore
+	uint32_t mask = used ? 0xFFFFFFFFu >> (8 * used) : 0xFFFFFFFFu;
+	return (last & mask) == 0;
+}
+
+
+/*------------------------------------------------------------------------------------------------------------------
+Celle dei dati come valori del sorgente. Un blocco di celle e' considerato di float se tutte le celle diverse da 0 sono
+float plausibili (non piccoli interi, valore assoluto tra 1e-6 e 1e9): i float vengono scritti in notazione fissa con
+il minimo numero di decimali che riproduce esattamente gli stessi bit. Gli altri valori con RenderValue (interi,
+esadecimali, nomi degli hash), sempre esatti. Il tipo pero' non e' memorizzato nel file AMX: e' una deduzione.
+------------------------------------------------------------------------------------------------------------------*/
+bool PlausibleFloat (int32_t cell)
+{
+	if (cell == 0 || cell == (int32_t)0x80000000)
+		return true;
+	if (cell < 0x01000000 && cell > -0x01000000)
+		return false;
+	float f;
+	memcpy(&f, &cell, 4);
+	return isfinite(f) && fabs(f) >= 1e-6f && fabs(f) < 1e9f;
+}
+
+
+string FloatText (int32_t cell)
+{
+	if (cell == 0)
+		return "0.0";
+	if (cell == (int32_t)0x80000000)
+		return "-0.0";
+	float f;
+	memcpy(&f, &cell, 4);
+	for (int d = 1; d <= 30; d++)
+	{
+		stringstream fx;
+		fx << fixed << setprecision(d) << f;
+		float g = strtof(fx.str().c_str(), NULL);
+		if (memcmp(&g, &f, 4) == 0)
+			return fx.str();
+	}
+	return "";
+}
+
+
+vector <string> RenderCells (const AMX_SCRIPT &amx, int32_t address, int cells, bool &isFloat)
+{
+	isFloat = false;
+	bool nonzero = false;
+	for (int c = 0; c < cells; c++)
+	{
+		int32_t v = amx.GetDataCell(address + 4 * c);
+		if (!PlausibleFloat(v))
+		{
+			isFloat = false;
+			nonzero = false;
+			break;
+		}
+		nonzero = nonzero || (v != 0 && v != (int32_t)0x80000000);
+		isFloat = true;
+	}
+	isFloat = isFloat && nonzero;
+	vector <string> out;
+	for (int c = 0; c < cells; c++)
+	{
+		int32_t v = amx.GetDataCell(address + 4 * c);
+		string t = isFloat ? FloatText(v) : string();
+		out.push_back(t.empty() ? RenderValue(v) : t);
+	}
+	return out;
 }
 
 
@@ -325,6 +419,11 @@ private:
 	set <int32_t> globals;
 	set <int32_t> globalArrays;					// Variabili globali usate come array
 	map <int32_t, int> globalSizes;				// Dimensione (in celle) delle variabili globali copiate con movs
+	map <int32_t, pair <int, int>> tables2D;	// Array a 2 dimensioni usati dal codice: indirizzo -> (righe, celle per riga)
+	map <int32_t, int> literals;				// Stringhe scritte nel codice come testo: indirizzo -> celle occupate
+	bool Table2D (int32_t base, int &rows, int &cols) const;
+	bool FindTable2D (int32_t address, int32_t &base, int &rows, int &cols) const;
+	string Literal (int32_t address, const string &s);
 
 	// Stato della funzione in corso di decompilazione
 	vector <Line> out;
@@ -523,7 +622,63 @@ bool Decompiler::IsStringConst (int32_t value, string &s) const
 {
 	if (!amx.ReadString(value, s))
 		return false;
-	return value == 0 || (amx.GetDataCell(value - 4) & 0xFF) == 0;		// La cella precedente deve terminare con 0 (fine della stringa precedente)
+	if (value == 0 || (amx.GetDataCell(value - 4) & 0xFF) == 0)		// La cella precedente termina con 0 (fine della stringa precedente)
+		return true;
+	string previous;													// Oppure non puo' far parte di una stringa (es. -1 di un array):
+	return !amx.ReadString(value - 4, previous);						// altrimenti value e' il centro di una stringa
+}
+
+
+string Decompiler::Literal (int32_t address, const string &s)	// Stringa del codice: testo (packed con '!') e celle coperte
+{
+	string text;
+	bool packed = false;
+	int cells = 0;
+	if (DataString(amx, address, text, packed, cells))
+		literals[address] = max(literals[address], cells);
+	return Quote(s, packed);
+}
+
+
+/*------------------------------------------------------------------------------------------------------------------
+Array a 2 dimensioni di Small 2.x nel blocco dati: all'indirizzo base una tabella con una cella per riga che contiene
+l'offset della riga relativo alla cella stessa, seguita dalle righe (tutte della stessa lunghezza, contigue). Il codice
+accede alla riga k con: indirizzo della cella k + valore della cella k. Le dimensioni sono esatte (dalla tabella).
+------------------------------------------------------------------------------------------------------------------*/
+bool Decompiler::Table2D (int32_t base, int &rows, int &cols) const
+{
+	if (!amx.IsDataAddress(base) || !amx.IsDataAddress(base + 4))
+		return false;
+	int32_t off0 = amx.GetDataCell(base);
+	if (off0 < 8 || off0 % 4)
+		return false;
+	rows = off0 / 4;
+	int32_t row0 = base + off0;
+	int32_t rowBytes = base + 4 + amx.GetDataCell(base + 4) - row0;
+	if (rowBytes <= 0 || rowBytes % 4 || (int64_t)row0 + (int64_t)rows * rowBytes > (int64_t)amx.data_size)
+		return false;
+	for (int k = 0; k < rows; k++)
+		if (base + 4 * k + amx.GetDataCell(base + 4 * k) != row0 + k * rowBytes)
+			return false;
+	cols = rowBytes / 4;
+	return true;
+}
+
+
+bool Decompiler::FindTable2D (int32_t address, int32_t &base, int &rows, int &cols) const	// Tabella che contiene l'indirizzo
+{
+	for (int32_t b = address; b >= 0 && b >= address - 4 * 65536; b -= 4)
+	{
+		int32_t off = amx.GetDataCell(b);
+		if (off <= address - b || off % 4)						// La prima riga deve iniziare dopo l'indirizzo
+			continue;
+		if (Table2D(b, rows, cols) && address < b + 4 * rows)
+		{
+			base = b;
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -547,12 +702,12 @@ string Decompiler::ArgText (ExprP a, const string &callee, int position)
 		else if (valid && votes.valid == votes.total)
 		{
 			if (a->value != 0 || votes.proven)
-				return Quote(s);
+				return Literal(a->value, s);
 			bool zeroClaimed = false;			// L'indirizzo 0 e' gia' usato come stringa da una posizione dimostrata
 			for (map <pair <string, int>, StringVotes>::const_iterator it = stringVotes.begin(); it != stringVotes.end() && !zeroClaimed; ++it)
 				zeroClaimed = it->second.proven && it->second.zero && it->second.valid == it->second.total;
 			if (!zeroClaimed)
-				return Quote(s);
+				return Literal(a->value, s);
 		}
 	}
 	return a->text;
@@ -1326,10 +1481,23 @@ int Decompiler::Instruction (int i, int to, State &st, int indent)
 		ExprP a = st.alt, v = st.pri;
 		if (a && v && !a->isAddress && v->isAddress)
 			swap(a, v);
+		ExprP c = st.alt, w = st.pri;							// Stesso calcolo con l'indirizzo costante: base + 4k + mem[base + 4k]
+		if (c && w && !c->isConst && w->isConst)
+			swap(c, w);
+		int32_t base;
+		int rows, cols;
 		if (a && v && a->isAddress && !v->var.empty() && v->var == Lvalue(a))
 		{
 			Use(v);
 			SetPri(st, MakeAddress(Lvalue(a), true, nullptr, 0), indent);
+		}
+		else if (c && w && c->isConst && !w->var.empty() && amx.IsDataAddress(c->value) && FindTable2D(c->value, base, rows, cols) &&
+				 w->var == Lvalue(c))
+		{
+			Use(w);
+			tables2D[base] = make_pair(rows, cols);
+			int k = (c->value - base) / 4;						// Riga k: g_XXXX[k] (indirizzo della riga)
+			SetPri(st, MakeAddress(GlobalName(base) + "[" + to_string(k) + "]", true, nullptr, 0), indent);
 		}
 		else
 			SetPri(st, Bin("+", P_ADD, st.alt, st.pri), indent);
@@ -1474,7 +1642,16 @@ bool Decompiler::Run (string filename)
 	file << "// Pseudo-code decompiled by TRAODLE from a Small 2.x AMX script. Variable names are generated:\n";
 	file << "//   g_XXXX = global variable at data address XXXX, argN = function argument, varN = local variable,\n";
 	file << "//   _xxx = constructs with no direct Pawn equivalent.\n";
-	file << "// Arguments are listed in call order; the native prototypes below only show the number of arguments used.\n\n";
+	file << "// Arguments are listed in call order; the native prototypes below only show the number of arguments used.\n";
+	file << "//\n";
+	file << "// DISCLAIMER: this file is a reconstruction and some data may be misinterpreted. The AMX format does not store\n";
+	file << "// data types: integers, floats, characters, hashes and data addresses are all plain 32-bit cells, so their type\n";
+	file << "// is deduced (e.g. a value may be written as an integer instead of a float, or an address as a number), and the\n";
+	file << "// sizes of one-dimensional arrays are deduced from the next known item. Every cell of the original data section\n";
+	file << "// is written below with its exact value (see the \"Data section\" line); cells not referenced by the decompiled\n";
+	file << "// code are declared as \"unreferenced\" variables. Check the result before recompiling.\n";
+	file << "// Strings use the Small 2.x escape character '^' ('\\' is a normal character); packed strings start with '!'.\n\n";
+	file << "#pragma ctrlchar '^'\n\n";
 
 	if (!amx.natives.empty())
 	{
@@ -1489,34 +1666,173 @@ bool Decompiler::Run (string filename)
 		file << "\n";
 	}
 
-	// Variabili globali (preparate prima della scrittura: anche i valori iniziali possono usare costanti con nome)
-	stringstream gl;
-	if (!globals.empty())
+	// Variabili globali e blocco dati (preparate prima della scrittura: anche i valori iniziali possono usare costanti con
+	// nome). Ogni cella del blocco dati originale deve comparire nel file, per poter ricompilare lo script dal .p:
+	//	- array a 2 dimensioni usati dal codice (tables2D), con le dimensioni esatte della tabella delle righe;
+	//	- variabili globali usate dal codice (scalari, array fino all'elemento successivo, stringhe);
+	//	- stringhe scritte come testo nel codice (literals: il compilatore le rimette nel blocco dati);
+	//	- tutto il resto come dati non referenziati (stringhe o array di celle "g_XXXX // unreferenced").
+	const int32_t dataSize = (int32_t)(amx.data_size / 4 * 4);
+	vector <char> covered(dataSize / 4, 0);
+	auto Cover = [&](int32_t start, int32_t end) { for (int32_t a = max(start, 0); a < end && a < dataSize; a += 4) covered[a / 4] = 1; };
+	map <int32_t, string> decls;									// Indirizzo -> dichiarazione
+	int nTableCells = 0, nGlobalCells = 0, nLiteralCells = 0, nUnreferencedCells = 0, nInexact = 0;
+	auto Declare = [&](int32_t address, int cells, const string &comment) -> string	// Scalare o array di celle
 	{
-		for (set <int32_t>::iterator it = globals.begin(); it != globals.end(); ++it)
+		bool isFloat;
+		vector <string> v = RenderCells(amx, address, cells, isFloat);
+		for (int c = 0; c < cells; c++)
+			if (isFloat && FloatText(amx.GetDataCell(address + 4 * c)).empty())
+				nInexact++;
+		stringstream d;
+		d << "new " << (isFloat ? "Float:" : "") << "g_" << Hex(address, 4);
+		if (cells == 1)
+			d << " = " << v[0] << ";" << comment << "\n";
+		else
+		{
+			d << "[" << cells << "] = {" << comment;
+			for (int c = 0; c < cells; c++)
+				d << (c ? "," : "") << (c % 8 == 0 ? "\n\t" : " ") << v[c];
+			d << "\n};\n";
+		}
+		return d.str();
+	};
+	auto DeclareString = [&](int32_t address, const string &s, bool packed, const string &comment)
+	{
+		return "new g_" + Hex(address, 4) + "[] = " + Quote(s, packed) + ";" + comment + "\n";
+	};
+
+	// Array a 2 dimensioni
+	map <int32_t, int32_t> tableEnd;
+	for (const pair <const int32_t, pair <int, int>> &t : tables2D)
+	{
+		int32_t base = t.first, rows = t.second.first, cols = t.second.second;
+		int32_t row0 = base + 4 * rows, end = row0 + 4 * rows * cols;
+		bool isFloat;
+		vector <string> v = RenderCells(amx, row0, rows * cols, isFloat);
+		stringstream d;
+		d << "new " << (isFloat ? "Float:" : "") << "g_" << Hex(base, 4) << "[" << rows << "][" << cols << "] = {";
+		for (int r = 0; r < rows; r++)
+		{
+			d << (r ? "," : "") << "\n\t{";
+			for (int c = 0; c < cols; c++)
+				d << (c ? ", " : "") << v[r * cols + c];
+			d << "}";
+		}
+		d << "\n};\n";
+		decls[base] = d.str();
+		tableEnd[base] = end;
+		Cover(base, end);
+		nTableCells += (end - base) / 4;
+	}
+	auto InTable = [&](int32_t address) { for (const pair <const int32_t, int32_t> &t : tableEnd) if (address >= t.first && address < t.second) return true; return false; };
+
+	// Inizio di ogni elemento noto: le variabili usate come array arrivano fino all'elemento successivo
+	set <int32_t> starts;
+	for (int32_t g : globals)
+		if (!InTable(g))
+			starts.insert(g);
+	for (const pair <const int32_t, int32_t> &t : tableEnd)
+		starts.insert(t.first);
+	for (const pair <const int32_t, int> &l : literals)
+		if (!InTable(l.first))
+			starts.insert(l.first);
+	auto NextStart = [&](int32_t address) { set <int32_t>::const_iterator it = starts.upper_bound(address); return it == starts.end() ? dataSize : min(*it, dataSize); };
+
+	// Variabili globali usate dal codice
+	for (int32_t g : globals)
+	{
+		if (InTable(g) || !amx.IsDataAddress(g) || (g < dataSize && covered[g / 4]))
+			continue;
+		string s;
+		bool packed;
+		int scells;
+		int cells = 1;
+		if (globalSizes.count(g))
+			cells = globalSizes[g];
+		else if (globalArrays.count(g))
+			cells = (NextStart(g) - g) / 4;
+		cells = max(1, min(cells, (dataSize - g) / 4));
+		if (DataString(amx, g, s, packed, scells) && scells <= max(cells, (NextStart(g) - g) / 4))
+		{
+			decls[g] = DeclareString(g, s, packed, "");
+			Cover(g, g + 4 * scells);
+			nGlobalCells += scells;
+		}
+		else
+		{
+			decls[g] = Declare(g, cells, "");
+			Cover(g, g + 4 * cells);
+			nGlobalCells += cells;
+		}
+	}
+
+	// Stringhe scritte nel codice
+	for (const pair <const int32_t, int> &l : literals)
+		for (int c = 0; c < l.second; c++)
+			if (l.first + 4 * c < dataSize && !covered[(l.first + 4 * c) / 4])
+			{
+				covered[(l.first + 4 * c) / 4] = 1;
+				nLiteralCells++;
+			}
+
+	// Dati non referenziati: stringhe valide oppure blocchi di celle fino alla stringa successiva. Una stringa packed corta
+	// puo' essere un float (es. 688.0 = 0x442C0000 = "D,"): vengono accettate solo stringhe packed di almeno 4 caratteri
+	// che non iniziano con un float plausibile
+	auto DataString = [&](const AMX_SCRIPT &amx, int32_t address, string &s, bool &packed, int &scells)
+	{
+		if (!::DataString(amx, address, s, packed, scells))
+			return false;
+		return !packed || (s.size() >= 4 && !PlausibleFloat(amx.GetDataCell(address)));
+	};
+	for (int32_t a = 0; a < dataSize; )
+	{
+		if (covered[a / 4])
+		{
+			a += 4;
+			continue;
+		}
+		int32_t end = a;
+		while (end < dataSize && !covered[end / 4])
+			end += 4;
+		Cover(a, end);
+		while (a < end)
 		{
 			string s;
-			set <int32_t>::iterator next = it;
-			++next;
-			int cells = 1;							// Dimensione: da movs, altrimenti per gli array fino alla variabile successiva
-			if (globalSizes.count(*it))
-				cells = globalSizes[*it];
-			else if (globalArrays.count(*it))
-				cells = ((next == globals.end() ? (int32_t)amx.data_size : *next) - *it) / 4;
-			if (amx.ReadString(*it, s))
-				gl << "new g_" << Hex(*it, 4) << "[] = " << Quote(s) << ";\n";
-			else if (cells > 1)
+			bool packed;
+			int scells;
+			if (DataString(amx, a, s, packed, scells) && a + 4 * scells <= end)
 			{
-				gl << "new g_" << Hex(*it, 4) << "[" << cells << "] = {";
-				for (int c = 0; c < cells; c++)
-					gl << (c ? "," : "") << (c % 8 == 0 ? "\n\t" : " ") << RenderValue(amx.GetDataCell(*it + c * 4));
-				gl << "\n};\n";
+				decls[a] = DeclareString(a, s, packed, "\t// unreferenced");
+				nUnreferencedCells += scells;
+				a += 4 * scells;
+				continue;
 			}
-			else
-				gl << "new g_" << Hex(*it, 4) << " = " << RenderValue(amx.GetDataCell(*it)) << ";\n";
+			int32_t stop = a + 4;
+			while (stop < end && !DataString(amx, stop, s, packed, scells))
+				stop += 4;
+			decls[a] = Declare(a, (stop - a) / 4, "\t// unreferenced");
+			nUnreferencedCells += (stop - a) / 4;
+			a = stop;
 		}
-		gl << "\n";
 	}
+	int nMissing = 0;
+	for (char c : covered)
+		nMissing += c ? 0 : 1;
+
+	stringstream gl;
+	gl << "// Data section: " << dataSize / 4 << " cells = " << nGlobalCells << " in global variables + " << nTableCells << " in 2D arrays + "
+	   << nLiteralCells << " in string literals of the code + " << nUnreferencedCells << " unreferenced";
+	if (nMissing || nInexact)
+		gl << " (WARNING: " << nMissing << " cells not reproduced, " << nInexact << " values not exact)";
+	gl << "\n";
+	for (const pair <const int32_t, string> &d : decls)
+		gl << d.second;
+	gl << "\n";
+	if (nMissing || nInexact)
+		msg(msg::TGT::FILE_CONS, msg::TYP::WARN) << filename << ": " << nMissing << " data cells not reproduced, " << nInexact << " values not exact.";
+	msg(msg::TGT::FILE, msg::TYP::LOG) << filename << ": data " << dataSize / 4 << " cells (globals " << nGlobalCells << ", 2D arrays " << nTableCells
+		<< ", literals " << nLiteralCells << ", unreferenced " << nUnreferencedCells << ", missing " << nMissing << ").";
 
 	// Costanti con nome: hash di animazioni, bones, personaggi e file del livello
 	if (!usedNames.empty())

@@ -20,6 +20,16 @@ void RMX_Audio_Locator (ifstream &rmxfile, string name, string room_name, string
 
 void RMX_Portal (ifstream &rmxfile, string name, string room_name, string layer, ofstream &out, FBX_EXPORT &FBX, MA_EXPORT &MA);
 
+struct RMX_MSG;
+
+string RMX_NodeLabel (uint32_t hash);						// Nome originale o noto agli script dell'hash di un nodo, altrimenti 0x<hash>
+
+string RMX_MessagesText (const vector <RMX_MSG> &messages, string separator);	// "NM_X => gruppo di eventi" per ogni RMX_MSG
+
+uint32_t RMX_Emitter (ifstream &rmxfile, string name, string room_name, string layer, ofstream &out, FBX_EXPORT &FBX, MA_EXPORT &MA);
+
+uint32_t RMX_Trigger (ifstream &rmxfile, string name, string room_name, unsigned int room, string layer, ofstream &out, stringstream &text, FBX_EXPORT &FBX, MA_EXPORT &MA);
+
 class RMX_WaypointInfo {				// Dati di un waypoint necessari per costruire il grafo dopo aver letto tutte le stanze
 public:
 	uint32_t hash;						// Hash del nome del waypoint

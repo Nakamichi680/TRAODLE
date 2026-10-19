@@ -10,7 +10,7 @@ Esporta un file CHR (personaggio) nei formati FBX e MA nella cartella \NOMELIVEL
 mesh in posa di bind con skinning, blend shapes del volto (dai file TMT del livello, vedi TMT_Struct.h), materiali (solo
 MA) e textures. Le animazioni facciali (file TMS e ".3") sono scritte come takes del file FBX; per Maya sono contenute
 nei file MA delle animazioni dei dialoghi e dei filmati (Export_CAL).
-I file CHR degli oggetti animati (magic "NODE") hanno un formato diverso, non ancora supportato: vengono saltati.
+I file CHR degli oggetti animati (magic "NODE") hanno un formato diverso e sono esportati da Export_CHR_Node.
 ------------------------------------------------------------------------------------------------------------------*/
 bool Export_CHR (string filename)
 {
@@ -33,10 +33,10 @@ bool Export_CHR (string filename)
 		msg(msg::TGT::FILE_CONS, msg::TYP::ERR) << filename << " is not a valid CHR file.";
 		return false;
 	}
-	if (chr_header.CHR_MAGIC == 0x45444F4E)						// "NODE": oggetto animato
+	if (chr_header.CHR_MAGIC == CHR_NODE_MAGIC)					// "NODE": oggetto animato
 	{
-		msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << filename << " is an animated object (NODE format): not supported yet. Skipped.";
-		return true;
+		chrfile.close();
+		return Export_CHR_Node(filename.substr(0, filename.find(".CHR")));
 	}
 	if (chr_header.CHR_MAGIC != 0 || chr_header.HeaderSize != sizeof(CHR_HEADER) || chr_header.nBONES == 0 || chr_header.nBONES > 255)
 	{
@@ -53,6 +53,8 @@ bool Export_CHR (string filename)
 	MA.Transform.push_back(group);
 
 	if (!CHR_Read_Skeleton(chrfile, chr_header, chrname, skeleton, FBX, MA))		// Lettura scheletro
+		return false;
+	if (!CHR_Read_Attachments(chrfile, chr_header, chrname, skeleton, FBX, MA))	// Oggetti agganciati (armi, fondine, ...)
 		return false;
 	if (!CHR_Read_Materials(chrfile, chr_header, chrname, MA))						// Lettura materiali
 		return false;

@@ -1,6 +1,6 @@
 /*------------------------------------------------------------------------------------------------------------------
 Scrittura di un'animazione scheletrica in un file Maya ASCII a parte (<anim.name>.ma, nella cartella corrente), che
-carica il personaggio come riferimento (reference_path, namespace = anim.character) e ne anima i joints ed il gruppo
+carica il personaggio come riferimento (reference_path, namespace = anim.name) e ne anima i joints ed il gruppo
 principale con curve lineari a 30 fps (animCurveTL per le traslazioni, animCurveTA per le rotazioni in gradi,
 animCurveTU per le scalature). Le connessioni verso i nodi del riferimento sono scritte come "reference edits" del
 nodo reference (placeHolderList): una connectAttr diretta non funzionerebbe perche' il riferimento viene caricato dopo la
@@ -9,6 +9,9 @@ Le chiavi vengono ridotte con mathCurveKeys (scarto massimo 0.001 per traslazion
 Se facial non e' nullptr vengono animati anche i pesi del blend shape del volto (filmati: animazione facciale dell'attore).
 Se targets non e' nullptr i target dei blend shapes del personaggio vengono sostituiti con quelli delle mesh indicate
 (filmati: blend shapes del TMT del filmato).
+Namespace, nodo reference e nomi delle curve dipendono dal nome dell'animazione: piu' animazioni dello stesso personaggio
+(es. STRAHOVA_1_CS_6_2 e STRAHOVA_2_CS_6_2, due attori con lo stesso CHR) caricate nella stessa scena restano personaggi
+distinti invece di animare lo stesso riferimento.
 INPUT: SkeletalAnimation anim, string reference_path, const BlendShapeAnimation *facial, const vector <Mesh> *targets
 ------------------------------------------------------------------------------------------------------------------*/
 
@@ -19,7 +22,10 @@ INPUT: SkeletalAnimation anim, string reference_path, const BlendShapeAnimation 
 
 void MA_Write_SkeletalAnimationFile (const SkeletalAnimation &anim, string reference_path, const BlendShapeAnimation *facial, const vector <Mesh> *targets)
 {
-	string ns = anim.character;
+	string ns = anim.name;											// Namespace unico per animazione
+	for (char &c : ns)
+		if (!isalnum((unsigned char)c) && c != '_')
+			c = '_';
 	string rn = ns + "RN";
 	unsigned int last = anim.nFrames > 0 ? anim.nFrames - 1 : 0;
 
@@ -31,16 +37,17 @@ void MA_Write_SkeletalAnimationFile (const SkeletalAnimation &anim, string refer
 		const struct { const char *attr, *type; const vector <float> *v; } channels[] = {
 			{"translateX", "animCurveTL", &node.tX}, {"translateY", "animCurveTL", &node.tY}, {"translateZ", "animCurveTL", &node.tZ},
 			{"rotateX", "animCurveTA", &node.rX}, {"rotateY", "animCurveTA", &node.rY}, {"rotateZ", "animCurveTA", &node.rZ},
-			{"scaleX", "animCurveTU", &node.sX}, {"scaleY", "animCurveTU", &node.sY}, {"scaleZ", "animCurveTU", &node.sZ}};
+			{"scaleX", "animCurveTU", &node.sX}, {"scaleY", "animCurveTU", &node.sY}, {"scaleZ", "animCurveTU", &node.sZ},
+			{"visibility", "animCurveTU", &node.vis}};											// Oggetti agganciati (chiavi MAKE_VISIBLE / INVISIBLE)
 		for (const auto &c : channels)
 			if (!c.v->empty())
-				curves.push_back({node.node + "_" + c.attr, c.type, ns + ":" + node.node + "." + c.attr, c.v});
+				curves.push_back({ns + "_" + node.node + "_" + c.attr, c.type, ns + ":" + node.node + "." + c.attr, c.v});
 	}
 	if (facial)													// Pesi dei blend shapes del volto (filmati)
 	{
 		for (unsigned int m = 0; m < facial->meshes.size(); m++)
 			for (unsigned int t = 0; t < facial->targets.size() && t < facial->weight.size(); t++)
-				curves.push_back({facial->meshes[m] + "_" + facial->targets[t], "animCurveTU", ns + ":" + facial->meshes[m] + "_blendShape.weight[" + to_string(t) + "]", &facial->weight[t]});
+				curves.push_back({ns + "_" + facial->meshes[m] + "_" + facial->targets[t], "animCurveTU", ns + ":" + facial->meshes[m] + "_blendShape.weight[" + to_string(t) + "]", &facial->weight[t]});
 		if (facial->nFrames > anim.nFrames)
 			last = facial->nFrames - 1;
 	}

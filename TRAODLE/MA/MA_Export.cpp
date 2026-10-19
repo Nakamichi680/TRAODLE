@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "MA/MA_Classes.h"
 #include "MA/MA_Functions.h"
+#include <set>
 
 void MA_Export (string output_filename, MA_EXPORT &MA)
 {
@@ -12,10 +13,33 @@ void MA_Export (string output_filename, MA_EXPORT &MA)
 	msg(msg::TGT::FILE, msg::TYP::LOG) << "Writing default nodes";
 	MA_Write_DefaultNodes(MA);
 
+	// Transform, poi joints, poi i transform figli di un joint (es. oggetti agganciati ai personaggi): in un file MA il
+	// nodo padre deve essere creato prima dei figli
+	set <string> joints, under_joint;
+	for (const Joint &j : MA.Joint)
+		joints.insert(j.name);
+	for (bool changed = true; changed; )
+	{
+		changed = false;
+		for (const Transform &t : MA.Transform)
+			if (!under_joint.count(t.name) && (joints.count(t.parent) || under_joint.count(t.parent)))
+			{
+				under_joint.insert(t.name);
+				changed = true;
+			}
+	}
 	if (MA.Transform.size() > 0)
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Writing transforms";
 	for (unsigned int t = 0; t < MA.Transform.size(); t++)
-		MA_Write_Transform(t, MA);
+		if (!under_joint.count(MA.Transform[t].name))
+			MA_Write_Transform(t, MA);
+	if (MA.Joint.size() > 0)
+		msg(msg::TGT::FILE, msg::TYP::LOG) << "Writing joints";
+	for (unsigned int j = 0; j < MA.Joint.size(); j++)
+		MA_Write_Joint(j, MA);
+	for (unsigned int t = 0; t < MA.Transform.size(); t++)
+		if (under_joint.count(MA.Transform[t].name))
+			MA_Write_Transform(t, MA);
 
 	if (MA.Light.size() > 0)
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Writing lights";
@@ -93,11 +117,6 @@ void MA_Export (string output_filename, MA_EXPORT &MA)
 		msg(msg::TGT::FILE, msg::TYP::LOG) << "Writing textures";
 	for (unsigned int t = 0; t < MA.Texture.size(); t++)
 		MA_Write_Texture(t, MA);
-
-	if (MA.Joint.size() > 0)
-		msg(msg::TGT::FILE, msg::TYP::LOG) << "Writing joints";
-	for (unsigned int j = 0; j < MA.Joint.size(); j++)
-		MA_Write_Joint(j, MA);
 
 	for (unsigned int m = 0; m < MA.Mesh.size(); m++)			// Blend shapes (solo mesh deformate da uno scheletro: servono ShapeOrig e skinCluster)
 		if (!MA.Mesh[m].BlendShape.empty() && !MA.Mesh[m].Skin.empty())

@@ -2,6 +2,7 @@
 #include "TRAOD/ZONE/ZONE_Struct.h"
 #include "TRAOD/ZONE/ZONE_Functions.h"
 #include "Misc_Functions.h"
+#include "AOD_Names.h"
 
 
 bool exportRoomsBoundingBoxes = false;
@@ -92,7 +93,11 @@ bool ZONE_Read_Rooms (string filename, vector <RoomInfo> RMX_Rooms, FBX_EXPORT &
 		}
 		else
 			r_RMX = 1000 + r;
-		temp << AOD_IO.levelname << "_" << zonename << "_ROOM_" << r_RMX << "_" << std::hex << RoomID << std::dec;
+		temp << AOD_IO.levelname << "_" << zonename << "_ROOM_" << r_RMX << "_";	// Nome originale della stanza se noto, altrimenti hash
+		if (AOD_NodeName(RoomID).empty())
+			temp << std::hex << RoomID << std::dec;
+		else
+			temp << AOD_MayaName(AOD_NodeName(RoomID));
 		room.name = temp.str();
 		FBX.Group.push_back(room);									// Inserimento gruppo stanza nel file FBX
 		MA.Transform.push_back(room);								// Inserimento gruppo stanza nel file MA

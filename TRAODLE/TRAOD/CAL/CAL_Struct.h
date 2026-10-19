@@ -6,11 +6,11 @@
 
 	Fonti:
 		[SRC]	sorgenti originali della libreria di animazione del gioco e dell'editor delle animazioni
-				(TRAOD\CHR\Reference_TRAODAE\Tools\Libs\AnimLib\AnimAPI.h / AnimAPI.c e Tools\AnimEdit\EditorToGame.cpp).
+				(TRAOD\Reference\Tools\Libs\AnimLib\AnimAPI.h / AnimAPI.c e Tools\AnimEdit\EditorToGame.cpp).
 				Tra parentesi quadre il nome originale della struttura o del campo, es. [ANIMATION.altanimID]
 		[OK]	verificato su tutti i 955 file CAL dei livelli (31658 animazioni, 6.5 milioni di canali)
 		[MAYA]	verificato confrontando LARA.CAL e KURTIS.CAL con le scene Maya originali
-				(TRAOD\CHR\Reference_TRAODAE\ANIMS e \Kurtis): errore 0 su traslazioni e rotazioni
+				(cartelle ANIMS e Kurtis, non incluse nel progetto): errore 0 su traslazioni e rotazioni
 		[?]		ipotesi / significato sconosciuto
 		[GARBAGE] memoria non inizializzata scritta dal builder (non va interpretata)
 	Il file e' l'immagine in memoria di un ANIMATION_LIST in cui i puntatori sono offset dall'inizio del file.
@@ -51,6 +51,11 @@
 		trovati: LARA_EYE_LEFT, LARA_EYE_RIGHT, GUNHAND_LEFT, GUNHAND_RIGHT, GUNHOLSTER_LEFT, GUNHOLSTER_RIGHT, HOLSTER,
 		POUCH, RADIO, SHOTGUN_PUMP, PISTOL_L, PISTOL_R, CANISTERA, TONFA, SHIELD, VISOR2, ... La loro visibilita' e'
 		gestita dalle chiavi TRACK_KEY_CODE_MAKE_VISIBLE / MAKE_INVISIBLE con lo stesso hash.
+		[OK][SRC: AO_AnimateItems] Il runtime usa solo le tracce il cui hash e' quello di un nodo agganciato del CHR (vedi
+		OGGETTI AGGANCIATI in CHR_Struct.h; la mesh del nodo e' la MESH2 animata con lo stesso ID): traslazione e scala
+		assolute (ANIM_SETTSCALE / ANIM_SETSSCALE). Le altre tracce (occhi, mesh di altri personaggi, 0xCDCDCDCD) non hanno
+		effetto. Le chiavi di visibilita' riguardano sia i nodi agganciati sia le MESH2 normali (es. COP_A: al frame 11
+		di COPA_DRAWHANDGUN la pistola nella fondina sparisce e compare quella nella mano).
 
 	DECODIFICA DI UN BLOCCO [OK][SRC: APB_GetTrackValue]
 		La traccia copre i frames da 0 a nFrames-1 ed e' divisa in blocchi. Ogni blocco copre i frames dall'ultimo frame
@@ -116,6 +121,9 @@
 #define CAL_SSCALE		255.0f				// [SRC: ANIM_SSCALE]
 #define CAL_VTSCALE		32.0f				// [SRC: ANIM_VTSCALE]
 #define CAL_VRSCALE		512.0f				// [SRC: ANIM_VRSCALE]
+#define CAL_SETTSCALE	1.0f				// [SRC: ANIM_SETTSCALE] Oggetti animati (CHR "NODE"): traslazione assoluta
+#define CAL_SETRSCALE	16383.0f			// [SRC: ANIM_SETRSCALE]
+#define CAL_SETSSCALE	255.0f				// [SRC: ANIM_SETSSCALE]
 
 
 struct CAL_HEADER				// SIZE: 24 bytes [ANIMATION_LIST]

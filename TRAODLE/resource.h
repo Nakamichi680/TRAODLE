@@ -362,6 +362,7 @@
 #define IDR_COLLISION_FLOOR_WETSAND_NOGRAB_SLIDE							457
 #define IDR_COLLISION_WALL_VIEWPERMEABLE_SHOTPERMEABLE_CLIMBABLE			458
 #define IDR_COLLISION_INVALID												459
+#define IDR_AOD_NAMES														460
 
 // Next default values for new objects
 // 

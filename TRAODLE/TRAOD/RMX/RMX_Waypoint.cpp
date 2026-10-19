@@ -5,6 +5,7 @@
 #include "MA/MA_Classes.h"
 #include "TRAOD/RMX/RMX_Struct.h"
 #include "TRAOD/RMX/RMX_Functions.h"
+#include "AOD_Names.h"
 
 
 /*------------------------------------------------------------------------------------------------------------------
@@ -27,9 +28,13 @@ uint32_t RMX_Waypoint (ifstream &rmxfile, string room_name, string layer, ofstre
 		wp.links.push_back(link);
 	}
 
-	// Nome del locator: hash del waypoint (stesso valore usato negli script AMX). Gli hash duplicati ricevono un suffisso
+	// Nome del locator: nome originale del waypoint se noto, altrimenti il suo hash (stesso valore usato negli script AMX).
+	// Gli hash duplicati ricevono un suffisso
 	stringstream ssname;
-	ssname << AOD_IO.levelname << "_WP_" << hex << uppercase << setw(8) << setfill('0') << wp.hash;
+	if (AOD_NodeName(wp.hash).empty())
+		ssname << AOD_IO.levelname << "_WP_" << hex << uppercase << setw(8) << setfill('0') << wp.hash;
+	else
+		ssname << AOD_IO.levelname << "_WP_" << AOD_MayaName(AOD_NodeName(wp.hash));
 	wp.name = ssname.str();
 	unsigned int duplicates = 0;
 	for (unsigned int w = 0; w < waypoints.size(); w++)

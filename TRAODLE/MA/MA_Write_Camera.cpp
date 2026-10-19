@@ -6,7 +6,14 @@ void MA_Write_Camera (unsigned int c, MA_EXPORT &MA)
 {
 	stringstream out;
 	out << setprecision(7);
-	out << "createNode transform -n \"" << MA.Camera[c].name << "\";\n";
+	out << "createNode transform -n \"" << MA.Camera[c].name << "\"";
+	if (MA.Camera[c].parent.size() > 0)
+		out << " -p \"" << MA.Camera[c].parent << "\"";
+	out << ";\n";
+	if (MA.Camera[c].translate_flag)
+		out << "	setAttr \".t\" -type \"double3\" " << MA.Camera[c].tX << " " << MA.Camera[c].tY << " " << MA.Camera[c].tZ << ";\n";
+	if (MA.Camera[c].rotate_flag)
+		out << "	setAttr \".r\" -type \"double3\" " << MA.Camera[c].rX << " " << MA.Camera[c].rY << " " << MA.Camera[c].rZ << ";\n";
 	out << "	setAttr \".s\" -type \"double3\" 120 120 120;\n";
 	out << "createNode camera -n \"" << MA.Camera[c].name << "Shape\" -p \"" << MA.Camera[c].name << "\";\n";
 	out << "	setAttr -k off \".v\";\n";

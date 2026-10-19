@@ -5,7 +5,7 @@
 	FORMATO POS - Tomb Raider: The Angel of Darkness (posizioni degli attori nei filmati CS_* / IG_*)
 
 	Fonti:
-		[SRC]	esportatore Maya originale (TRAOD\CHR\Reference_TRAODAE\Tools\Exporter\Export_Animation.cpp:
+		[SRC]	esportatore Maya originale (TRAOD\Reference\Tools\Exporter\Export_Animation.cpp:
 				chunk "CPOS", ExportCharCutscenePositions, SampleCutCurve1)
 		[OK]	verificato su tutti i file POS di PARIS1B
 
