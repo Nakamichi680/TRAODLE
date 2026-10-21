@@ -1,7 +1,8 @@
 /*------------------------------------------------------------------------------------------------------------------
 Scrittura di un'animazione scheletrica come take FBX: AnimationStack + AnimationLayer, e per ogni nodo animato (joint
 o gruppo) un AnimationCurveNode "T", "R" o "S" collegato a "Lcl Translation", "Lcl Rotation" o "Lcl Scaling" del
-Model, con un'AnimationCurve per asse (chiavi lineari, 30 fps). I canali di un gruppo senza curva usano il valore 0
+Model, con un'AnimationCurve per asse (chiavi lineari, 30 fps). I nodi con camera = true sono telecamere (Model
+"Camera"): la lunghezza focale (fl) va sulla proprieta' FocalLength del loro NodeAttribute. I canali di un gruppo senza curva usano il valore 0
 (rotazioni e traslazioni) o 1 (scalature). Le chiavi vengono ridotte con mathCurveKeys (scarto massimo 0.001
 per traslazioni e rotazioni, 0.00001 per le scalature).
 INPUT: SkeletalAnimation anim, set <string> animated (gruppi di canali animati in almeno una take del file)
@@ -83,7 +84,54 @@ void FBX_Write_SkeletalAnimation (const SkeletalAnimation &anim, const set <stri
 
 	for (const NodeAnimation &node : nodes)
 	{
-		string model_id = node.joint ? hashID(node.node, "Joint") : hashID(node.node, "Group");
+		string model_id = node.camera ? hashID(node.node, "Camera") : node.joint ? hashID(node.node, "Joint") : hashID(node.node, "Group");
+		if (node.camera && !node.fl.empty())					// Lunghezza focale della telecamera
+		{
+			string key = anim.name + "|" + node.node + "|FocalLength";
+			string node_id = hashID(key, "AnimCurveNode"), curve_id = hashID(key, "AnimCurve");
+			vector <unsigned int> frames = mathCurveKeys(node.fl, 1e-3f);
+			string times, values;
+			char buf[64];
+			for (unsigned int k = 0; k < frames.size(); k++)
+			{
+				snprintf(buf, sizeof(buf), "%s%s%llu", k ? "," : "", (k && k % 20 == 0) ? "\n" : "", frames[k] * FBX_FRAME_30FPS);
+				times += buf;
+				snprintf(buf, sizeof(buf), "%s%s%.7g", k ? "," : "", (k && k % 20 == 0) ? "\n" : "", node.fl[frames[k]]);
+				values += buf;
+			}
+			FBX.FBX_Count.AnimationCurveNode++;
+			out << "	AnimationCurveNode: " << node_id << ", \"AnimCurveNode::FocalLength\", \"\" {\n";
+			out << "		Properties70:  {\n";
+			out << "			P: \"d|FocalLength\", \"Number\", \"\", \"A\"," << node.fl[0] << "\n";
+			out << "		}\n";
+			out << "	}\n";
+			conn << "	;AnimCurveNode::FocalLength, AnimLayer::BaseLayer\n";
+			conn << "	C: \"OO\"," << node_id << "," << layer_id << "\n\n";
+			conn << "	;AnimCurveNode::FocalLength, NodeAttribute::" << node.node << "\n";
+			conn << "	C: \"OP\"," << node_id << "," << hashID(node.node, "Camera_NodeAttribute") << ", \"FocalLength\"\n\n";
+			FBX.FBX_Count.AnimationCurve++;
+			out << "	AnimationCurve: " << curve_id << ", \"AnimCurve::\", \"\" {\n";
+			out << "		Default: 0\n";
+			out << "		KeyVer: 4009\n";
+			out << "		KeyTime: *" << frames.size() << " {\n";
+			out << "			a: " << times << "\n";
+			out << "		}\n";
+			out << "		KeyValueFloat: *" << frames.size() << " {\n";
+			out << "			a: " << values << "\n";
+			out << "		}\n";
+			out << "		KeyAttrFlags: *1 {\n";
+			out << "			a: 1028\n";
+			out << "		}\n";
+			out << "		KeyAttrDataFloat: *4 {\n";
+			out << "			a: 0,0,218434821,0\n";
+			out << "		}\n";
+			out << "		KeyAttrRefCount: *1 {\n";
+			out << "			a: " << frames.size() << "\n";
+			out << "		}\n";
+			out << "	}\n";
+			conn << "	;AnimCurve::, AnimCurveNode::FocalLength\n";
+			conn << "	C: \"OP\"," << curve_id << "," << node_id << ", \"d|FocalLength\"\n\n";
+		}
 		const struct { const char *type, *property; float def, tolerance; const vector <float> *v[3]; } groups[] = {
 			{"T", "Lcl Translation", 0, 1e-3f, {&node.tX, &node.tY, &node.tZ}},
 			{"R", "Lcl Rotation", 0, 1e-3f, {&node.rX, &node.rY, &node.rZ}},

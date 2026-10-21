@@ -79,8 +79,6 @@ bool CAM_BuildAnimatedCamera (string name, const vector <float> &Xfrom, const ve
 	if (nFrames == 0)
 		return false;
 	Camera CAM;
-	Animation FBX_anim;
-	AnimationCurveNode FBX_animCurveNode;
 	MA_animCurve MA_animCurve;
 	vector <float> Xrot(nFrames), Yrot(nFrames), Zrot(nFrames);
 	vector <float> Focal_lenght(nFrames);
@@ -102,57 +100,6 @@ bool CAM_BuildAnimatedCamera (string name, const vector <float> &Xfrom, const ve
 		Zrot[f] = rot.z;
 		COI[f] = sqrt((Xat[f] - Xfrom[f]) * (Xat[f] - Xfrom[f]) + (Yat[f] - Yfrom[f]) * (Yat[f] - Yfrom[f]) + (Zat[f] - Zfrom[f]) * (Zat[f] - Zfrom[f]));
 	
-
-		//////// FBX
-		// Scrittura traslazione X
-		FBX_animCurveNode.tX.KeyTime.push_back((unsigned long long)f * FBXframe1);			// Tempo
-		FBX_animCurveNode.tX.KeyValueFloat.push_back(Xfrom[f]);
-		FBX_animCurveNode.tX.KeyAttrFlags.push_back(24840);												// Cubic|TangeantAuto|GenericTimeIndependent|GenericClampProgressive
-        FBX_animCurveNode.tX.KeyAttrDataFloat.push_back(0);												// RightSlope:0
-        FBX_animCurveNode.tX.KeyAttrDataFloat.push_back(0);												// NextLeftSlope:0
-        FBX_animCurveNode.tX.KeyAttrDataFloat.push_back(218434821);										// RightWeight:0.333333, NextLeftWeight:0.333333
-        FBX_animCurveNode.tX.KeyAttrDataFloat.push_back(0);												// RightVelocity:0, NextLeftVelocity:0		
-		// Scrittura traslazione Y
-		FBX_animCurveNode.tY.KeyTime.push_back((unsigned long long)f * FBXframe1);			// Tempo
-		FBX_animCurveNode.tY.KeyValueFloat.push_back(Yfrom[f]);
-		FBX_animCurveNode.tY.KeyAttrFlags.push_back(24840);												// Cubic|TangeantAuto|GenericTimeIndependent|GenericClampProgressive
-        FBX_animCurveNode.tY.KeyAttrDataFloat.push_back(0);												// RightSlope:0
-        FBX_animCurveNode.tY.KeyAttrDataFloat.push_back(0);												// NextLeftSlope:0
-        FBX_animCurveNode.tY.KeyAttrDataFloat.push_back(218434821);										// RightWeight:0.333333, NextLeftWeight:0.333333
-        FBX_animCurveNode.tY.KeyAttrDataFloat.push_back(0);												// RightVelocity:0, NextLeftVelocity:0
-		// Scrittura traslazione Z
-		FBX_animCurveNode.tZ.KeyTime.push_back((unsigned long long)f * FBXframe1);			// Tempo
-		FBX_animCurveNode.tZ.KeyValueFloat.push_back(Zfrom[f]);
-		FBX_animCurveNode.tZ.KeyAttrFlags.push_back(24840);												// Cubic|TangeantAuto|GenericTimeIndependent|GenericClampProgressive
-        FBX_animCurveNode.tZ.KeyAttrDataFloat.push_back(0);												// RightSlope:0
-        FBX_animCurveNode.tZ.KeyAttrDataFloat.push_back(0);												// NextLeftSlope:0
-        FBX_animCurveNode.tZ.KeyAttrDataFloat.push_back(218434821);										// RightWeight:0.333333, NextLeftWeight:0.333333
-        FBX_animCurveNode.tZ.KeyAttrDataFloat.push_back(0);												// RightVelocity:0, NextLeftVelocity:0
-		// Scrittura rotazione X
-		FBX_animCurveNode.rX.KeyTime.push_back((unsigned long long)f * FBXframe1);			// Tempo
-		FBX_animCurveNode.rX.KeyValueFloat.push_back(Xrot[f]);
-		FBX_animCurveNode.rX.KeyAttrFlags.push_back(24840);												// Cubic|TangeantAuto|GenericTimeIndependent|GenericClampProgressive
-        FBX_animCurveNode.rX.KeyAttrDataFloat.push_back(0);												// RightSlope:0
-        FBX_animCurveNode.rX.KeyAttrDataFloat.push_back(0);												// NextLeftSlope:0
-        FBX_animCurveNode.rX.KeyAttrDataFloat.push_back(218434821);										// RightWeight:0.333333, NextLeftWeight:0.333333
-        FBX_animCurveNode.rX.KeyAttrDataFloat.push_back(0);												// RightVelocity:0, NextLeftVelocity:0		
-		// Scrittura rotazione Y
-		FBX_animCurveNode.rY.KeyTime.push_back((unsigned long long)f * FBXframe1);			// Tempo
-		FBX_animCurveNode.rY.KeyValueFloat.push_back(Yrot[f]);
-		FBX_animCurveNode.rY.KeyAttrFlags.push_back(24840);												// Cubic|TangeantAuto|GenericTimeIndependent|GenericClampProgressive
-        FBX_animCurveNode.rY.KeyAttrDataFloat.push_back(0);												// RightSlope:0
-        FBX_animCurveNode.rY.KeyAttrDataFloat.push_back(0);												// NextLeftSlope:0
-        FBX_animCurveNode.rY.KeyAttrDataFloat.push_back(218434821);										// RightWeight:0.333333, NextLeftWeight:0.333333
-        FBX_animCurveNode.rY.KeyAttrDataFloat.push_back(0);												// RightVelocity:0, NextLeftVelocity:0
-		// Scrittura rotazione Z
-		FBX_animCurveNode.rZ.KeyTime.push_back((unsigned long long)f * FBXframe1);			// Tempo
-		FBX_animCurveNode.rZ.KeyValueFloat.push_back(Zrot[f]);
-		FBX_animCurveNode.rZ.KeyAttrFlags.push_back(24840);												// Cubic|TangeantAuto|GenericTimeIndependent|GenericClampProgressive
-        FBX_animCurveNode.rZ.KeyAttrDataFloat.push_back(0);												// RightSlope:0
-        FBX_animCurveNode.rZ.KeyAttrDataFloat.push_back(0);												// NextLeftSlope:0
-        FBX_animCurveNode.rZ.KeyAttrDataFloat.push_back(218434821);										// RightWeight:0.333333, NextLeftWeight:0.333333
-        FBX_animCurveNode.rZ.KeyAttrDataFloat.push_back(0);												// RightVelocity:0, NextLeftVelocity:0
-
 
 		//////// MA
 		// Scrittura traslazioni
@@ -195,24 +142,20 @@ bool CAM_BuildAnimatedCamera (string name, const vector <float> &Xfrom, const ve
 	CAM.fl = Focal_lenght[0];
 	CAM.coi = COI[0];
 
-	// Porzione file FBX
+	// Porzione file FBX: animazione come take (FBX_Write_SkeletalAnimation, nodo telecamera)
 	FBX.Camera.push_back(CAM);
-	FBX_animCurveNode.name = "Joint_0";
-	FBX_animCurveNode.parent = CAM.name;
-	FBX_animCurveNode.FBX_parent = hashID(CAM.name, "Camera");
-	FBX_animCurveNode.tX_flag = true;
-	FBX_animCurveNode.tY_flag = true;
-	FBX_animCurveNode.tZ_flag = true;
-	FBX_animCurveNode.rX_flag = true;
-	FBX_animCurveNode.rY_flag = true;
-	FBX_animCurveNode.rZ_flag = true;
-
-	FBX_anim.name = CAM.name;
-	FBX_anim.nJoints = 1;
-	FBX_anim.nFrames = nFrames;
-	FBX_anim.Curvenode.push_back(FBX_animCurveNode);
-
-	FBX.Animation.push_back(FBX_anim);
+	SkeletalAnimation take;
+	take.name = CAM.name;
+	take.nFrames = nFrames;
+	NodeAnimation node;
+	node.node = CAM.name;
+	node.joint = false;
+	node.camera = true;
+	node.tX = Xfrom;	node.tY = Yfrom;	node.tZ = Zfrom;
+	node.rX = Xrot;		node.rY = Yrot;		node.rZ = Zrot;
+	node.fl = Focal_lenght;
+	take.nodes.push_back(node);
+	FBX.SkeletalAnimation.push_back(take);
 
 	// Porzione file MA
 	MA_animCurve.name = temp.str();

@@ -7,6 +7,7 @@
 
 void FBX_Export (string output_filename, FBX_EXPORT &FBX);
 void FBX_Write_Group (Transform input, FBX_EXPORT &FBX);
+void FBX_Write_Attributes (stringstream &out, const vector <pair <string, int>> &ints, const vector <pair <string, float>> &floats, const vector <pair <string, string>> &strings);
 void FBX_Write_Locator (Locator input, FBX_EXPORT &FBX);
 void FBX_Write_Camera (Camera input, FBX_EXPORT &FBX);
 void FBX_Write_PointLight (Light input, FBX_EXPORT &FBX);

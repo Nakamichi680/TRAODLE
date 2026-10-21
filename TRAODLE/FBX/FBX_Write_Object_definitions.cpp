@@ -76,6 +76,18 @@ void FBX_Write_Object_definitions (FBX_EXPORT &FBX)
     if (FBX.FBX_Count.NodeAttribute > 0)    {
         out << "	ObjectType: \"NodeAttribute\" {\n";
         out << "		Count: " << FBX.FBX_Count.NodeAttribute << "\n";
+        if (!FBX.Camera.empty())                                // Telecamere: proprieta' animabili (FocalLength)
+        {
+            out << "		PropertyTemplate: \"FbxCamera\" {\n";
+            out << "			Properties70:  {\n";
+            out << "				P: \"FilmWidth\", \"double\", \"Number\", \"\",0.816\n";
+            out << "				P: \"FilmHeight\", \"double\", \"Number\", \"\",0.612\n";
+            out << "				P: \"FocalLength\", \"Number\", \"\", \"A\",34.89327\n";
+            out << "				P: \"NearPlane\", \"double\", \"Number\", \"\",10\n";
+            out << "				P: \"FarPlane\", \"double\", \"Number\", \"\",4000\n";
+            out << "			}\n";
+            out << "		}\n";
+        }
         out << "	}\n";   }
     if (FBX.FBX_Count.Pose > 0) {
         out << "	ObjectType: \"Pose\" {\n";

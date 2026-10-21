@@ -534,6 +534,9 @@ public:
 	float sX = 1;						// Scalatura X
 	float sY = 1;						// Scalatura Y
 	float sZ = 1;						// Scalatura Z
+	vector <pair <string, int>> int_attributes;			// Attributi personalizzati come in Transform (nome, valore)
+	vector <pair <string, string>> string_attributes;
+	vector <pair <string, float>> float_attributes;
 };
 
 
@@ -664,6 +667,8 @@ class NodeAnimation {					// Curve di animazione di un nodo (joint o gruppo): un
 public:
 	string node;						// Nome del nodo
 	bool joint = true;					// Vero se il nodo e' un joint (falso: gruppo/transform)
+	bool camera = false;				// Vero se il nodo e' una telecamera (Camera, solo file FBX: le curve vanno sul Model "Camera")
+	vector <float> fl;					// Telecamere: lunghezza focale (FBX: proprieta' FocalLength del NodeAttribute)
 	vector <float> tX, tY, tZ;			// Traslazione
 	vector <float> rX, rY, rZ;			// Rotazione in gradi (ordine XYZ)
 	vector <float> sX, sY, sZ;			// Scala
@@ -677,6 +682,9 @@ public:
 	string character;					// Nome del personaggio (file CHR / MA referenziato)
 	unsigned int nFrames = 0;			// Numero di frames (30 fps)
 	vector <NodeAnimation> nodes;		// Nodi animati
+	vector <pair <string, vector <pair <unsigned int, double>>>> events;	// Eventi (solo file MA): attributo interno del nodo
+										// <animazione>_EVENTS -> chiavi a gradini (frame, valore)
+	vector <pair <string, string>> event_text;	// Attributi di testo del nodo <animazione>_EVENTS (es. effetti agganciati)
 };
 
 
@@ -687,6 +695,9 @@ public:
 	string FBX_parent = "0";		// hashID del gruppo/oggetto da cui dipende
 	string layer;					// Nome layer di appartenenza, se vuoto non appartiene ad alcun layer (solo file Maya ASCII)
 	string material_name;			// Nome del materiale associato alla mesh
+	vector <pair <string, int>> int_attributes;			// Attributi personalizzati del transform della mesh, come in Transform (nome, valore)
+	vector <pair <string, string>> string_attributes;
+	vector <pair <string, float>> float_attributes;
 	unsigned int nV;
 	bool uv_set1_flag = true;
 	bool uv_set2_flag = true;

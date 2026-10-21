@@ -7,6 +7,21 @@ OUTPUT: FBX_EXPORT &FBX
 #include "stdafx.h"
 #include "FBX/FBX_Classes.h"
 #include "MATH/math.h"
+#include "FBX/FBX_Functions.h"
+
+
+/*------------------------------------------------------------------------------------------------------------------
+Attributi personalizzati come proprieta' utente (Properties70 del Model)
+------------------------------------------------------------------------------------------------------------------*/
+void FBX_Write_Attributes (stringstream &out, const vector <pair <string, int>> &ints, const vector <pair <string, float>> &floats, const vector <pair <string, string>> &strings)
+{
+	for (const pair <string, int> &a : ints)
+		out << "			P: \"" << a.first << "\", \"int\", \"Integer\", \"U\"," << a.second << "\n";
+	for (const pair <string, float> &a : floats)
+		out << "			P: \"" << a.first << "\", \"double\", \"Number\", \"U\"," << a.second << "\n";
+	for (const pair <string, string> &a : strings)
+		out << "			P: \"" << a.first << "\", \"KString\", \"\", \"U\", \"" << a.second << "\"\n";
+}
 
 
 // Angoli XYZ (gradi) della rotazione inversa: Maya importa il rotate axis come inversa della PostRotation dell'FBX
@@ -59,12 +74,7 @@ void FBX_Write_Group (Transform input, FBX_EXPORT &FBX)
 			if (p.second->x != 0 || p.second->y != 0 || p.second->z != 0)
 				out << "			P: \"" << p.first << "\", \"Vector3D\", \"Vector\", \"\"," << p.second->x << "," << p.second->y << "," << p.second->z << "\n";
 	}
-	for (const pair <string, int> &a : input.int_attributes)			// Attributi personalizzati (proprieta' utente)
-		out << "			P: \"" << a.first << "\", \"int\", \"Integer\", \"U\"," << a.second << "\n";
-	for (const pair <string, float> &a : input.float_attributes)
-		out << "			P: \"" << a.first << "\", \"double\", \"Number\", \"U\"," << a.second << "\n";
-	for (const pair <string, string> &a : input.string_attributes)
-		out << "			P: \"" << a.first << "\", \"KString\", \"\", \"U\", \"" << a.second << "\"\n";
+	FBX_Write_Attributes(out, input.int_attributes, input.float_attributes, input.string_attributes);	// Proprieta' utente
 	out << "		}\n";
 	out << "		Shading: Y\n";
 	out << "		Culling: \"CullingOff\"\n";

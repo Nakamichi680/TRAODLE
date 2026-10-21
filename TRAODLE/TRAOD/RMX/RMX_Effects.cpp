@@ -243,6 +243,14 @@ uint32_t RMX_Trigger (ifstream &rmxfile, string name, string room_name, unsigned
 	group.tX = t.Node.Xpos;	group.tY = t.Node.Ypos;	group.tZ = t.Node.Zpos;
 	group.rX = t.Node.Xrot;	group.rY = t.Node.Yrot;	group.rZ = t.Node.Zrot;
 	group.string_attributes.push_back(make_pair(string("triggerFlags"), flags));
+	if (t.MinorAxis != 0)
+	{
+		float minor_axis;
+		memcpy(&minor_axis, &t.MinorAxis, sizeof(minor_axis));
+		group.float_attributes.push_back(make_pair(string("minorAxis"), minor_axis));
+	}
+	if (t.SecondaryID != 0)
+		group.int_attributes.push_back(make_pair(string("secondaryID"), (int)t.SecondaryID));
 	if (!(t.Node.Flags & 1))
 		group.int_attributes.push_back(make_pair(string("inactive"), 1));		// Attivato da un messaggio
 	string all_actions;

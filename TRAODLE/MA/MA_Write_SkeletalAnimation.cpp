@@ -9,6 +9,9 @@ Le chiavi vengono ridotte con mathCurveKeys (scarto massimo 0.001 per traslazion
 Se facial non e' nullptr vengono animati anche i pesi del blend shape del volto (filmati: animazione facciale dell'attore).
 Se targets non e' nullptr i target dei blend shapes del personaggio vengono sostituiti con quelli delle mesh indicate
 (filmati: blend shapes del TMT del filmato).
+Gli eventi dell'animazione (anim.events, anim.event_text: suoni, animazioni sovrapposte, effetti, ...) vanno sul nodo
+<namespace>_EVENTS del file (non nel riferimento): un attributo intero per tipo di evento con chiavi a gradini e
+attributi di testo.
 Namespace, nodo reference e nomi delle curve dipendono dal nome dell'animazione: piu' animazioni dello stesso personaggio
 (es. STRAHOVA_1_CS_6_2 e STRAHOVA_2_CS_6_2, due attori con lo stesso CHR) caricate nella stessa scena restano personaggi
 distinti invece di animare lo stesso riferimento.
@@ -123,13 +126,51 @@ void MA_Write_SkeletalAnimationFile (const SkeletalAnimation &anim, string refer
 		out << "createNode " << curve.type << " -n \"" << curve.name << "\";\n";
 		out << "	setAttr \".tan\" 2;\n";								// Tangenti lineari
 		out << "	setAttr \".wgt\" no;\n";
-		out << "	setAttr -s " << frames.size() << " \".ktv[0:" << frames.size() - 1 << "]\"" << keys << ";\n";
+		out << "	setAttr -s " << frames.size() << " \".ktv[0" << (frames.size() > 1 ? ":" + to_string(frames.size() - 1) : string()) << "]\"" << keys << ";\n";
+	}
+	if (!anim.events.empty() || !anim.event_text.empty())			// Eventi dell'animazione
+	{
+		string ev = ns + "_EVENTS";
+		out << "createNode transform -n \"" << ev << "\";\n";
+		for (const auto &e : anim.events)
+			out << "	addAttr -ci true -k true -sn \"" << e.first << "\" -ln \"" << e.first << "\" -at \"long\";\n";
+		for (const auto &t : anim.event_text)
+		{
+			string value;
+			for (char c : t.second)
+			{
+				if (c == '"' || c == '\\')
+					value.push_back('\\');
+				if (c == '\n')
+					value += "\\n";
+				else
+					value.push_back(c);
+			}
+			out << "	addAttr -ci true -sn \"" << t.first << "\" -ln \"" << t.first << "\" -dt \"string\";\n";
+			out << "	setAttr \"." << t.first << "\" -type \"string\" \"" << value << "\";\n";
+		}
+		for (const auto &e : anim.events)
+		{
+			out << "createNode animCurveTU -n \"" << ev << "_" << e.first << "\";\n";
+			out << "	setAttr \".tan\" 18;\n";
+			out << "	setAttr \".wgt\" no;\n";
+			out << "	setAttr -s " << e.second.size() << " \".ktv[0" << (e.second.size() > 1 ? ":" + to_string(e.second.size() - 1) : string()) << "]\"";
+			for (unsigned int k = 0; k < e.second.size(); k++)
+				out << ((k % 8 == 0) ? "\n\t\t" : " ") << e.second[k].first << " " << setprecision(10) << e.second[k].second << setprecision(7);
+			out << ";\n";
+			out << "	setAttr -s " << e.second.size() << " \".kot[0" << (e.second.size() > 1 ? ":" + to_string(e.second.size() - 1) : string()) << "]\"";
+			for (unsigned int k = 0; k < e.second.size(); k++)
+				out << " 5";											// Tangenti a gradini
+			out << ";\n";
+		}
 	}
 	out << "createNode script -n \"sceneConfigurationScriptNode\";\n";		// Intervallo della timeline
 	out << "	setAttr \".b\" -type \"string\" \"playbackOptions -min 0 -max " << last << " -ast 0 -aet " << last << " \";\n";
 	out << "	setAttr \".st\" 6;\n";
 	for (unsigned int c = 0; c < curves.size(); c++)
 		out << "connectAttr \"" << curves[c].name << ".o\" \"" << rn << ".phl[" << c + 1 << "]\";\n";
+	for (const auto &e : anim.events)
+		out << "connectAttr \"" << ns << "_EVENTS_" << e.first << ".o\" \"" << ns << "_EVENTS." << e.first << "\";\n";
 	out << "// End of " << anim.name << ".ma\n";
 	out.close();
 	msg(msg::TGT::FILE, msg::TYP::LOG) << "Output filename: " << anim.name << ".ma";

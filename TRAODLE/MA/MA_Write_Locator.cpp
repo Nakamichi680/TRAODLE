@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "MA/MA_Classes.h"
+#include "MA/MA_Functions.h"
 
 
 void MA_Write_Locator (unsigned int l, MA_EXPORT &MA)
@@ -18,6 +19,7 @@ void MA_Write_Locator (unsigned int l, MA_EXPORT &MA)
 		out << "	setAttr \".r\" -type \"double3\" " << MA.Locator[l].rX << " " << MA.Locator[l].rY << " " << MA.Locator[l].rZ << ";\n";
 	if (MA.Locator[l].scale_flag)
 		out << "	setAttr \".s\" -type \"double3\" " << MA.Locator[l].sX << " " << MA.Locator[l].sY << " " << MA.Locator[l].sZ << ";\n";	
+	MA_Write_Attributes(out, MA.Locator[l].int_attributes, MA.Locator[l].float_attributes, MA.Locator[l].string_attributes);
 	out << "createNode locator -n \"" << MA.Locator[l].name << "Shape\" -p \"" << MA.Locator[l].name << "\";\n";
 	out << "	setAttr -k off \".v\";\n";
 	MA.MA_Nodes << out.str();

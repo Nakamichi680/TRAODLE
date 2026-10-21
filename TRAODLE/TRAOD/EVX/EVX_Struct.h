@@ -18,6 +18,9 @@
 		EVX_HEADER (12 bytes)
 		EVX_GROUP x nGroups					Tabella dei gruppi
 		Per ogni gruppo: uint32_t nMessages + EVX_MESSAGE x nMessages, all'offset indicato nella tabella
+		All'offset EVX_HEADER.Size: EVX_TEMPLATES_HEADER + EVX_OBJTEMPLATE x nTemplates (Object Template degli oggetti
+		interattivi, indicizzati da RMX_OBJECT.ObjectIndex) [SRC: tagMAP_OBJTEMPLATE][OK: 57 file, nTemplates = massimo
+		ObjectIndex + 1 in tutti i livelli], seguiti da altri dati (template delle porte, non decodificati)
 		Padding fino a multiplo di 2048 bytes
 
 	Gruppi presenti in tutti i livelli [OK]: 0x7582915E (NM_OPEN), 0xC1617B88 (NM_CLOSE), 0xB9863743 (NM_UNLOCK), con un
@@ -51,6 +54,36 @@ struct EVX_MESSAGE				// SIZE: 12 bytes
 										//       ...) o valori impacchettati (2 x 16 bit o 4 x 8 bit)
 };
 static_assert(sizeof(EVX_MESSAGE) == 12, "EVX_MESSAGE deve essere 12 bytes");
+
+
+struct EVX_TEMPLATES_HEADER		// SIZE: 16 bytes
+{
+	uint32_t nTemplates;				// [OK] Numero di EVX_OBJTEMPLATE
+	uint32_t Unknown1;					// [?] Minore o uguale a nTemplates (forse il numero di template delle porte, MAP_DOORTEMPLATE)
+	uint32_t pad[2];					// [OK] Sempre 0
+};
+static_assert(sizeof(EVX_TEMPLATES_HEADER) == 16, "EVX_TEMPLATES_HEADER deve essere 16 bytes");
+
+
+struct EVX_OBJTEMPLATE			// SIZE: 96 bytes [SRC: tagMAP_OBJTEMPLATE]. Object Template di un oggetto interattivo
+{
+	uint32_t Weight;					// [SRC] Peso
+	uint32_t Strength;					// [SRC] Resistenza
+	uint32_t Flags;						// [SRC] Flag dell'oggetto
+	uint32_t pAO;						// [SRC] Puntatore runtime all'oggetto animato (0 nel file)
+	uint32_t pAL;						// [SRC] Puntatore runtime alla lista di animazioni (0 nel file)
+	uint32_t AnimCloned;				// [SRC]
+	uint32_t DoorClass;					// [SRC] Classe della porta
+	uint32_t PuzzleCount;				// [SRC] Numero di oggetti puzzle
+	int32_t PuzzleItem[4];				// [SRC] Oggetti puzzle (A-D), -1 se non usati
+	uint32_t UserValue;					// [SRC]
+	uint32_t SubClass;					// [SRC]
+	uint32_t DisconnectRule;			// [SRC]
+	uint32_t Pad;						// [SRC]
+	char AnimFileName[32];				// [SRC][OK] Nome del CHR "NODE" / CAL dell'oggetto animato (es. "DOOR_LEFT", "weed"),
+										//		"__NULL__" se l'oggetto non e' animato. Le mesh sono quelle dello slot del RMX_OBJECT
+};
+static_assert(sizeof(EVX_OBJTEMPLATE) == 96, "EVX_OBJTEMPLATE deve essere 96 bytes");
 
 
 #define EVX_MSG_SELF	0x80000000		// [OK] Messaggio inviato al nodo a cui e' legato il gruppo (sempre con Target = 0)

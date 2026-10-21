@@ -11,7 +11,7 @@ e da nessun Fake in tutto il livello (esportati nella prima zona in cui lo slot 
 degli oggetti che non appartengono a nessuno slot. La loro posizione nel mondo non e' nota (potrebbero essere creati
 dagli script), quindi vengono disposti su una griglia a fianco della geometria gia' esportata e distanziati fra di loro
 in modo da non sovrapporsi. Deve essere chiamata dopo ZONE_Read_Rooms, ZONE_Read_Fakes e ZONE_Read_Instances.
-Layer: NOMELIVELLO_Z&&_Items.
+Layer: NOMELIVELLO_Z&&_Unused_Items.
 ------------------------------------------------------------------------------------------------------------------*/
 bool ZONE_Read_Items (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 {
@@ -28,7 +28,7 @@ bool ZONE_Read_Items (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 	const ZONE_LevelObjects &level = ZONE_GetLevelObjects();
 
 	Layer items_layer;
-	items_layer.name = AOD_IO.levelname + "_" + data.zonename + "_Items";
+	items_layer.name = AOD_IO.levelname + "_" + data.zonename + "_Unused_Items";
 	items_layer.Label_ARGB = 0xFFD8A200;
 
 	// Lettura Items: slot non usati nel livello e mesh fuori da ogni slot

@@ -282,7 +282,8 @@ static_assert(sizeof(CAL_LINK) == 12, "CAL_LINK deve essere 12 bytes");
 
 struct CAL_TRACK_KEY			// SIZE: 12 bytes [TRACK_KEY]
 {
-	uint32_t time;						// [OK] Bit 0-23: frame. Bit 24-31: CAL_AUDIO_EVENT_FLAGS (solo per i suoni)
+	uint32_t time;						// [SRC] Bit 0-15: frame (il gioco confronta (short)time). Bit 16-31: CAL_AUDIO_EVENT_FLAGS (solo
+										// per i suoni; bit 16-23 visti solo in COPCAR insieme a 0x80000000, significato ignoto)
 	uint32_t type;						// [OK] CAL_TRACK_KEY_CODE
 	uint32_t data;						// [OK] Dipende dal tipo
 };
@@ -307,7 +308,9 @@ enum CAL_AUDIO_EVENT_FLAGS : uint32_t	// [SRC: AEFLAG_*] Bit alti di CAL_TRACK_K
 {
 	CAL_AEFLAG_ISFOOTSTEP = 1 << 24,	// Passo (il suono dipende dal materiale della collisione)
 	CAL_AEFLAG_ISLEFTRIGHT = 1 << 25,	// Piede sinistro / destro
-	CAL_AEFLAG_ISFRONTBACK = 1 << 26	// Punta / tallone
+	CAL_AEFLAG_ISFRONTBACK = 1 << 26,	// Punta / tallone ((time >> 25) & 3 = tipo di passo passato a FXHandler)
+	CAL_AEFLAG_NOCUE = 1 << 30,			// [SRC: AnimAPI.c] Il suono non viene avviato (CueAudioEvent) al frame della chiave
+	CAL_AEFLAG_UPDATE = 1u << 31		// [SRC: AnimAPI.c] Il suono gia' avviato viene aggiornato ad ogni frame (UpdateAudioEvent)
 };										// Valori trovati nel byte alto: 1, 2, 3, 5, 6, 7, 0x80, 0xC0
 
 

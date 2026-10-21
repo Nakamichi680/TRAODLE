@@ -438,3 +438,38 @@ bool Export_EVX (string filename)
 	msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Output: " << name << "_EVENTS.txt (" << header.nGroups << " event groups, " << nMessages << " messages, " << nBindings << " node bindings)";
 	return ok;
 }
+
+
+/*------------------------------------------------------------------------------------------------------------------
+Object Template del livello (EVX_OBJTEMPLATE dopo i gruppi di eventi del file <LIVELLO>.EVX), letti una volta sola.
+------------------------------------------------------------------------------------------------------------------*/
+const vector <EVX_OBJTEMPLATE> &EVX_GetTemplates ()
+{
+	static vector <EVX_OBJTEMPLATE> templates;
+	static string level;
+	if (level == AOD_IO.levelname)
+		return templates;
+	level = AOD_IO.levelname;
+	templates.clear();
+	ifstream evx(AOD_IO.folder_level + AOD_IO.levelname + ".EVX", ios::binary);
+	vector <uint8_t> data((istreambuf_iterator<char>(evx)), istreambuf_iterator<char>());
+	EVX_HEADER header;
+	EVX_TEMPLATES_HEADER th;
+	if (data.size() < sizeof(header))
+		return templates;
+	memcpy(&header, data.data(), sizeof(header));
+	if ((size_t)header.Size + sizeof(th) > data.size())
+		return templates;
+	memcpy(&th, &data[header.Size], sizeof(th));
+	for (uint32_t t = 0; t < th.nTemplates && t < 10000; t++)
+	{
+		size_t offset = (size_t)header.Size + sizeof(th) + sizeof(EVX_OBJTEMPLATE) * t;
+		if (offset + sizeof(EVX_OBJTEMPLATE) > data.size())
+			break;
+		EVX_OBJTEMPLATE ot;
+		memcpy(&ot, &data[offset], sizeof(ot));
+		ot.AnimFileName[31] = 0;
+		templates.push_back(ot);
+	}
+	return templates;
+}

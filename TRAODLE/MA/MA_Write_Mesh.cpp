@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Classes.h"
 #include "MA/MA_Classes.h"
+#include "MA/MA_Functions.h"
 
 
 void MA_Write_Mesh (const Mesh& mesh, MA_EXPORT &MA)
@@ -327,6 +328,7 @@ void MA_Write_Mesh (const Mesh& mesh, MA_EXPORT &MA)
 	if (mesh.parent.size() > 0)
 		out << " -p \"" << mesh.parent << "\"";
 	out << ";\n";
+	MA_Write_Attributes(out, mesh.int_attributes, mesh.float_attributes, mesh.string_attributes);	// Extra Attributes del transform
 	// Le mesh deformate da uno scheletro hanno la geometria nella shape intermedia "ShapeOrig", che alimenta lo skinCluster
 	bool skinned = !mesh.Skin.empty();
 	out << "createNode mesh -n \"" << mesh.name << (skinned ? "ShapeOrig" : "Shape") << "\" -p \"" << mesh.name << "\";\n";

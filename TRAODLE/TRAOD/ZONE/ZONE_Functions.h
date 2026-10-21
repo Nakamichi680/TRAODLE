@@ -50,6 +50,9 @@ public:
 	vector <uint32_t> mesh_collision;			// Collisioni: offset di ZONE_OBJECT_COLLISION, altrimenti 0
 	vector <uint32_t> mesh_hash;				// Hash del nome di ogni mesh (ZONE_OBJECT_INFO.Hash)
 	vector <int> mesh_link;					// Collisione della mesh (ZONE_OBJECT_INFO.CollisionIndex), altrimenti -1
+	vector <uint32_t> mesh_flags;				// ZONE_OBJECT_INFO.Flags (ZONE_MESHFLAG_*)
+	vector <uint32_t> mesh_alias;				// ZONE_OBJECT_INFO.ParentHash (AliasHash, con ZONE_MESHFLAG_ALIAS)
+	vector <uint32_t> mesh_broken;				// ZONE_OBJECT_INFO.Unknown2 (nBroken)
 	vector <vector <ZONE_SlotCommand>> slots;	// Comandi di ogni slot (vuoto = slot vuoto)
 };
 
@@ -72,6 +75,9 @@ public:
 	int zone;									// Indice della zona in cui viene esportata
 	bool interactive = false;					// Oggetto interattivo (RMX_OBJECT)
 	unsigned int object_index = 0;				// RMX_OBJECT.ObjectIndex
+	uint32_t obj_flags = 0;						// RMX_OBJECT.ObjFlags
+	unsigned int db_key = 0;					// RMX_OBJECT.absDBKey
+	unsigned int n_elements = 0;				// RMX_OBJECT.nElements
 	uint32_t hash = 0;							// Hash del nome del nodo RMX
 };
 

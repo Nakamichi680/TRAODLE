@@ -62,6 +62,7 @@ public:
 	int zone = -1;							// Indice della zona
 	unsigned int slot = 0;					// Slot dell'oggetto nel file ZONE
 	unsigned int matched = 0;				// Nodi con almeno una mesh nello slot
+	bool linked = false;					// Slot collegato esplicitamente (Object Template dell'EVX o file XXX)
 };
 
 
@@ -71,7 +72,7 @@ bool Export_CHR_Node (string chrname);
 
 bool CHR_FindNodeObject (string chrname, CHR_NodeObject &object);
 
-bool CHR_Build_NodeObject (const CHR_NodeObject &object, FBX_EXPORT &FBX, MA_EXPORT &MA);
+bool CHR_Build_NodeObject (const CHR_NodeObject &object, FBX_EXPORT &FBX, MA_EXPORT &MA, unsigned int *nodes_with_mesh = nullptr);
 
 const map <pair <int, unsigned int>, string> &CHR_GetNodeObjectSlots ();
 

@@ -100,8 +100,17 @@ void RMX_Water (ifstream &rmxfile, string name, string room_name, string layer, 
 	MA.Locator.push_back(FBX_MA_Water_Locator);				// Inserimento oggetto PS2 nel vettore dei locator del file MA
 	
 	// Esportazione Water Box
-	FBX.Geometry.push_back(DrawBox(name4, room_name, "", WBmin, WBmax, 0x15007BFF));
-	MA.Mesh.push_back(DrawBox(name4, room_name, layer, WBmin, WBmax, 0x15007BFF));
+	// Attributi dell'acqua sulla Water Box: WaterType, WaterFlags + Validate, Shade, Highlight, Envlight, PerturbType
+	Mesh FBX_box = DrawBox(name4, room_name, "", WBmin, WBmax, 0x15007BFF);
+	const pair <const char*, int> water_attributes[] = {{"waterType", rmx_water.Unknown5}, {"waterFlags", (int)(rmx_water.Unknown7 & 0xFFFF)},
+		{"waterValidate", (int)(rmx_water.Unknown7 >> 16)}, {"shade", (int)(rmx_water.Unknown9 & 0xFF)}, {"highlight", (int)((rmx_water.Unknown9 >> 8) & 0xFF)},
+		{"envlight", (int)((rmx_water.Unknown9 >> 16) & 0xFF)}, {"perturbType", (int)(rmx_water.Unknown9 >> 24)}};
+	for (const pair <const char*, int> &a : water_attributes)
+		FBX_box.int_attributes.push_back(make_pair(string(a.first), a.second));
+	Mesh MA_box = DrawBox(name4, room_name, layer, WBmin, WBmax, 0x15007BFF);
+	MA_box.int_attributes = FBX_box.int_attributes;
+	FBX.Geometry.push_back(FBX_box);
+	MA.Mesh.push_back(MA_box);
 
 	// Esportazione Water Patch
 	PolyPlane waterpatch;

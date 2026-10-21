@@ -4,6 +4,11 @@
 
 void FBX_Export (string output_filename, FBX_EXPORT &FBX)
 {
+	if (DISABLE_FBX_EXPORT)											// Switch di debug in TRAODLE.cpp
+	{
+		msg(msg::TGT::FILE, msg::TYP::LOG) << "FBX export disabled (DISABLE_FBX_EXPORT): " << output_filename << ".FBX not written";
+		return;
+	}
 	msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Output filename: " << output_filename << ".FBX";
 	FBX.Clear();
 	FBX.Init();

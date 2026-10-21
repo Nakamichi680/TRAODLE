@@ -158,6 +158,9 @@ bool ZONE_ReadObjectData (ifstream &zonefile, string filename, ZONE_ObjectData &
 	data.mesh_collision.assign(data.mesh_offsets.size(), 0);
 	data.mesh_hash.assign(data.mesh_offsets.size(), 0);
 	data.mesh_link.assign(data.mesh_offsets.size(), -1);
+	data.mesh_flags.assign(data.mesh_offsets.size(), 0);
+	data.mesh_alias.assign(data.mesh_offsets.size(), 0);
+	data.mesh_broken.assign(data.mesh_offsets.size(), 0);
 	vector <uint32_t> collision_ptr(data.mesh_offsets.size(), 0);
 	for (uint32_t i = 0; i < objheader.nObjects && i < data.mesh_base.size(); i++)
 	{
@@ -166,6 +169,9 @@ bool ZONE_ReadObjectData (ifstream &zonefile, string filename, ZONE_ObjectData &
 		if (!zonefile.read(reinterpret_cast<char*>(&info), sizeof(info)))
 			break;
 		data.mesh_hash[i] = info.Hash;
+		data.mesh_flags[i] = info.Flags;
+		data.mesh_alias[i] = info.ParentHash;
+		data.mesh_broken[i] = info.Unknown2;
 		if (info.CollisionIndex < data.mesh_offsets.size())
 			data.mesh_link[i] = (int)info.CollisionIndex;
 		if ((info.Flags & 1) && info.nBatches == 0)			// Collisione: nodo ZONE_OBJECT_COLLISION valido
@@ -247,6 +253,26 @@ bool ZONE_ExportMesh (ifstream &zonefile, const ZONE_ObjectData &data, unsigned 
 		element.parent = parent;
 		element.layer = layer;
 		element.FBX_parent = hashID(parent, "Group");
+		if (mesh < data.mesh_flags.size())						// Attributi della mesh (ZONE_OBJECT_INFO)
+		{
+			string flags;
+			const pair <uint32_t, const char*> known[] = {{ZONE_MESHFLAG_ALIAS, "ALIAS"}, {ZONE_MESHFLAG_SOLID, "SOLID"}, {ZONE_MESHFLAG_CAPSULE, "CAPSULE"}, {ZONE_MESHFLAG_LIT, "LIT"}};
+			for (const pair <uint32_t, const char*> &k : known)
+				if (data.mesh_flags[mesh] & k.first)
+					flags += (flags.empty() ? "" : " ") + string(k.second);
+			element.int_attributes.push_back(make_pair(string("meshFlags"), (int)data.mesh_flags[mesh]));
+			if (!flags.empty())
+				element.string_attributes.push_back(make_pair(string("meshFlagsText"), flags));
+			if (data.mesh_flags[mesh] & ZONE_MESHFLAG_ALIAS)		// Nome alternativo (mapFindAliasMesh)
+			{
+				char hash[16];
+				snprintf(hash, sizeof(hash), "%08X", data.mesh_alias[mesh]);
+				string alias = AOD_MeshName(data.mesh_alias[mesh]);
+				element.string_attributes.push_back(make_pair(string("aliasHash"), alias.empty() ? string(hash) : alias));
+			}
+			if (data.mesh_broken[mesh])
+				element.int_attributes.push_back(make_pair(string("nBroken"), (int)data.mesh_broken[mesh]));
+		}
 		ssmaterial << AOD_IO.levelname << "_" << data.zonename << "_Material_" << element_header.Material_Ref;
 		element.material_name = ssmaterial.str();
 
@@ -712,6 +738,9 @@ const ZONE_LevelObjects &ZONE_GetLevelObjects ()
 				instance.slot = obj.ZoneSlot;
 				instance.interactive = true;
 				instance.object_index = obj.ObjectIndex;
+				instance.obj_flags = obj.ObjFlags;
+				instance.db_key = obj.absDBKey;
+				instance.n_elements = obj.nElements;
 				instance.hash = obj.Node.Hash;
 				level.nTemplates = max(level.nTemplates, (unsigned int)obj.ObjectIndex + 1);
 				AddInstance(instance);
@@ -757,6 +786,7 @@ bool ZONE_Read_Instances (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 	Layer layers[2];
 	layers[0].name = AOD_IO.levelname + "_" + data.zonename + "_Objects";
 	layers[0].Label_ARGB = 0xFF2E86C1;
+	layers[0].Visible = false;								// Oggetti statici: la versione PC li contiene gia' nelle mesh delle stanze
 	layers[1].name = AOD_IO.levelname + "_" + data.zonename + "_Interactive";
 	layers[1].Label_ARGB = 0xFFC0392B;
 	map <unsigned int, unsigned int> copies[2];				// Numero di istanze per slot (per i nomi)
@@ -791,6 +821,16 @@ bool ZONE_Read_Instances (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 		if (instance.interactive)
 		{
 			root.int_attributes.push_back(make_pair(string("objectIndex"), (int)instance.object_index));
+			root.int_attributes.push_back(make_pair(string("objFlags"), (int)instance.obj_flags));	// RMX_OBJECT.ObjFlags
+			string flags_text;													// Bit noti (dal codice del gioco)
+			const pair <uint32_t, const char*> known[] = {{0x10, "ROCKING"}, {0x10000, "NOPHYSICS"}, {0x20000, "OPENABLE"}, {0x40000, "OPEN"}, {0x1000000, "SWITCHON"}};
+			for (const pair <uint32_t, const char*> &k : known)
+				if (instance.obj_flags & k.first)
+					flags_text += (flags_text.empty() ? "" : " ") + string(k.second);
+			if (!flags_text.empty())
+				root.string_attributes.push_back(make_pair(string("objFlagsText"), flags_text));
+			root.int_attributes.push_back(make_pair(string("dbKey"), (int)instance.db_key));		// Chiave nel database degli oggetti
+			root.int_attributes.push_back(make_pair(string("nElements"), (int)instance.n_elements));
 			string template_name = AOD_TemplateName(instance.object_index, level.nTemplates);
 			if (!template_name.empty())
 				root.string_attributes.push_back(make_pair(string("objectTemplate"), template_name));	// Object Template (log di WorldEdit)

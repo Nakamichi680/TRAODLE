@@ -9,6 +9,8 @@
 #include "TRAOD/ZONE/ZONE_Struct.h"
 #include "TRAOD/ZONE/ZONE_Functions.h"
 #include "hash_Functions.h"
+#include "TRAOD/EVX/EVX_Functions.h"
+#include "TRAOD/CAL/CAL_Functions.h"
 
 
 /*------------------------------------------------------------------------------------------------------------------
@@ -143,9 +145,41 @@ static unsigned int CHR_MatchSlot (const ZONE_ObjectData &data, unsigned int slo
 
 
 /*------------------------------------------------------------------------------------------------------------------
-Legge i nodi di un CHR "NODE" e cerca lo slot dei file ZONE del livello che contiene le mesh del maggior numero di nodi,
-preferendo a parita' gli slot piazzati da un nodo RMX_OBJECT. Falso se il CHR non e' un oggetto animato. Va chiamata con
-la cartella corrente \NOMELIVELLO.
+Slot dei file ZONE collegati esplicitamente ad un CHR "NODE", come fa il gioco (zona, slot):
+- oggetti del livello: i RMX_OBJECT il cui Object Template (EVX_OBJTEMPLATE, indice RMX_OBJECT.ObjectIndex) ha
+  AnimFileName uguale al nome del CHR (es. DOOR_LEFT, weed);
+- oggetti dei filmati (OBJECTnn_<FILMATO>): il RMX_OBJECT del nodo indicato per OBJECTnn nel file <FILMATO>.XXX (es.
+  OBJECT03_CS_6_21A -> objects__gong1).
+------------------------------------------------------------------------------------------------------------------*/
+static set <pair <int, unsigned int>> CHR_LinkedSlots (const string &chrname)
+{
+	auto Upper = [](string s) { for (char &c : s) c = (char)toupper((unsigned char)c); return s; };
+	string name = Upper(chrname);
+	set <unsigned int> templates;
+	const vector <EVX_OBJTEMPLATE> &t = EVX_GetTemplates();
+	for (unsigned int i = 0; i < t.size(); i++)
+		if (Upper(t[i].AnimFileName) == name)
+			templates.insert(i);
+	set <uint32_t> nodes;
+	for (const pair <const uint32_t, CAL_PropPositions> &p : CAL_Read_PropPositions())
+	{
+		string xxx = p.second.xxxfile.substr(0, p.second.xxxfile.find('.'));
+		if (Upper(p.second.object + "_" + xxx) == name)
+			nodes.insert((uint32_t)GetHashValue(p.second.node.c_str()));
+	}
+	set <pair <int, unsigned int>> slots;
+	for (const ZONE_Instance &instance : ZONE_GetLevelObjects().instances)
+		if (instance.interactive && (templates.count(instance.object_index) || nodes.count(instance.hash)))
+			slots.insert(make_pair(instance.zone, instance.slot));
+	return slots;
+}
+
+
+/*------------------------------------------------------------------------------------------------------------------
+Legge i nodi di un CHR "NODE" e sceglie lo slot dei file ZONE con le sue mesh: tra gli slot collegati esplicitamente
+(CHR_LinkedSlots) quello con le mesh del maggior numero di nodi; se non ce ne sono, lo slot di tutto il livello con
+le mesh del maggior numero di nodi (stesso nome), preferendo a parita' gli slot piazzati da un nodo RMX_OBJECT.
+Falso se il CHR non e' un oggetto animato. Va chiamata con la cartella corrente \NOMELIVELLO.
 ------------------------------------------------------------------------------------------------------------------*/
 bool CHR_FindNodeObject (string chrname, CHR_NodeObject &object)
 {
@@ -157,13 +191,24 @@ bool CHR_FindNodeObject (string chrname, CHR_NodeObject &object)
 	for (const ZONE_Instance &instance : ZONE_GetLevelObjects().instances)
 		if (instance.interactive)
 			placed.insert(make_pair(instance.zone, instance.slot));
+	set <pair <int, unsigned int>> linked = CHR_LinkedSlots(chrname);
+	object.linked = !linked.empty();
 	bool best_placed = false;
 	for (const pair <const string, ZONE_ObjectData> &z : CHR_ZoneData())
 	{
 		int zone = CHR_ZoneIndex(z.first);
 		for (unsigned int s = 0; s < z.second.slots.size(); s++)
 		{
+			if (object.linked && !linked.count(make_pair(zone, s)))
+				continue;										// Solo gli slot collegati
 			unsigned int matched = CHR_MatchSlot(z.second, s, object);
+			if (object.linked && object.zonefile.empty())		// Il primo slot collegato anche senza nomi in comune
+			{
+				object.matched = matched;
+				object.zonefile = z.first;
+				object.zone = zone;
+				object.slot = s;
+			}
 			bool is_placed = placed.count(make_pair(zone, s)) > 0;
 			if (matched > object.matched || (matched > 0 && matched == object.matched && is_placed && !best_placed))
 			{
@@ -175,6 +220,20 @@ bool CHR_FindNodeObject (string chrname, CHR_NodeObject &object)
 			}
 		}
 	}
+	if (object.zonefile.empty())								// Nessuno slot: zona con le mesh dei nodi fuori dagli slot
+		for (const pair <const string, ZONE_ObjectData> &z : CHR_ZoneData())
+		{
+			for (const CHR_Node &node : object.nodes)
+				if (node.mesh_hash && find(z.second.mesh_hash.begin(), z.second.mesh_hash.end(), node.mesh_hash) != z.second.mesh_hash.end())
+				{
+					object.zonefile = z.first;
+					object.zone = CHR_ZoneIndex(z.first);
+					object.slot = (unsigned int)z.second.slots.size();	// Nessuno slot
+					break;
+				}
+			if (!object.zonefile.empty())
+				break;
+		}
 	return true;
 }
 
@@ -201,6 +260,14 @@ const map <pair <int, unsigned int>, string> &CHR_GetNodeObjectSlots ()
 				objects.push_back(object);
 		}
 	sort(objects.begin(), objects.end(), [](const CHR_NodeObject &a, const CHR_NodeObject &b) { return a.name < b.name; });
+	set <pair <int, unsigned int>> linked;						// Slot collegati esplicitamente (template / XXX)
+	for (const CHR_NodeObject &object : objects)
+		for (const pair <int, unsigned int> &s : CHR_LinkedSlots(object.name))
+			if (!slots.count(s))
+			{
+				slots[s] = object.name;
+				linked.insert(s);
+			}
 	map <pair <int, unsigned int>, float> score;
 	for (const pair <const string, ZONE_ObjectData> &z : CHR_ZoneData())
 		for (unsigned int s = 0; s < z.second.slots.size(); s++)
@@ -209,6 +276,8 @@ const map <pair <int, unsigned int>, string> &CHR_GetNodeObjectSlots ()
 				unsigned int matched = CHR_MatchSlot(z.second, s, object);
 				float value = matched + (float)matched / (object.nodes.size() + 1);
 				pair <int, unsigned int> key(CHR_ZoneIndex(z.first), s);
+				if (linked.count(key))
+					continue;
 				if (matched > 0 && (!score.count(key) || value > score[key]))
 				{
 					score[key] = value;
@@ -243,14 +312,17 @@ static void CHR_NodePose (const CHR_Node &node, const MATRIX &L, Transform &grou
 /*------------------------------------------------------------------------------------------------------------------
 Modello di un oggetto animato: gruppo radice (nome del CHR), un gruppo per nodo (<CHR>_<nodo>) con pivot, traslazioni
 dei pivot e rotate axis, e le mesh dello slot del file ZONE:
-- mesh con lo stesso nome di un nodo (e la loro collisione, ZONE_OBJECT_INFO.CollisionIndex): figlie del nodo,
-  le altre figlie del gruppo radice (parti fisse). I vertici sono nello spazio dell'oggetto;
+- mesh di ogni nodo come le cerca il gioco (mapFindAliasMesh): nello slot dell'oggetto una mesh con lo stesso nome
+  (hash) o con ZONE_MESHFLAG_ALIAS e AliasHash uguale; altrimenti la prima mesh con lo stesso hash in tutta la zona
+  (mapFindMeshFromHash: es. il gong di CS_6_21A ha il gong nello slot 221 e trave e catene nello slot 222), con la sua
+  trasformazione nel proprio slot. Le loro collisioni (ZONE_OBJECT_INFO.CollisionIndex) seguono la mesh. Figlie del
+  nodo; le altre mesh dello slot figlie del gruppo radice (parti fisse). I vertici sono nello spazio dell'oggetto;
 - posa di riposo: quella dello slot del file ZONE (trasformazione del nodo della lista di comandi che contiene la prima
   mesh del nodo, scomposta con i pivot del nodo), che e' la posa dell'oggetto nel livello;
 - mesh con una trasformazione diversa da quella del loro nodo: in un gruppo intermedio (<mesh>_T).
 Le collisioni vanno nel layer nascosto <CHR>_Collisions. Va chiamata con la cartella corrente \NOMELIVELLO.
 ------------------------------------------------------------------------------------------------------------------*/
-bool CHR_Build_NodeObject (const CHR_NodeObject &object, FBX_EXPORT &FBX, MA_EXPORT &MA)
+bool CHR_Build_NodeObject (const CHR_NodeObject &object, FBX_EXPORT &FBX, MA_EXPORT &MA, unsigned int *nodes_with_mesh)
 {
 	ZONE_ObjectExport out;
 	Transform root;
@@ -260,20 +332,69 @@ bool CHR_Build_NodeObject (const CHR_NodeObject &object, FBX_EXPORT &FBX, MA_EXP
 
 	const ZONE_ObjectData *data = nullptr;
 	map <string, ZONE_ObjectData>::const_iterator z = CHR_ZoneData().find(object.zonefile);
-	if (z != CHR_ZoneData().end() && object.slot < z->second.slots.size())
+	if (z != CHR_ZoneData().end())
 		data = &z->second;
 	vector <pair <int, MATRIX>> meshes;
-	if (data)
+	if (data && object.slot < data->slots.size())
 		meshes = ZONE_SlotMeshes(*data, object.slot);
 	vector <int> mesh_node(meshes.size(), -1);						// Nodo di ogni mesh
 	for (unsigned int m = 0; m < meshes.size(); m++)
 		for (unsigned int n = 0; n < object.nodes.size() && mesh_node[m] < 0; n++)
-			if (data->mesh_hash[meshes[m].first] == object.nodes[n].mesh_hash)
+			if (data->mesh_hash[meshes[m].first] == object.nodes[n].mesh_hash ||
+				((data->mesh_flags[meshes[m].first] & ZONE_MESHFLAG_ALIAS) && data->mesh_alias[meshes[m].first] == object.nodes[n].mesh_hash))
 				mesh_node[m] = n;
+	if (data)														// Nodi senza mesh nello slot: mesh con lo stesso hash nella zona
+	{
+		set <unsigned int> found;
+		for (int n : mesh_node)
+			if (n >= 0)
+				found.insert(n);
+		map <uint32_t, unsigned int> wanted;						// Hash -> nodo
+		for (unsigned int n = 0; n < object.nodes.size(); n++)
+			if (!found.count(n) && object.nodes[n].mesh_hash && !wanted.count(object.nodes[n].mesh_hash))
+				wanted[object.nodes[n].mesh_hash] = n;
+		for (unsigned int s = 0; s < data->slots.size() && !wanted.empty(); s++)
+		{
+			if (s == object.slot)
+				continue;
+			vector <pair <int, MATRIX>> other = ZONE_SlotMeshes(*data, s);
+			for (const pair <int, MATRIX> &m : other)
+			{
+				map <uint32_t, unsigned int>::iterator w = wanted.find(data->mesh_hash[m.first]);
+				if (w == wanted.end() || data->mesh_collision[m.first])
+					continue;
+				meshes.push_back(m);
+				mesh_node.push_back((int)w->second);
+				for (const pair <int, MATRIX> &c : other)			// Collisione della mesh
+					if (c.first == data->mesh_link[m.first])
+					{
+						meshes.push_back(c);
+						mesh_node.push_back((int)w->second);
+					}
+				wanted.erase(w);
+			}
+		}
+		for (unsigned int i = 0; i < data->mesh_hash.size() && !wanted.empty(); i++)	// Mesh fuori da ogni slot
+		{
+			map <uint32_t, unsigned int>::iterator w = wanted.find(data->mesh_hash[i]);
+			if (w == wanted.end() || data->mesh_collision[i] || (data->mesh_vertices[i] == 0 && data->mesh_base[i] < 0))
+				continue;
+			meshes.push_back(make_pair((int)i, MATRIX()));
+			mesh_node.push_back((int)w->second);
+			wanted.erase(w);
+		}
+	}
 	for (unsigned int m = 0; m < meshes.size(); m++)				// Collisioni delle mesh di un nodo
 		for (unsigned int m2 = 0; m2 < meshes.size() && mesh_node[m] < 0; m2++)
 			if (mesh_node[m2] >= 0 && data->mesh_link[meshes[m2].first] == meshes[m].first)
 				mesh_node[m] = mesh_node[m2];
+
+	if (nodes_with_mesh)
+	{
+		set <int> n_found(mesh_node.begin(), mesh_node.end());
+		n_found.erase(-1);
+		*nodes_with_mesh = (unsigned int)n_found.size();
+	}
 
 	// Nodi: posa di riposo dalla prima mesh del nodo (i padri precedono sempre i figli)
 	vector <MATRIX> world(object.nodes.size());
@@ -375,11 +496,14 @@ bool Export_CHR_Node (string chrname)
 	}
 	if (object.zonefile.empty())
 		msg(msg::TGT::FILE_CONS, msg::TYP::WARN) << chrname << ".CHR: no ZONE object contains the meshes of its nodes. Only the " << object.nodes.size() << " nodes are exported.";
-	else
-		msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Animated object: " << object.nodes.size() << " nodes, meshes of " << object.matched << " nodes in " << object.zonefile << " object slot " << object.slot;
 	FBX_EXPORT FBX;
 	MA_EXPORT MA;
-	bool ok = CHR_Build_NodeObject(object, FBX, MA);
+	unsigned int with_mesh = 0;
+	bool ok = CHR_Build_NodeObject(object, FBX, MA, &with_mesh);
+	if (!object.zonefile.empty())
+		msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Animated object: " << object.nodes.size() << " nodes, " << with_mesh << " with meshes (" << object.matched << " in " << object.zonefile << " object slot " << object.slot << (object.linked ? ", linked" : ", by mesh names") << ")";
+	if (!object.zonefile.empty() && with_mesh < object.nodes.size())
+		msg(msg::TGT::FILE, msg::TYP::WARN) << chrname << ".CHR: " << object.nodes.size() - with_mesh << " nodes without meshes.";
 	if (!object.zonefile.empty())
 		ok &= ZONE_ObjectMaterials(object.zonefile, MA);
 	SetCurrentDirectory(AOD_IO.folder_characters_lpwstr);		// \NOMELIVELLO\Characters

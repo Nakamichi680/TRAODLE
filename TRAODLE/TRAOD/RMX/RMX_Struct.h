@@ -220,7 +220,10 @@ struct RMX_ROOM			// SIZE: 368 bytes [SRC: ROOM_HEADER_TAG]. I primi 112 bytes s
 	uint32_t Offset33;					// [SRC: FakeVisibility] Offset della maschera di visibilita' dei Fakes (sempre subito dopo quella delle
 										//		stanze, che termina quindi qui; prosegue fino ai portali). Il Fake con indice i
 										//		(ZONE_FAKES_ELEMENT.Index) viene disegnato solo se il bit i della maschera della stanza
-										//		corrente e' a 1 (mapDrawFakes). Di solito tutti i bit dei Fakes del livello sono a 1
+										//		corrente e' a 1 (mapDrawFakes; PC: SYS_DRAW_CRP::CalculateFakes, maschera a stanza+0x144,
+										//		senza stanza corrente vengono disegnati tutti). Lunghezza: le parole necessarie agli indici
+										//		dei Fakes del livello, poi zeri fino ad un multiplo di 16 bytes (nei livelli senza Fakes
+										//		solo zeri). Alcuni bit sono a 1 per indici senza Fake (Fakes cancellati nell'editor)
 	int32_t iFlipRooms[4];				// [SRC: iFlipRooms] Stanze "flip" (versioni alternative della stanza, scambiate da un messaggio
 										//		NM_*FLIP*, mapFlipRoom): indici delle stanze, -1 se non usato. 0 nelle stanze flip stesse
 										//		(es. PARIS3: stanze 66-72 -> 74-80 e 81-87)

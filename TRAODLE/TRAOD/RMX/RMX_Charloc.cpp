@@ -57,6 +57,29 @@ void RMX_Charloc (ifstream &rmxfile, string room_name, string layer, string pawn
 	FBX_MA_Charloc.rX = rmx_charloc.Node.Xrot;
 	FBX_MA_Charloc.rY = rmx_charloc.Node.Yrot;
 	FBX_MA_Charloc.rZ = rmx_charloc.Node.Zrot;
+	FBX_MA_Charloc.int_attributes.push_back(make_pair(string("charFlags"), (int)rmx_charloc.CharFlags));	// CHARFLAGS_*
+	const pair <uint32_t, const char*> char_flags[] = {{0x1, "COLLISION"}, {0x2, "RESERVED2"}, {0x4, "ENABLE"}, {0x10, "TRIGGER"}, {0x20, "ACTIVATE"},
+		{0x40, "TALK"}, {0x80, "RAGDOLL"}, {0x400, "RAGDOLL_TRACK"}, {0x800, "RAGDOLL_BLEND"}, {0x8000, "STATIC"}, {0x10000, "ONSCREEN"},
+		{0x20000, "ANIMATED"}, {0x40000, "TARGETABLE"}, {0x80000, "TARGETED"}, {0x100000, "DORMANT"}, {0x200000, "SNOOZE"}, {0x400000, "CUTSCENE"},
+		{0x800000, "DROPPEDITEM"}, {0x1000000, "INVISIBLE"}, {0x2000000, "NOTARGET"}, {0x4000000, "BLOCKER"}, {0x8000000, "BOSS"}, {0x10000000, "NOCULL"}};
+	string flags_text;
+	uint32_t other = rmx_charloc.CharFlags;
+	for (const pair <uint32_t, const char*> &f : char_flags)
+		if (rmx_charloc.CharFlags & f.first)
+		{
+			flags_text += (flags_text.empty() ? "" : " ") + string(f.second);
+			other &= ~f.first;
+		}
+	if (other)
+	{
+		char buf[16];
+		snprintf(buf, sizeof(buf), "0x%X", other);
+		flags_text += (flags_text.empty() ? "" : " ") + string(buf);
+	}
+	FBX_MA_Charloc.string_attributes.push_back(make_pair(string("charFlagsText"), flags_text));
+	FBX_MA_Charloc.float_attributes.push_back(make_pair(string("weight"), rmx_charloc.Weight));
+	if (rmx_charloc.LinkedObject != 0)											// Oggetto lasciato/raccolto (dropTarget)
+		FBX_MA_Charloc.string_attributes.push_back(make_pair(string("dropTarget"), RMX_NodeLabel(rmx_charloc.LinkedObject)));
 	FBX.Locator.push_back(FBX_MA_Charloc);
 	MA.Locator.push_back(FBX_MA_Charloc);
 

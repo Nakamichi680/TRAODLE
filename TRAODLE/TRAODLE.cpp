@@ -22,6 +22,10 @@ AE_IO_CLASS AE_IO;								// Classe Input/Output globale per AE
 ofstream msg_file_stream;
 mutex mu;
 int TargetRenderer;
+
+// SWITCH DI DEBUG (da modificare qui, non in runtime): true = nessun file FBX viene scritto, per nessun tipo di file
+// (esportazioni piu' veloci quando servono solo i file MA). Rimettere a false per esportare anche gli FBX.
+extern const bool DISABLE_FBX_EXPORT = true;
 string version = "0.251105";
 
 

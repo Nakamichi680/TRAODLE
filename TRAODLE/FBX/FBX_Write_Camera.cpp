@@ -23,6 +23,16 @@ void FBX_Write_Camera (Camera input, FBX_EXPORT &FBX)
 	out << "		}\n";
 	out << "	}\n";
 	out << "	NodeAttribute: " << hashID(input.name, "Camera_NodeAttribute") << ", \"NodeAttribute::" << input.name << "\", \"Camera\" {\n";
+	out << "		Properties70:  {\n";											// Ottica come nei file MA (pollici, mm)
+	out << "			P: \"FilmWidth\", \"double\", \"Number\", \"\"," << input.hfa << "\n";
+	out << "			P: \"FilmHeight\", \"double\", \"Number\", \"\"," << input.vfa << "\n";
+	out << "			P: \"ApertureMode\", \"enum\", \"\", \"\",3\n";				// Ottica definita dalla lunghezza focale (altrimenti FocalLength viene ignorata)
+	out << "			P: \"GateFit\", \"enum\", \"\", \"\",2\n";
+	out << "			P: \"FocalLength\", \"Number\", \"\", \"A+\"," << input.fl << "\n";
+	out << "			P: \"NearPlane\", \"double\", \"Number\", \"\"," << input.ncp << "\n";
+	out << "			P: \"FarPlane\", \"double\", \"Number\", \"\"," << input.fcp << "\n";
+	out << "		}\n";
+	out << "		TypeFlags: \"Camera\"\n";
 	out << "	}\n";
 	FBX.FBX_Properties << out.str();			// Copia il testo nello stringstream Properties definitivo
 

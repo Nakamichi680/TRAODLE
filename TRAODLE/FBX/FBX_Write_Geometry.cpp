@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "FBX/FBX_Classes.h"
+#include "FBX/FBX_Functions.h"
 
 
 void FBX_Write_Geometry (Mesh input, FBX_EXPORT &FBX)
@@ -17,6 +18,7 @@ void FBX_Write_Geometry (Mesh input, FBX_EXPORT &FBX)
     out << "			P: \"InheritType\", \"enum\", \"\", \"\",1\n";
     out << "			P: \"ScalingMin\", \"Vector3D\", \"Vector\", \"\",1,1,1\n";
     out << "			P: \"DefaultAttributeIndex\", \"int\", \"Integer\", \"\",0\n";
+	FBX_Write_Attributes(out, input.int_attributes, input.float_attributes, input.string_attributes);	// Proprieta' utente
     out << "		}\n";
     out << "		Shading: T\n";
     out << "		Culling: \"CullingOff\"\n";

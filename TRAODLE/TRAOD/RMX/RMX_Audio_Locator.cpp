@@ -53,6 +53,8 @@ void RMX_Audio_Locator (ifstream &rmxfile, string name, string room_name, string
 	//FBX_MA_Audio_Locator.sX = rmx_audio_locator.Unknown1;
 	//FBX_MA_Audio_Locator.sY = rmx_audio_locator.Unknown2;
 	//FBX_MA_Audio_Locator.sZ = rmx_audio_locator.Unknown3;
+	FBX_MA_Audio_Locator.int_attributes.push_back(make_pair(string("audioTrack"), (int)rmx_audio_locator.AudioTrack));
+	FBX_MA_Audio_Locator.int_attributes.push_back(make_pair(string("audioFlags"), (int)rmx_audio_locator.Unknown8));	// AudioFlags
 	FBX.Locator.push_back(FBX_MA_Audio_Locator);			// Inserimento oggetto PS2 nel vettore dei locator del file FBX
 	MA.Locator.push_back(FBX_MA_Audio_Locator);				// Inserimento oggetto PS2 nel vettore dei locator del file MA
 }

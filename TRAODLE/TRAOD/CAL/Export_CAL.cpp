@@ -8,6 +8,7 @@
 #include "TRAOD/CAL/CAL_Functions.h"
 #include "TRAOD/CSS/CSS_Functions.h"
 #include "hash_Functions.h"
+#include "AOD_Names.h"
 
 
 class CAL_Character {						// Personaggio (CHR) a cui si applicano le animazioni di un CAL
@@ -417,7 +418,7 @@ static bool CAL_ReadAnimation (const vector <uint8_t> &data, const CAL_ANIMATION
 				break;
 			if (key.type != CAL_KEY_MAKE_VISIBLE && key.type != CAL_KEY_MAKE_INVISIBLE)
 				continue;
-			pair <unsigned int, float> value(key.time & 0xFFFFFF, key.type == CAL_KEY_MAKE_VISIBLE ? 1.0f : 0.0f);
+			pair <unsigned int, float> value(key.time & 0xFFFF, key.type == CAL_KEY_MAKE_VISIBLE ? 1.0f : 0.0f);
 			map <uint32_t, unsigned int>::const_iterator a = attachment_of_hash.find(key.data);
 			map <uint32_t, vector <string>>::const_iterator m = character.mesh_names.find(key.data);
 			if (a != attachment_of_hash.end())
@@ -517,7 +518,7 @@ static vector <pair <unsigned int, uint32_t>> CAL_MorphTriggers (const vector <u
 		if (!CAL_Get(data, anim.KEYS_PTR + sizeof(CAL_TRACK_KEY) * k, key))
 			break;
 		if (key.type == CAL_KEY_FIRE_MORPH_TRIGGER)
-			triggers.push_back(make_pair(key.time & 0xFFFFFF, key.data));
+			triggers.push_back(make_pair(key.time & 0xFFFF, key.data));
 	}
 	return triggers;
 }
@@ -533,8 +534,322 @@ i gruppi di canali (T, R, S) che si discostano dalla posa del modello (posa dell
 Filmati: se un file XXX ("PPOS", vedi XXX_Struct.h) contiene l'animazione (stesso animID), il gruppo radice dell'oggetto
 viene spostato per ogni frame nella posizione nel mondo indicata, con la visibilita' (solo file MA).
 ------------------------------------------------------------------------------------------------------------------*/
+/*------------------------------------------------------------------------------------------------------------------
+Nomi delle animazioni di tutti i CAL del livello (animID -> nome), letti una volta: servono per i FIRE_ANIM_TRIGGER, che
+avviano animazioni di altri CAL (es. GENERIC_FEMALE_NOD nei dialoghi).
+------------------------------------------------------------------------------------------------------------------*/
+static const map <uint32_t, string> &CAL_LevelAnimationNames ()
+{
+	static map <uint32_t, string> names;
+	static bool loaded = false;
+	if (loaded)
+		return names;
+	loaded = true;
+	for (const auto &f : AOD_IO.gmxfiles)
+	{
+		if (f.type != AoDFileType::CAL)
+			continue;
+		ifstream calfile(AOD_IO.folder_level + f.name, std::ios::binary);
+		vector <uint8_t> data((istreambuf_iterator<char>(calfile)), istreambuf_iterator<char>());
+		CAL_HEADER header;
+		if (!CAL_Get(data, 0, header) || header.Version != CAL_GAME_ANIMATION_VERSION || header.nAnims > 100000)
+			continue;
+		for (unsigned int a = 0; a < header.nAnims; a++)
+		{
+			uint32_t ptr;
+			CAL_ANIMATION anim;
+			if (CAL_Get(data, header.ANIM_LIST_PTR + 4 * a, ptr) && CAL_Get(data, ptr, anim))
+				names.insert(make_pair(anim.animID, string(anim.name, strnlen(anim.name, sizeof(anim.name)))));
+		}
+	}
+	return names;
+}
+
+
+/*------------------------------------------------------------------------------------------------------------------
+Nomi dei nodi e delle mesh che le chiavi MAKE_VISIBLE / INVISIBLE possono nominare anche fuori dal CHR del CAL (hash ->
+nome): i nomi dei nodi agganciati e delle mesh "cloth" cercati dal codice del gioco ([SRC] stringhe di TRAOD_P4.exe e
+Debug.elf, map_charnode.c) e le stringhe (identificatori) di tutti i CHR del livello (nodi agganciati degli altri
+modelli dello stesso personaggio, es. LARAC1 per LARA.CAL applicato a LARAD). Hash del nome e del nome in maiuscolo.
+------------------------------------------------------------------------------------------------------------------*/
+static const map <uint32_t, string> &CAL_LevelNodeNames ()
+{
+	static map <uint32_t, string> names;
+	static bool loaded = false;
+	if (loaded)
+		return names;
+	loaded = true;
+	static const char *game_names[] = {"GUNHOLSTER_RIGHT", "LARA_K2_IMPACTOR_HOLSTER", "LARA_SIGHT_K2_IMPACTOR_HOLSTER", "LARA_RIGG09_HOLSTER",
+		"LARA_MV9_HOLSTER", "LARA_SILENCER_MV9_HOLSTER", "LARA_SIGHT_MV9_HOLSTER", "LARA_DESERT_RANGER_HOLSTER", "LARA_SIGHT_DESERT_RANGER_HOLSTER",
+		"LARA_DART_SS_HOLSTER", "LARA_SIGHT_DART_SS_HOLSTER", "LARA_SCORPION_X_HOLSTER", "LARA_SILENCER_SCORPION_X_HOLSTER", "GUNHOLSTER_LEFT",
+		"SHOTGUN_BACKPACK", "LARA_VIPER_SMG_HOLSTER", "LARA_SIGHT_VIPER_SMG_HOLSTER", "LARA_MAGVEGA_HOLSTER", "LARA_SILENCER_MAGVEGA_HOLSTER",
+		"LARA_SIGHT_MAGVEGA_HOLSTER", "LARA_GLASSES", "LARA_REBREATHER", "LARA_DIVINGMASK", "LARA_RESPIRATOR", "GUNHAND_LEFT", "LARA_CROWBAR",
+		"SHOTGUN", "SHOTGUN_PUMP", "GUNHAND_RIGHT", "LARA_SHARD", "LARA_K2_IMPACTOR", "LARA_SIGHT_K2_IMPACTOR", "LARA_RIGG09", "LARA_MV10",
+		"LARA_SILENCER_MV9", "LARA_SIGHT_MV9", "LARA_DESERT_RANGER", "LARA_SIGHT_DESERT_RANGER", "LARA_DART_SS", "LARA_SIGHT_DART_SS",
+		"LARA_SCORPION_X", "LARA_SILENCER_SCORPION_X", "LARA_VIPER_SMG", "LARA_SIGHT_VIPER_SMG", "LARA_MAGVEGA", "LARA_SILENCER_MAGVEGA",
+		"LARA_SIGHT_MAGVEGA", "LARA_HAMMER", "HARPOON_GUN", "HARPOON_GUN_BACKPACK", "LARA_SCORPION_X_LEFT", "LARA_SILENCER_SCORPION_X_LEFT",
+		"LARA_SCORPION_X_LEFTHOLSTER", "LARA_SILENCER_SCORPION_X_LEFTHOLSTER", "HIP_CHATKA", "PISTOL_HAND", "GLAVE_SPIKE", "GLAVE", "SHARD",
+		"LASER", "SIGHTS", "SILENCER", "BOAZFLY_CLOTH_H", "BOAZFLY_CLOTH_S", "KURTIS_CLOTH_H", "KURTIS_CLOTH_S", "LAB2_CLOTH_H", "LAB2_CLOTH_S",
+		"COAT_CLOTH_H", "COAT_CLOTH_S", "KAREL_JACKET_CLOTH_H", "KAREL_JACKET_CLOTH_S", "TENDRILD_CLOTH_H", "TENDRILD_CLOTH_S",
+		"TENDRILA_CLOTH_H", "TENDRILA_CLOTH_S", "TENDRILB_CLOTH_H", "TENDRILB_CLOTH_S", "BELLY_DYNAMIC", "STABBY", "CLAWMOUTH"};
+	for (const char *n : game_names)
+		names.insert(make_pair((uint32_t)GetHashValue(n), string(n)));
+	for (const auto &f : AOD_IO.gmxfiles)							// Identificatori nei CHR del livello
+	{
+		if (f.type != AoDFileType::CHR)
+			continue;
+		ifstream chrfile(AOD_IO.folder_level + f.name, std::ios::binary);
+		string data((istreambuf_iterator<char>(chrfile)), istreambuf_iterator<char>());
+		size_t start = 0;
+		for (size_t i = 0; i <= data.size(); i++)
+		{
+			char c = i < data.size() ? data[i] : 0;
+			if (isalnum((unsigned char)c) || c == '_')
+				continue;
+			if (c == 0 && i - start >= 3 && i - start < 64 && (isalpha((unsigned char)data[start]) || data[start] == '_'))
+			{
+				string word = data.substr(start, i - start), upper = word;
+				for (char &u : upper)
+					u = (char)toupper((unsigned char)u);
+				names.insert(make_pair((uint32_t)GetHashValue(word.c_str()), word));
+				names.insert(make_pair((uint32_t)GetHashValue(upper.c_str()), upper));
+			}
+			start = i + 1;
+		}
+	}
+	return names;
+}
+
+
+/*------------------------------------------------------------------------------------------------------------------
+Nome dell'hash di una chiave (MAKE_VISIBLE / INVISIBLE: oggetto agganciato o mesh; FIRE_ANIM_TRIGGER: animazione;
+FIRE_MORPH_TRIGGER: sequenza facciale): dizionario del CAL, animazioni del livello, nomi originali (log di WorldEdit).
+Vuoto se sconosciuto. Gli ID dei FIRE_AUDIO_EVENT sono numeri degli eventi audio (banchi audio non presenti nel GMX).
+------------------------------------------------------------------------------------------------------------------*/
+static string CAL_HashName (uint32_t type, uint32_t hash, const map <uint32_t, string> &names)
+{
+	if (type != CAL_KEY_MAKE_INVISIBLE && type != CAL_KEY_MAKE_VISIBLE && type != CAL_KEY_FIRE_ANIM_TRIGGER && type != CAL_KEY_FIRE_MORPH_TRIGGER)
+		return string();
+	map <uint32_t, string>::const_iterator n = names.find(hash);
+	if (n != names.end())
+		return n->second;
+	if (type == CAL_KEY_FIRE_ANIM_TRIGGER)
+	{
+		n = CAL_LevelAnimationNames().find(hash);
+		if (n != CAL_LevelAnimationNames().end())
+			return n->second;
+	}
+	if (type == CAL_KEY_MAKE_INVISIBLE || type == CAL_KEY_MAKE_VISIBLE)
+	{
+		n = CAL_LevelNodeNames().find(hash);
+		if (n != CAL_LevelNodeNames().end())
+			return n->second;
+	}
+	string name = AOD_MeshName(hash);
+	return name.empty() ? AOD_NodeName(hash) : name;
+}
+
+
+static const char *CAL_KeyName (uint32_t type)					// Nome del tipo di chiave (TRACK_KEY_CODE)
+{
+	static const char *names[] = {"MAKE_INVISIBLE", "MAKE_VISIBLE", "FIRE_AUDIO_EVENT", "FIRE_ANIM_TRIGGER", "FIRE_MORPH_TRIGGER",
+								  "FIRE_FXEVENT_ON", "FIRE_FXEVENT_OFF", "FIRE_FXEVENT_ONESHOT"};
+	return type < 8 ? names[type] : "UNKNOWN";
+}
+
+
+/*------------------------------------------------------------------------------------------------------------------
+Eventi di un'animazione per il file MA (nodo <animazione>_EVENTS, vedi MA_Write_SkeletalAnimationFile): un attributo
+per tipo di chiave con un impulso a gradini (valore al frame della chiave, -1 altrimenti; con piu' chiavi dello stesso
+tipo nello stesso frame le successive vanno negli attributi <nome>2, <nome>3, ...):
+	audioEvent		FIRE_AUDIO_EVENT: ID dell'evento audio (i flag dei passi sono nel file _EVENTS.txt)
+	animTrigger		FIRE_ANIM_TRIGGER: hash dell'animazione sovrapposta (intero con segno)
+	morphTrigger	FIRE_MORPH_TRIGGER: hash della sequenza facciale (intero con segno)
+e un attributo fx<i> per ogni effetto (FXNODE i) con lo stato dato dalle chiavi FIRE_FXEVENT_*: 0 spento (iniziale),
+1 acceso (ON), 2 per un frame (ONESHOT, poi torna allo stato precedente).
+Le chiavi MAKE_VISIBLE / INVISIBLE sono gia' curve di visibilita' degli oggetti. Gli effetti agganciati (FXNODE) sono
+descritti nell'attributo di testo fxNodes (una riga per effetto), i nomi degli hash delle chiavi nell'attributo
+eventNames (una riga "frame TIPO nome" per chiave con nome noto). names: nome di ogni bone / nodo (indice FXNODE.bone),
+hash_names: nomi degli hash (vedi CAL_HashName).
+------------------------------------------------------------------------------------------------------------------*/
+static void CAL_AnimationEvents (const vector <uint8_t> &data, const CAL_ANIMATION &anim, const vector <string> &names, const map <uint32_t, string> &hash_names,
+								 SkeletalAnimation &out)
+{
+	string event_names;
+	const char *attr[5] = {nullptr, nullptr, "audioEvent", "animTrigger", "morphTrigger"};
+	vector <pair <string, map <unsigned int, double>>> pulses;			// Attributo -> (frame -> valore)
+	map <uint32_t, vector <pair <unsigned int, uint32_t>>> fx_keys;		// Effetto -> (frame, tipo) in ordine
+	for (uint32_t k = 0; k < anim.nKeys && k < 100000; k++)
+	{
+		CAL_TRACK_KEY key;
+		if (!CAL_Get(data, anim.KEYS_PTR + sizeof(CAL_TRACK_KEY) * (size_t)k, key))
+			break;
+		unsigned int frame = key.time & 0xFFFF;
+		string hash_name = CAL_HashName(key.type, key.data, hash_names);
+		if (!hash_name.empty())
+			event_names += to_string(frame) + " " + CAL_KeyName(key.type) + " " + hash_name + "\n";
+		if (key.type >= CAL_KEY_FIRE_FXEVENT_ON && key.type <= CAL_KEY_FIRE_FXEVENT_ONESHOT)
+		{
+			fx_keys[key.data].push_back(make_pair(frame, key.type));
+			continue;
+		}
+		if (key.type >= 5 || !attr[key.type])
+			continue;
+		for (unsigned int n = 1; ; n++)									// Primo attributo libero in questo frame
+		{
+			string name = string(attr[key.type]) + (n > 1 ? to_string(n) : string());
+			unsigned int p = 0;
+			while (p < pulses.size() && pulses[p].first != name)
+				p++;
+			if (p == pulses.size())
+				pulses.push_back(make_pair(name, map <unsigned int, double> ()));
+			if (!pulses[p].second.count(frame))
+			{
+				pulses[p].second[frame] = (double)(int32_t)key.data;
+				break;
+			}
+		}
+	}
+	for (const pair <string, map <unsigned int, double>> &p : pulses)
+	{
+		vector <pair <unsigned int, double>> keys;
+		if (p.second.begin()->first > 0)
+			keys.push_back(make_pair(0u, -1.0));
+		for (map <unsigned int, double>::const_iterator it = p.second.begin(); it != p.second.end(); ++it)
+		{
+			keys.push_back(make_pair(it->first, it->second));
+			map <unsigned int, double>::const_iterator next = it;
+			++next;
+			if (next == p.second.end() || next->first > it->first + 1)
+				keys.push_back(make_pair(it->first + 1, -1.0));			// Fine dell'impulso
+		}
+		out.events.push_back(make_pair(p.first, keys));
+	}
+	for (const pair <const uint32_t, vector <pair <unsigned int, uint32_t>>> &f : fx_keys)
+	{
+		map <unsigned int, double> state;								// Frame -> stato (l'ultima chiave del frame vince)
+		map <unsigned int, double> oneshot;								// Frame dei ONESHOT -> stato successivo
+		double current = 0.0;
+		for (const pair <unsigned int, uint32_t> &k : f.second)			// Le chiavi sono in ordine di frame
+		{
+			if (k.second == CAL_KEY_FIRE_FXEVENT_ONESHOT)
+				oneshot[k.first] = current;
+			else
+			{
+				current = k.second == CAL_KEY_FIRE_FXEVENT_ON ? 1.0 : 0.0;
+				state[k.first] = current;
+				oneshot.erase(k.first);
+			}
+		}
+		for (const pair <const unsigned int, double> &o : oneshot)
+		{
+			state[o.first] = 2.0;
+			if (!state.count(o.first + 1))
+				state[o.first + 1] = o.second;
+		}
+		vector <pair <unsigned int, double>> keys;
+		if (state.empty() || state.begin()->first > 0)
+			keys.push_back(make_pair(0u, 0.0));
+		keys.insert(keys.end(), state.begin(), state.end());
+		out.events.push_back(make_pair("fx" + to_string(f.first), keys));
+	}
+	string fx;
+	for (uint32_t f = 0; f < anim.nFXNodes && f < 1000; f++)
+	{
+		CAL_FXNODE node;
+		if (!CAL_Get(data, anim.FXNODES_PTR + sizeof(CAL_FXNODE) * (size_t)f, node))
+			break;
+		char buf[512];
+		string bone = node.bone < names.size() ? names[node.bone] : to_string(node.bone);
+		snprintf(buf, sizeof(buf), "%u %s bone=%s t=%g %g %g r=%g %g %g s=%g %g %g type=%u message=%u\n", f,
+				 string(node.name, strnlen(node.name, sizeof(node.name))).c_str(), bone.c_str(), node.translate[0], node.translate[1], node.translate[2],
+				 node.rotate[0] * 57.2957795, node.rotate[1] * 57.2957795, node.rotate[2] * 57.2957795, node.scale[0], node.scale[1], node.scale[2], node.type, node.Message);
+		fx += buf;
+	}
+	if (!fx.empty())
+		out.event_text.push_back(make_pair(string("fxNodes"), fx));
+	if (!event_names.empty())
+		out.event_text.push_back(make_pair(string("eventNames"), event_names));
+}
+
+
+/*------------------------------------------------------------------------------------------------------------------
+Scrive \NOMELIVELLO\Animations\<NOMECAL>\<NOMECAL>_EVENTS.txt: per ogni animazione gli effetti agganciati (CAL_FXNODE, tutti
+i campi) e tutte le chiavi (CAL_TRACK_KEY: frame, flag dei suoni, tipo, dato), con i valori esatti (float con 9 cifre
+significative, interi in esadecimale) per poterli riscrivere. names: nome di ogni bone / nodo (FXNODE.bone), se noto;
+hash_names: nomi degli hash delle chiavi (CAL_HashName), scritti dopo il dato.
+Formato (una voce per riga):
+	ANIM <indice> NOME(0xanimID) frames=N fxnodes=N keys=N
+	  FXNODE <i> name=<nome> bone=<nome>(<indice>) mirrorTrack=<n> t=x y z r=x y z (radianti) s=x y z flags=0x.. argb=0x..
+	         type=<n> speed= emit= random= u=u0 u1 u2 u3 message=<n>
+	  KEY frame=<n> flags=0x.. type=<NOME>(<n>) data=0x........ [nome dell'hash, se noto]
+Al termine la cartella corrente torna \NOMELIVELLO.
+------------------------------------------------------------------------------------------------------------------*/
+static void CAL_ExportEvents (const vector <uint8_t> &data, const vector <CAL_ANIMATION> &anims, string calname, const vector <string> &names,
+							  const map <uint32_t, string> &hash_names)
+{
+	auto Hex = [](uint32_t v) { char b[16]; snprintf(b, sizeof(b), "0x%08X", v); return string(b); };
+	stringstream out;
+	out << setprecision(9);
+	out << "# TRAODLE - eventi delle animazioni di " << calname << ".CAL (effetti agganciati CAL_FXNODE e chiavi CAL_TRACK_KEY)\n";
+	out << "# KEY: frame, flags = 16 bit alti del tempo (suoni: 0x100 passo, 0x200 sinistro/destro, 0x400 punta/tallone,\n";
+	out << "#      0x4000 non avviato, 0x8000 aggiornato ad ogni frame), tipo, dato\n";
+	unsigned int nKeys = 0, nFx = 0;
+	for (unsigned int a = 0; a < anims.size(); a++)
+	{
+		const CAL_ANIMATION &anim = anims[a];
+		out << "\nANIM " << a << " " << string(anim.name, strnlen(anim.name, sizeof(anim.name))) << "(" << Hex(anim.animID) << ") frames=" << anim.nFrames
+			<< " fxnodes=" << anim.nFXNodes << " keys=" << anim.nKeys << "\n";
+		for (uint32_t f = 0; f < anim.nFXNodes && f < 1000; f++)
+		{
+			CAL_FXNODE node;
+			if (!CAL_Get(data, anim.FXNODES_PTR + sizeof(CAL_FXNODE) * (size_t)f, node))
+				break;
+			out << "  FXNODE " << f << " name=" << string(node.name, strnlen(node.name, sizeof(node.name))) << " bone="
+				<< (node.bone < names.size() ? names[node.bone] : string("?")) << "(" << node.bone << ") mirrorTrack=" << node.mirrorTrack
+				<< " t=" << node.translate[0] << " " << node.translate[1] << " " << node.translate[2]
+				<< " r=" << node.rotate[0] << " " << node.rotate[1] << " " << node.rotate[2]
+				<< " s=" << node.scale[0] << " " << node.scale[1] << " " << node.scale[2]
+				<< " flags=" << Hex(node.flags) << " argb=" << Hex(node.argb) << " type=" << node.type << " speed=" << node.speed << " emit=" << node.emit
+				<< " random=" << node.random << " u=" << node.u0 << " " << node.u1 << " " << node.u2 << " " << node.u3 << " message=" << node.Message << "\n";
+			nFx++;
+		}
+		for (uint32_t k = 0; k < anim.nKeys && k < 100000; k++)
+		{
+			CAL_TRACK_KEY key;
+			if (!CAL_Get(data, anim.KEYS_PTR + sizeof(CAL_TRACK_KEY) * (size_t)k, key))
+				break;
+			out << "  KEY frame=" << (key.time & 0xFFFF) << " flags=0x" << hex << uppercase << (key.time >> 16) << dec << nouppercase
+				<< " type=" << CAL_KeyName(key.type) << "(" << key.type << ") data=" << Hex(key.data);
+			string hash_name = CAL_HashName(key.type, key.data, hash_names);
+			if (!hash_name.empty())
+				out << " " << hash_name;
+			out << "\n";
+			nKeys++;
+		}
+	}
+	string folder = AOD_IO.folder_animations + calname;
+	CreateDirectoryA(AOD_IO.folder_animations.c_str(), NULL);
+	CreateDirectoryA(folder.c_str(), NULL);
+	string path = folder + "\\" + calname + "_EVENTS.txt";
+	ofstream file(path, ios::binary);
+	file << out.str();
+	SetCurrentDirectory(AOD_IO.folder_level_lpwstr);
+	msg(msg::TGT::FILE, msg::TYP::LOG) << "Events: " << nFx << " FX nodes, " << nKeys << " keys in " << path;
+}
+
+
 static bool CAL_ExportObject (const vector <uint8_t> &data, const vector <CAL_ANIMATION> &anims, string calname, const CHR_NodeObject &object)
 {
+	vector <string> node_names;									// Nomi dei nodi (indici FXNODE.bone)
+	map <uint32_t, string> hash_names;							// Nomi degli hash delle chiavi: nodi (nome e mesh)
+	for (const CHR_Node &n : object.nodes)
+	{
+		node_names.push_back(n.group);
+		hash_names.insert(make_pair((uint32_t)GetHashValue(n.name.c_str()), n.name));
+		hash_names.insert(make_pair(n.mesh_hash, n.name));
+	}
+	CAL_ExportEvents(data, anims, calname, node_names, hash_names);
 	msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Animated object: " << object.name << ".CHR, animations: " << anims.size();
 	FBX_EXPORT FBX;												// Modello + tutte le animazioni come takes
 	MA_EXPORT MA;
@@ -607,6 +922,7 @@ static bool CAL_ExportObject (const vector <uint8_t> &data, const vector <CAL_AN
 				msg(msg::TGT::FILE_CONS, msg::TYP::WARN) << name << ": " << anim.nFrames << " frames, " << prop->second.frames.size() << " positions in " << prop->second.xxxfile << ".";
 			msg(msg::TGT::FILE, msg::TYP::LOG) << name << ": object position from " << prop->second.xxxfile << " (" << prop->second.object << ", " << prop->second.node << ")";
 		}
+		CAL_AnimationEvents(data, anim, node_names, hash_names, skanim);
 		MA_Write_SkeletalAnimationFile(skanim, "../../Characters/" + object.name + ".MA");	// Stesso nome scritto da MA_Export
 		FBX.SkeletalAnimation.push_back(move(skanim));
 		exported++;
@@ -841,6 +1157,7 @@ bool Export_CAL (string filename)
 	if (!found)
 	{
 		msg(msg::TGT::FILE_CONS, msg::TYP::WARN) << "No character or animated object (CHR) with " << nBoneTracks << " animated bones / nodes found for " << filename << ". Animations not exported.";
+		CAL_ExportEvents(data, anims, calname, vector <string> (), map <uint32_t, string> ());	// Gli eventi vengono comunque scritti
 		return true;
 	}
 	msg(msg::TGT::FILE_CONS, msg::TYP::LOG) << "Character: " << character.name << ".CHR, animations: " << header.nAnims;
@@ -869,6 +1186,15 @@ bool Export_CAL (string filename)
 			facial_base = CAL_ReadFacial(character, "");
 			break;
 		}
+	map <uint32_t, string> hash_names;							// Nomi degli hash delle chiavi: oggetti agganciati, mesh, sequenze
+	for (const CHR_Attachment &a : character.skeleton.attachments)
+		hash_names.insert(make_pair(a.hash, a.name));
+	for (const pair <const uint32_t, vector <string>> &m : character.mesh_names)
+		if (!m.second.empty())
+			hash_names.insert(make_pair(m.first, m.second[0]));
+	for (const BlendShapeAnimation &b : facial_base.anims)
+		hash_names.insert(make_pair(b.id, b.name));
+	CAL_ExportEvents(data, anims, calname, character.skeleton.joint_name, hash_names);	// Eventi delle animazioni (file di testo)
 
 	// Cartella \NOMELIVELLO\Animations\NOMECAL
 	string folder = AOD_IO.folder_animations + calname;
@@ -962,6 +1288,7 @@ bool Export_CAL (string filename)
 			}
 		for (vector <float> &w : face.weight)
 			w.resize(face.nFrames, w.empty() ? 0 : w.back());
+		CAL_AnimationEvents(data, anim, character.skeleton.joint_name, hash_names, skanim);	// Suoni, animazioni sovrapposte, effetti
 		MA_Write_SkeletalAnimationFile(skanim, "../../Characters/" + character.name + ".MA", face.meshes.empty() ? nullptr : &face, face_targets);	// Stesso nome scritto da MA_Export
 		FBX.SkeletalAnimation.push_back(move(skanim));
 		exported++;

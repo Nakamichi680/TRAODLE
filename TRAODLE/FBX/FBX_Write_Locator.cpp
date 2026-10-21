@@ -6,6 +6,7 @@ OUTPUT: FBX_EXPORT &FBX
 
 #include "stdafx.h"
 #include "FBX/FBX_Classes.h"
+#include "FBX/FBX_Functions.h"
 
 
 void FBX_Write_Locator (Locator input, FBX_EXPORT &FBX)
@@ -29,6 +30,7 @@ void FBX_Write_Locator (Locator input, FBX_EXPORT &FBX)
 		out << "			P: \"Lcl Rotation\", \"Lcl Rotation\", \"\", \"A\"," << input.rX << "," << input.rY << "," << input.rZ << "\n";
 	if (input.scale_flag)
 		out << "			P: \"Lcl Scaling\", \"Lcl Scaling\", \"\", \"A\"," << input.sX << "," << input.sY << "," << input.sZ << "\n";
+	FBX_Write_Attributes(out, input.int_attributes, input.float_attributes, input.string_attributes);	// Proprieta' utente
 	out << "		}\n";
 	out << "		Shading: Y\n";
 	out << "		Culling: \"CullingOff\"\n";

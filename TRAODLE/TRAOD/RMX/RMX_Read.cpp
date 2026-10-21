@@ -267,6 +267,38 @@ bool RMX_Read (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 			FBX_MA_room_group.int_attributes.push_back(make_pair(string("isFlipRoom"), 1));
 		if (rmx_room.Indoor)
 			FBX_MA_room_group.int_attributes.push_back(make_pair(string("indoor"), 1));
+		FBX_MA_room_group.int_attributes.push_back(make_pair(string("reverb"), (int)rmx_room.ReverbID));		// Preset di riverbero
+		FBX_MA_room_group.string_attributes.push_back(make_pair(string("reverbPreset"), Reverb_preset(rmx_room.ReverbID)));
+		if (rmx_room.Collision_set != 0)												// Set di collisioni (CollisionFlipIndex)
+			FBX_MA_room_group.int_attributes.push_back(make_pair(string("collisionSet"), (int)rmx_room.Collision_set));
+		if (rmx_room.Offset33 != 0)														// Maschera di visibilita' dei Fakes: termina al primo
+		{																				// dato successivo della stanza (portali, zone, nodi)
+			uint32_t end = 0;
+			const uint32_t next[] = {rmx_room.P15_Portal_First, rmx_room.Offset28, rmx_room.NL_OBJ_First, rmx_room.NL_LIGHT_First, rmx_room.NL_CHARLOC_First,
+				rmx_room.NL_TRIGGER_First, rmx_room.NL_WAYPOINT_First, rmx_room.NL_WATER_First, rmx_room.NL_EMITTER_First,
+				rmx_room.P11_PS2_Room_Obj_First, rmx_room.P12_Audio_Locator_First};
+			for (uint32_t n : next)
+				if (n >= rmx_room.Offset33 && (end == 0 || n < end))		// Uguale: maschera vuota (es. PRAGUE4A)
+					end = n;
+			unsigned int nWords = end ? min((end - rmx_room.Offset33) / 4, 256u) : 0;
+			if (nWords)
+			{
+				vector <uint32_t> fake_mask(nWords, 0);
+				rmxfile.seekg(rmx_offsets.Offset + rmx_room.Offset33, ios_base::beg);
+				rmxfile.read(reinterpret_cast<char*>(fake_mask.data()), nWords * sizeof(uint32_t));
+				while (!fake_mask.empty() && fake_mask.back() == 0)						// Zeri di allineamento a 16 bytes
+					fake_mask.pop_back();
+				string text;															// Parole di 32 bit in esadecimale: bit i della parola
+				for (uint32_t w : fake_mask)											// i / 32 = Fake con indice i
+				{
+					char buf[16];
+					snprintf(buf, sizeof(buf), "%s%08X", text.empty() ? "" : " ", w);
+					text += buf;
+				}
+				if (!text.empty())														// Livelli senza Fakes: solo zeri
+					FBX_MA_room_group.string_attributes.push_back(make_pair(string("fakeVisibility"), text));
+			}
+		}
 		FBX.Group.push_back(FBX_MA_room_group);			// Inserimento gruppo stanza nel vettore dei gruppi del file FBX
 		MA.Transform.push_back(FBX_MA_room_group);		// Inserimento gruppo stanza nel vettore dei gruppi del file MA
 		if (Export_Bounding_Box)

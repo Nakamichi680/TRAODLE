@@ -1,5 +1,29 @@
 #include "stdafx.h"
 #include "MA/MA_Classes.h"
+#include "MA/MA_Functions.h"
+
+
+/*------------------------------------------------------------------------------------------------------------------
+Attributi personalizzati (Extra Attributes) del nodo corrente: interi e numerici bloccati, testo modificabile.
+------------------------------------------------------------------------------------------------------------------*/
+void MA_Write_Attributes (stringstream &out, const vector <pair <string, int>> &ints, const vector <pair <string, float>> &floats, const vector <pair <string, string>> &strings)
+{
+	for (const pair <string, int> &a : ints)
+	{
+		out << "	addAttr -ci true -sn \"" << a.first << "\" -ln \"" << a.first << "\" -at \"long\";\n";
+		out << "	setAttr -l on \"." << a.first << "\" " << a.second << ";\n";
+	}
+	for (const pair <string, float> &a : floats)
+	{
+		out << "	addAttr -ci true -sn \"" << a.first << "\" -ln \"" << a.first << "\" -at \"double\";\n";
+		out << "	setAttr -l on \"." << a.first << "\" " << a.second << ";\n";
+	}
+	for (const pair <string, string> &a : strings)
+	{
+		out << "	addAttr -ci true -sn \"" << a.first << "\" -ln \"" << a.first << "\" -dt \"string\";\n";
+		out << "	setAttr \"." << a.first << "\" -type \"string\" \"" << a.second << "\";\n";
+	}
+}
 
 
 void MA_Write_Transform (unsigned int t, MA_EXPORT &MA)
@@ -24,21 +48,7 @@ void MA_Write_Transform (unsigned int t, MA_EXPORT &MA)
 			if (p.second->x != 0 || p.second->y != 0 || p.second->z != 0)
 				out << "	setAttr \"." << p.first << "\" -type \"double3\" " << p.second->x << " " << p.second->y << " " << p.second->z << ";\n";
 	}
-	for (const pair <string, int> &a : MA.Transform[t].int_attributes)			// Attributi personalizzati (Extra Attributes)
-	{
-		out << "	addAttr -ci true -sn \"" << a.first << "\" -ln \"" << a.first << "\" -at \"long\";\n";
-		out << "	setAttr -l on \"." << a.first << "\" " << a.second << ";\n";
-	}
-	for (const pair <string, float> &a : MA.Transform[t].float_attributes)
-	{
-		out << "	addAttr -ci true -sn \"" << a.first << "\" -ln \"" << a.first << "\" -at \"double\";\n";
-		out << "	setAttr -l on \"." << a.first << "\" " << a.second << ";\n";
-	}
-	for (const pair <string, string> &a : MA.Transform[t].string_attributes)
-	{
-		out << "	addAttr -ci true -sn \"" << a.first << "\" -ln \"" << a.first << "\" -dt \"string\";\n";
-		out << "	setAttr \"." << a.first << "\" -type \"string\" \"" << a.second << "\";\n";
-	}
+	MA_Write_Attributes(out, MA.Transform[t].int_attributes, MA.Transform[t].float_attributes, MA.Transform[t].string_attributes);	// Extra Attributes
 	MA.MA_Nodes << out.str();
 
 	out.str("");

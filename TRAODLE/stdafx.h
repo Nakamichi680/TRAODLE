@@ -11,7 +11,8 @@ extern int MaxThreadLimit;
 extern AOD_IO_CLASS AOD_IO;
 extern AODRemastered_IO_CLASS AODRemastered_IO;
 extern AE_IO_CLASS AE_IO;
-extern int TargetRenderer;			//		1 = Maya Hardware 2.0		2 = Arnold
+extern int TargetRenderer;
+extern const bool DISABLE_FBX_EXPORT;	// Switch di debug in TRAODLE.cpp: true = nessun file FBX			//		1 = Maya Hardware 2.0		2 = Arnold
 
 using namespace std;
 #define NOMINMAX

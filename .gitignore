@@ -261,3 +261,19 @@ __pycache__/
 *.pyc
 # Materiale di riferimento (sorgenti e tool originali, animazioni Maya): non fa parte del progetto
 TRAODLE/TRAOD/CHR/Reference_TRAODAE/
+# Materiale solo locale (non necessario alla compilazione, non pubblicato): eseguibili del gioco PC, sorgenti e
+# programmi originali copiati da Reference_TRAODAE, script di analisi, generatori dei documenti in Docs
+TRAODLE/TRAOD/Reference/PC/
+TRAODLE/TRAOD/Reference/Tools/AWDMasher/
+TRAODLE/TRAOD/Reference/Tools/Libs/ExportPC/
+TRAODLE/TRAOD/Reference/Tools/Libs/SmallC/
+TRAODLE/TRAOD/Reference/Tools/worldedit/Bin/
+TRAODLE/TRAOD/Reference/Tools/worldedit/Docs/
+TRAODLE/TRAOD/Reference/Tools/Exporter/*
+!TRAODLE/TRAOD/Reference/Tools/Exporter/Export_Animation.cpp
+!TRAODLE/TRAOD/Reference/Tools/Exporter/map_msg.h
+TRAODLE/TRAOD/Reference/Tools/ScriptProducer/*
+!TRAODLE/TRAOD/Reference/Tools/ScriptProducer/ScriptProducerDlg.cpp
+!TRAODLE/TRAOD/Reference/Tools/ScriptProducer/ScriptProducerDlg.h
+Tools/Analysis/
+Docs/src/

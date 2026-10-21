@@ -18,6 +18,7 @@ void MA_Write_Locator (unsigned int l, MA_EXPORT &MA);
 void MA_Write_DefaultNodes (MA_EXPORT &MA);
 
 void MA_Write_Transform (unsigned int t, MA_EXPORT &MA);
+void MA_Write_Attributes (stringstream &out, const vector <pair <string, int>> &ints, const vector <pair <string, float>> &floats, const vector <pair <string, string>> &strings);
 
 void MA_Write_Mesh (const Mesh& mesh, MA_EXPORT &MA);
 

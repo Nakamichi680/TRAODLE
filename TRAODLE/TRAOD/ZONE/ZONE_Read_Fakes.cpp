@@ -40,6 +40,8 @@ bool ZONE_Read_Fakes (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 		zonefile.seekg(fake);
 		zonefile.read(reinterpret_cast<char*>(&element.BegPrev), sizeof(element.BegPrev));
 		zonefile.read(reinterpret_cast<char*>(&element.BegNext), sizeof(element.BegNext));
+		zonefile.seekg(fake + 24);
+		zonefile.read(reinterpret_cast<char*>(&element.Unknown1), sizeof(element.Unknown1));
 		zonefile.seekg(fake + 32);
 		zonefile.read(reinterpret_cast<char*>(&element.Xpos), sizeof(element.Xpos));
 		zonefile.read(reinterpret_cast<char*>(&element.Ypos), sizeof(element.Ypos));
@@ -74,6 +76,8 @@ bool ZONE_Read_Fakes (string filename, FBX_EXPORT &FBX, MA_EXPORT &MA)
 			root.tX = element.Xpos;		root.tY = element.Ypos;		root.tZ = element.Zpos;
 			root.sX = element.Xscal;	root.sY = element.Yscal;	root.sZ = element.Zscal;
 			root.int_attributes.push_back(make_pair(string("objectSlot"), (int)element.Fake_List_Index));
+			root.int_attributes.push_back(make_pair(string("fakeIndex"), (int)element.Unknown1));	// UserPad: bit della maschera fakeVisibility
+			root.int_attributes.push_back(make_pair(string("followCamera"), element.Static_FollowCam & 8 ? 1 : 0));
 			object.groups.push_back(root);
 			ok &= ZONE_ExportSlot(zonefile, data, element.Fake_List_Index, root.name, layer.name, object);
 			object.PushTo(FBX, MA);
